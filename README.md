@@ -1,6 +1,6 @@
-# Boticot
-Bot interface and conversational toolkit
+<img alt="Boticot" src="https://github.com/Boticot/boticot/blob/master/admin/src/assets/boticot.png"><br>
 
+# Bot Interface and Conversational Toolkit
 
 ## Boticot API QuickStart
 
