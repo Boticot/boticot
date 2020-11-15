@@ -1,0 +1,82 @@
+#app {
+    font-family: "Avenir", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+}
+
+#nav {
+    padding: 30px;
+}
+
+#nav a {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+#nav a.router-link-exact-active {
+    color: #42b983;
+}
+
+.header-banner {
+    background: #e9eaed;
+    color: white;
+}
+.grid-content {
+    border-radius: 4px;
+    min-height: 36px;
+}  
+
+.displayNone {
+    display: none;
+}
+
+.marginTopSmall {
+    margin-top: 15px;
+}
+  
+.marginTopMedium {
+    margin-top: 25px;
+}
+
+.marginBottomMedium {
+    margin-bottom: 25px;
+}
+
+.marginRightSmall {
+    margin-right: 10px;
+}
+
+.marginLeftMedium {
+    margin-left: 30px;
+}
+
+.marginRightMedium {
+    margin-right: 30px;
+}
+
+.textAlignRight {
+    text-align: right;
+}
+
+.textAlignLeft {
+    text-align: left;
+}
+
+.textAlignCenter {
+    text-align: center;
+}
+
+.halfSize {
+    width: 50%; 
+    margin: auto;
+}
+
+.errorMsg {
+    color: red;
+}
+
+.successMsg {
+    color: green;
+}

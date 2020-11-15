@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  boticot-api:
+      container_name: boticot-api
+      image: "boticot/api:0.1.0-SNAPSHOT"
+      restart: "always"
+      build:
+        context: .

@@ -1,0 +1,74 @@
+version: '3'
+
+services:
+
+    mongo:
+        container_name: mongo
+        image: mongo:3.6.3
+        restart: "always"
+        ports:
+          - 27017:27017
+        environment:
+          MONGO_INITDB_ROOT_USERNAME: boticot
+          MONGO_INITDB_ROOT_PASSWORD: botw0rd
+        volumes:
+          - /home/omar/dev/mongodb/boticot/data:/data/db
+
+    mongo-express:
+        image: mongo-express
+        restart: "always"
+        ports:
+            - 8081:8081
+        environment:
+            ME_CONFIG_MONGODB_ADMINUSERNAME: boticot
+            ME_CONFIG_MONGODB_ADMINPASSWORD: botw0rd
+
+    boticot-api:
+        container_name: boticot-api
+        image: "boticot/api:0.1.0-SNAPSHOT"
+        restart: "always"
+        environment:
+            - "SERVER_HOST=0.0.0.0"
+            - "MONGO_CONNECTION_STRING=mongodb://boticot:botw0rd@mongo:27017/boticotdb?authSource=admin"
+            - "MODELS_PATH=./models/"
+            - "SERVER_PORT=8010"
+            - "MODEL_LOADER=mongodb"
+            - "ACTIVATE_LOADER_CRON=1"
+            - "LOADER_CRON_SCHEDULE=1"
+            - "MAX_PAGE_SIZE=200"
+            - "TF_XLA_FLAGS=--tf_xla_cpu_global_jit"
+            - "JWT_SECRET_KEY=7165e13fac4bcc29789f43e410c00f4ccd1f74a0"
+            - "JWT_ACCESS_TOKEN_EXPIRES=120"
+            - "ADMIN_LOGIN=admin@boticot.ai"
+            - "ADMIN_PWD=B0ti0t!"
+        ports:
+            - "8010:8010"
+
+    boticot-trainer:
+        container_name: boticot-trainer
+        image: "boticot/trainer:0.1.0-SNAPSHOT"
+        restart: "always"
+        environment:
+            - "SERVER_HOST=0.0.0.0"
+            - "SERVER_PORT=8011"
+            - "MONGO_CONNECTION_STRING=mongodb://boticot:botw0rd@mongo:27017/boticotdb?authSource=admin"
+            - "MODEL_RECORDER=mongodb"
+            - "MODEL_PERSIST_NUMBER=5"
+            - "TRAINING_CRON_SCHEDULE=1"
+            - "MODELS_PATH=./models/"
+            - "NLU_CONFIG_PATH=./models/nlu-config/"
+            - "TF_XLA_FLAGS=--tf_xla_cpu_global_jit"
+        ports:
+            - "8011:8011"
+
+    boticot-admin:
+        container_name: boticot-admin
+        image: "boticot/admin:0.1.0-SNAPSHOT"
+        restart: "always"
+        environment:
+            - "HOST=0.0.0.0"
+            - "VUE_APP_NLP_SERVICE_URL=http://boticot-api:8010"
+            - "VUE_APP_NLP_PATH=/nlu/agents"
+            - "VUE_APP_NLP_ENTRIES_PAGE_SIZE=10"
+        ports:
+            - "8012:8080"

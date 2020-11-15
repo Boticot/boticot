@@ -1,0 +1,33 @@
+
+export const colorsArray = [
+  'powderblue',
+  'palegreen',
+  'orange',
+  'yellow',
+  'peachpuff',
+  'gainsboro',
+  'cyan',
+  'tomato',
+  'greenyellow',
+  'fuchsia',
+  'darkgoldenrod',
+  'silver',
+  'red',
+  'cornflowerblue',
+  'tan',
+  'lemonchiffon',
+  'gold',
+  'chocolate',
+  'indianred',
+  'hotpink',
+  'deeppink',
+  'lime',
+  'darkkhaki',
+  'moccasin',
+  'lightsalmon',
+  'forestgreen',
+  'deepskyblue',
+  'tan',
+];
+
+export const newColorsArray = (): Array<string> => Object.assign([], colorsArray);
