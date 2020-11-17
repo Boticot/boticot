@@ -19,7 +19,7 @@ services:
             - "JWT_SECRET_KEY=7165e13fac4bcc29789f43e410c00f4ccd1f74a0"
             - "JWT_ACCESS_TOKEN_EXPIRES=120"
             - "ADMIN_LOGIN=admin@boticot.ai"
-            - "ADMIN_PWD=B0ti0t!"
+            - "ADMIN_PWD=B0tic0t!"
         ports:
             - "8010:8010"
 
@@ -46,8 +46,8 @@ services:
         restart: "always"
         environment:
             - "HOST=0.0.0.0"
-            - "VUE_APP_NLP_SERVICE_URL=http://boticot-api:8010"
-            - "VUE_APP_NLP_PATH=/nlu/agents"
-            - "VUE_APP_NLP_ENTRIES_PAGE_SIZE=10"
+            - "VUE_APP_NLU_SERVICE_URL=http://boticot-api:8010"
+            - "VUE_APP_NLU_PATH=/nlu/agents"
+            - "VUE_APP_NLU_ENTRIES_PAGE_SIZE=10"
         ports:
             - "8012:8080"
