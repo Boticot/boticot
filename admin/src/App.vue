@@ -98,15 +98,13 @@ export default Vue.extend({
             }
           }
         })
-        .catch((e) => {
-          console.log(`Error When Retrieving Agents: ${e}`);
+        .catch(() => {
           this.choices = ['ERROR...'];
         });
     }
   },
 });
 </script>
-
 
 <style>
   @import 'assets/css/global.css';

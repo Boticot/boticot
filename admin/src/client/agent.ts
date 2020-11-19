@@ -89,7 +89,6 @@ const parseText = async (agentName: string, text: string): Promise<any> => {
   return response;
 };
 
-
 export {
   getAgents, addAgent, getInputs, parseText, getAgent, deleteAgent,
 };

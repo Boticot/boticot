@@ -1,4 +1,3 @@
-
 export const colorsArray = [
   'powderblue',
   'palegreen',

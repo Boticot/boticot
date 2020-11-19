@@ -1,4 +1,3 @@
-
 import { newColorsArray } from '@/utils';
 import { GlobalEntity } from '@/types';
 

@@ -20,6 +20,7 @@ module.exports = {
     'no-param-reassign': 0,
     'import/prefer-default-export': "off",
     'no-explicit-any': 0,
+    'linebreak-style': "off",
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/no-explicit-any': 'off',

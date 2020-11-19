@@ -1,4 +1,3 @@
-
 import { getAgents, addAgent } from '@/client/agent';
 import { deleteTrainingData, updateTrainingData, addTrainingData } from '@/client/trainingData';
 import { EntryType, NluData } from '@/types';
