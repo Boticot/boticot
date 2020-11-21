@@ -3,7 +3,7 @@ version: '3'
 services:
   boticot-trainer:
     container_name: boticot-trainer
-    image: "boticot/trainer:0.1.0-SNAPSHOT"
+    image: "boticot/trainer:0.1.0"
     restart: "always"
     build:
       context: .
