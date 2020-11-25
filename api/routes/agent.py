@@ -10,10 +10,8 @@ from flask import current_app, send_from_directory
 
 @current_app.route("/nlu/agents", methods=["GET"])
 def get_all_agents():
-    bots = []
-    for bot in (AgentsService.get_instance().get_bots()):
-        bots.append(AgentsService.get_instance().get_agent(bot))
-    return jsonify(bots)
+    agents = AgentsService.get_instance().get_agents()
+    return jsonify(agents)
 
 @current_app.route("/nlu/agents/<agent_name>", methods=["GET"])
 def get_agent(agent_name):
