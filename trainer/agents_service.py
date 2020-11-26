@@ -57,8 +57,8 @@ class AgentsService(object):
             tmp_data.append(entry["synonyms"])
         return tmp_data
     
-    def get_all_modified_agents(self):
-        return list(self.agents_repository.get_all_modified_agents())
+    def get_all_agents(self):
+        return list(self.agents_repository.get_all_agents())
 
     def _has_at_list_two_intents(self, training) -> bool:
         first_intent = training[0]["intent"]

@@ -10,15 +10,18 @@ logger = logging.getLogger(__name__)
 class TrainingCron:
 
     def __enter__(self):
-        allModifiedAgents = AgentsService.get_instance().get_all_modified_agents()
-        logger.info("Agents found for training: {0}".format(allModifiedAgents))
-        for agent in allModifiedAgents:
+        all_agents = AgentsService.get_instance().get_all_agents()
+        trained_agents = []
+        for agent in all_agents:
             try :
-                bot = agent.get("name")
-                logger.info("Start train Agent: {0}".format(bot))
-                AgentsService.get_instance().train_agent(bot)
+                if (agent.get("lastModified") > agent.get("lastTrain")):
+                    bot = agent.get("name")
+                    logger.info("Start training Agent: {0}".format(bot))
+                    AgentsService.get_instance().train_agent(bot)
+                    trained_agents.append(bot)
             except Exception as e:
                 logger.error("Exception when training agent {0}. {1}".format(bot, e), exc_info=True)
+        logger.info("Trained Agents: {0}".format(trained_agents))
 
 
     def __exit__(self, type, value, traceback):
