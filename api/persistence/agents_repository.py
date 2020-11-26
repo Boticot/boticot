@@ -38,17 +38,6 @@ class AgentsRepository():
     def get_fallback(self, agent_name):
         return(self.agents_collection.find_one({"name" : agent_name}, {"_id": 0, "fallback": 1}))
 
-    def get_all_trained_agents(self):
-        return self.agents_collection.find(
-            {
-            "$and" : [
-                {"$expr":{"$gt":["$lastTrain", "$lastModified"]}}, 
-                {"$expr":{"$not":{"$eq":["$lastVersion", "$currentVersion"] }}} 
-                ]
-            },
-            {"_id": 0, "name": 1, "lastVersion": 1} 
-        )
-
     def update_agent_intents(self, agent_name, intents):
         """Add/update agent intents"""
         return self.agents_collection.update_one(
