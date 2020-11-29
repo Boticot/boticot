@@ -87,7 +87,7 @@ class AgentsService(object):
                 train_data["rasa_nlu_data"]["entity_synonyms"] = self._get_agent_synonyms(agent_name)
                 config = self.agents_repository.get_agent_config(agent_name).get("config")
                 training_data_file = os.environ.get("MODELS_PATH") + agent_name + ".json"
-                config_file = os.environ.get("NLU_CONFIG_PATH") +  agent_name + ".json"
+                config_file = os.environ.get("MODELS_PATH") +  agent_name + "_config.json"                
                 create_file(training_data_file, json.dumps(train_data))
                 create_file(config_file, json.dumps(config))
                 agent = Agent(agentName = agent_name ,  botconfig = config_file ,data = training_data_file)
