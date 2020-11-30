@@ -102,6 +102,13 @@ class AgentsService(object):
         """Get Bots loaded in memory""" 
         return self.bots
 
+    def get_agents(self):
+        db_agents = self.agents_repository.get_all_agents()
+        agents = []
+        for entry in db_agents:
+            agents.append(json.loads(MongoJSONEncoder().encode(entry)))
+        return agents
+
     def get_training_data(self, agent_name, intent=None, pageNumber=30, pageSize=30):
         db_training_data = self.training_data_repository.get_agent_training_data(agent_name, intent, pageNumber, pageSize)
         trainingData = []
