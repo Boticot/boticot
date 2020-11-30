@@ -371,7 +371,15 @@ class AgentsService(object):
         return(self.training_data_repository.get_intent_by_text(text, agent_name))
 
     def get_trained_agents(self):
-        return self.agents_repository.get_all_trained_agents()
+        trained_agents = []
+        agents = self.agents_repository.get_all_agents()
+        for agent in agents:
+            if (agent.get("lastTrain") > agent.get("lastModified")) and (agent.get("lastVersion") != agent.get("currentVersion")):
+                trained_agents.append({
+                    "name": agent.get("name"),
+                    "lastVersion": agent.get("lastVersion")
+                })
+        return trained_agents
 
     def get_models(self, agent_name):
         return self.agents_repository.get_versions(agent_name).get("versions")
