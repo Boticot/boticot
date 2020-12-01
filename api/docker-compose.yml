@@ -3,7 +3,7 @@ version: '3'
 services:
   boticot-api:
       container_name: boticot-api
-      image: "boticot/api:0.2.0-alpha"
+      image: "boticot/api:0.2.0"
       restart: "always"
       build:
         context: .
