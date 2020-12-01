@@ -229,20 +229,21 @@ class AgentsService(object):
         while True:
             try:
                 self.training_data_repository.delete_all_training_data(agent_name)
-                self.agents_repository.delete_agent(agent_name)
                 self.lookups_repository.delete_lookups(agent_name)
                 self.synonyms_repository.delete_synonyms(agent_name)
                 self.responses_repository.delete_responses(agent_name)
+                self.contexts_repository.delete_contexts(agent_name)
+                self.agents_repository.delete_agent(agent_name)
                 return True
             except Exception as e:
                 if e.__class__.__name__ == "OperationFailure":
                     counter = counter + 1
-                    logger.debug("Retry number {0} to remove agent {1} due to operation exception".format(counter, name))
+                    logger.debug("Retry number {0} to remove agent {1} due to operation exception".format(counter, agent_name))
                     if counter == maxTries:
                         logger.error("Exception Max retries reached when deleting agent from database. {0}".format(e))
                         return False 
                 else:
-                    logger.error("Exception when deleting agent {0} from database. {1}".format(name, e))
+                    logger.error("Exception when deleting agent {0} from database. {1}".format(agent_name, e))
                     return False
     
     def delete_agent_from_memory(self, agent_name):
