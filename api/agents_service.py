@@ -232,7 +232,6 @@ class AgentsService(object):
                 self.lookups_repository.delete_lookups(agent_name)
                 self.synonyms_repository.delete_synonyms(agent_name)
                 self.responses_repository.delete_responses(agent_name)
-                self.contexts_repository.delete_contexts(agent_name)
                 self.agents_repository.delete_agent(agent_name)
                 return True
             except Exception as e:
