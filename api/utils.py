@@ -17,7 +17,7 @@ def response_template(code, message):
     response.status_code = code
     return response
 
-def createFolder(directory):
+def create_folder(directory):
     try:
         if not os.path.exists(directory):
             os.makedirs(directory, mode=0o777)

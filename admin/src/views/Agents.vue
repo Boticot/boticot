@@ -69,9 +69,20 @@
         <el-table-column prop="name" label="Name" width="150"></el-table-column>
         <el-table-column prop="currentVersion" label="Current Version" width="150"></el-table-column>
         <el-table-column prop="lastVersion" label="Last Version" width="150"></el-table-column>
-        <el-table-column prop="lastTrain" label="Last Train" width="150"></el-table-column>
-        <el-table-column prop="lastModified" label="Last Modified" width="150"></el-table-column>
-        <el-table-column fixed="right" width="100">
+        <el-table-column prop="lastTrain" label="Last Train" width="110"></el-table-column>
+        <el-table-column prop="lastModified" label="Last Modified" width="120"></el-table-column>
+        <el-table-column fixed="right" width="90">
+          <template slot-scope="scope">
+            <el-button
+            type="primary"
+            @click="downloadAgentFile(scope.row.name)"
+            icon="el-icon-download"
+            :style="{ marginLeft: '15px' }"
+            plain
+          ></el-button>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" width="90">
           <template slot-scope="scope">
             <el-button
             type="danger"
@@ -90,7 +101,7 @@
 <script lang='ts'>
 import Vue from 'vue';
 import { createNewAgent } from '@/service/agentService';
-import { getAgents, deleteAgent } from '@/client/agent';
+import { getAgents, deleteAgent, getAgentFile } from '@/client/agent';
 
 const pipelineExample = {
   language: 'fr',
@@ -213,6 +224,16 @@ export default Vue.extend({
       if (this.agents.length === 0) {
         this.isHideExistingAgents = true;
       }
+    },
+    async downloadAgentFile(name: string) {
+      const response = await getAgentFile(name);
+      const buffer = Buffer.from(response);
+      const fileURL = window.URL.createObjectURL(new Blob([buffer]));
+      const fileLink = document.createElement('a');
+      fileLink.href = fileURL;
+      fileLink.setAttribute('download', `${name}.json`);
+      document.body.appendChild(fileLink);
+      fileLink.click();
     },
   },
   mounted() {

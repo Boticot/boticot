@@ -94,8 +94,8 @@ class AgentsService(object):
             del entry["_id"]
             del entry["agentName"]
             intent = entry["key"].replace("INTENT_","")
-            text = entry["text"]
-            tmp_data.append({"intent": intent, "text": text})
+            fulfillment_text = entry["fulfillment_text"]
+            tmp_data.append({"intent": intent, "fulfillment_text": fulfillment_text})
         return tmp_data
 
     def get_bots(self):
@@ -331,16 +331,13 @@ class AgentsService(object):
             self.agents_repository.agent_modified(agent_name)
 
     def create_agent_file(self, agent_name):
+        agent_data = self.get_agent(agent_name)
         agent = {}
-        agent["nluData"] = {}
-        agent["nluData"]["rasa_nlu_data"] = {}
-        agent["nluData"]["rasa_nlu_data"]["common_examples"] = self.get_agent_training_data(agent_name)
-        agent["nluData"]["rasa_nlu_data"]["lookup_tables"] = self.get_agent_lookups(agent_name)
-        agent["nluData"]["rasa_nlu_data"]["entity_synonyms"] = self.get_agent_synonyms(agent_name)
-        agentData = self.get_agent(agent_name)
-        agent["config"] = agentData.get("config")
-        agent["lastTrain"] = agentData.get("lastTrain")
-        agent["modelName"] = agentData.get("modelName")
+        agent["config"] = agent_data.get("config")
+        agent["rasa_nlu_data"] = {}
+        agent["rasa_nlu_data"]["common_examples"] = self.get_agent_training_data(agent_name)
+        agent["rasa_nlu_data"]["lookup_tables"] = self.get_agent_lookups(agent_name)
+        agent["rasa_nlu_data"]["entity_synonyms"] = self.get_agent_synonyms(agent_name)
         agent["responses"] = self.get_agent_responses(agent_name)
         return agent
 

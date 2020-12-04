@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from utils import response_template, remove_file_or_dir
+from utils import response_template, remove_file_or_dir, create_folder
 from flask import request, jsonify
 import json
 import sys
@@ -23,11 +23,11 @@ def get_agent(agent_name):
 def get_agent_file(agent_name):
     directory_name = os.environ.get("MODELS_PATH") + "export/" 
     file_name = agent_name + ".json"
-    remove_file_or_dir(directory_name + file_name)
+    file_path = directory_name + file_name
+    remove_file_or_dir(file_path)
     dic = AgentsService.get_instance().create_agent_file(agent_name)
-    if not (os.path.exists(directory_name)):
-        os.mkdir(directory_name)
-    with open(directory_name + file_name, "w+") as f:
+    create_folder(directory_name)
+    with open(file_path, "w+") as f:
         json.dump(dic,f)
     return(send_from_directory(directory = directory_name, filename = "./" + file_name, as_attachment = True))
 
