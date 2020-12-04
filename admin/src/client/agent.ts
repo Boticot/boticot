@@ -28,6 +28,19 @@ const getAgent = async (agentName: string): Promise<any> => {
   return agent;
 };
 
+const getAgentFile = async (agentName: string): Promise<any> => {
+  const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const opt = {
+    url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/export`,
+    headers: {
+      encoding: null,
+      'content-type': 'application/json',
+    },
+  };
+  const agent = await request.get(opt);
+  return agent;
+};
+
 const addAgent = async (data: any): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
   const opt = {
@@ -90,5 +103,5 @@ const parseText = async (agentName: string, text: string): Promise<any> => {
 };
 
 export {
-  getAgents, addAgent, getInputs, parseText, getAgent, deleteAgent,
+  getAgents, addAgent, getInputs, parseText, getAgent, deleteAgent, getAgentFile,
 };

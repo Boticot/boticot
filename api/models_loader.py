@@ -1,6 +1,6 @@
 import os
 from typing import Optional, Text
-from utils import createFolder
+from utils import create_folder
 import logging
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ class ModelsLoader:
         """Downloads a model that has been persisted"""
         download_dir = os.environ.get("MODELS_PATH") + agent_name + "/"
         if not os.path.exists(download_dir):
-            createFolder(download_dir)
+            create_folder(download_dir)
         download_path = download_dir + model_name + ".tar.gz"
         if os.path.exists(download_path):
             logger.info("Already existing model: {0} for agent {1}".format(model_name, agent_name))
