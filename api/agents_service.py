@@ -232,6 +232,7 @@ class AgentsService(object):
                 self.lookups_repository.delete_lookups(agent_name)
                 self.synonyms_repository.delete_synonyms(agent_name)
                 self.responses_repository.delete_responses(agent_name)
+                self.users_repository.delete_users_inputs(agent_name)
                 self.agents_repository.delete_agent(agent_name)
                 return True
             except Exception as e:
@@ -341,14 +342,19 @@ class AgentsService(object):
         agent["responses"] = self.get_agent_responses(agent_name)
         return agent
 
-    def store_user_input(self, agent_name, mBody, userId, timestamp):
+    def store_user_input(self, agent_name, nlu_data, userId):
         try:
-            mBody["user_id"] = userId
-            mBody["timestamp"] = timestamp
-            mBody["agentName"] = agent_name
-            self.users_repository.insert_user_input(mBody)
+            user_input = {}
+            user_input["agentName"] = agent_name 
+            user_input["userId"] = userId
+            user_input["text"] = nlu_data.get("text") 
+            user_input["intent"] = nlu_data.get("intent") 
+            user_input["entities"] = nlu_data.get("entities") 
+            user_input["fulfillmentText"] = nlu_data.get("fulfillment_text") 
+            user_input["date"] = datetime.utcnow()
+            self.users_repository.insert_user_input(user_input)
         except:
-            logger.error("Can't insert log in database with time, " + str(datetime.now()))
+            logger.error("Can't insert user input for agent {0}. {1}".format(agent_name, e), exc_info=True)
     
     def get_agent_inputs(self,agent_name, maxConfidence, minConfidence, pageNumber, pageSize):
         dbUserInputs = self.users_repository.get_agent_inputs(agent_name, maxConfidence, minConfidence, pageNumber, pageSize)
