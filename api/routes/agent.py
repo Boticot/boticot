@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from utils import response_template, remove_file_or_dir, create_folder
 from flask import request, jsonify
 import json
@@ -72,13 +71,12 @@ def parse(agent_name):
     if request.get_data():
         query = (json.loads((request.get_data()).decode()))["text"]
         user_id = (json.loads((request.get_data()).decode())).get("user_id")
-        timestamp = str(datetime.now())
         bot = ((AgentsService.get_instance().get_bots()).get(agent_name))
         if bot is not None:
-            mBody = bot.handle(query, agent_name)
+            nlu_response = bot.handle(query, agent_name)
             if (request.args.get("test") is None or request.args.get("test").lower() != "true"):
-                AgentsService.get_instance().store_user_input(agent_name, dict(mBody),user_id,timestamp)
-            return jsonify(mBody)
+                AgentsService.get_instance().store_user_input(agent_name, dict(nlu_response), user_id)
+            return jsonify(nlu_response)
         else:
             return response_template(404, "Agent {0} not found".format(agent_name))
     else:

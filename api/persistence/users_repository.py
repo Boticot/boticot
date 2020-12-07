@@ -4,8 +4,10 @@ from .mongodb import mongo
 class UsersRepository():
 
     def __init__(self):
-        self.users_inputs_collection = mongo.db.usersInputs
         self.users_collection = mongo.db.users
+        self.users_inputs_collection = mongo.db.usersInputs
+        ttl_users_inputs = 30*60*60*24 # 30 days in seconds
+        self.users_inputs_collection.ensure_index("date", expireAfterSeconds=ttl_users_inputs)
 
     def insert_user_input(self, data):
         return(self.users_inputs_collection.insert_one(data))
@@ -17,6 +19,9 @@ class UsersRepository():
         if page_size > int(os.environ.get("MAX_PAGE_SIZE")):
             page_size = int(os.environ.get("MAX_PAGE_SIZE"))
         return(self.users_inputs_collection.find({"agentName": agent_name, "intent.confidence": {"$lte": max_confidence, "$gte": min_confidence}}, {"agentName": 0}).sort("timestamp", -1).skip((page_number - 1) * page_size).limit(page_size))
+
+    def delete_users_inputs(self, agent_name):
+        self.users_inputs_collection.delete_many({"agentName": agent_name})
 
     def get_user_inputs(self, agent_name, user_id, max_confidence, min_confidence, page_number, page_size):
         if page_size > int(os.environ.get("MAX_PAGE_SIZE")):
