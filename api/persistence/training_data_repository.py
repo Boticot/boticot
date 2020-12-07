@@ -45,14 +45,15 @@ class TrainingDataRepository():
             logger.error("Can't insert data {0}".format(e), exc_info=True)
             return(False)  
 
-    def get_agent_training_data(self, agent_name, intent, pageNumber, pageSize):
+    def get_agent_training_data(self, agent_name, intent, page_number, page_size):
         """retrieve training data based on filters: intent, page size and page number"""
-        if pageSize > int(os.environ.get("MAX_PAGE_SIZE")):
-            pageSize = int(os.environ.get("MAX_PAGE_SIZE"))
+        max_page_size = int(os.environ.get("MAX_PAGE_SIZE", 200))
+        if page_size > max_page_size:
+            page_size = max_page_size
         if intent:
-            return self.training_data_collection.find({"agentName": agent_name, "data.intent": intent}, {"agentName": 0}).skip((pageNumber - 1) * pageSize).limit(pageSize)
+            return self.training_data_collection.find({"agentName": agent_name, "data.intent": intent}, {"agentName": 0}).skip((page_number - 1) * page_size).limit(page_size)
         else:
-            return self.training_data_collection.find({"agentName": agent_name}, {"agentName": 0}).skip((pageNumber - 1) * pageSize).limit(pageSize)
+            return self.training_data_collection.find({"agentName": agent_name}, {"agentName": 0}).skip((page_number - 1) * page_size).limit(page_size)
     
     def get_intent_by_text(self, text, agent_name):
         return(self.training_data_collection.find_one({"agentName": agent_name, "data.text": text}, {"_id": 0, "data.intent": 1, "data.entities": 1}))
