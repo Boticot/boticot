@@ -46,7 +46,7 @@ const createNewAgent = async (agentName: string, configType: string, language: s
     name: agentName,
     config: nluPipeline,
     fallback: fallback / 100,
-    nluData: {
+    nlu_data: {
       rasa_nlu_data: trainingData,
     },
     responses: defaultResponses,

@@ -6,7 +6,7 @@ class SynonymsRepository():
         self.synonyms_collection = mongo.db.synonyms
 
     def find_agent_synonyms(self, agent_name):
-        return self.synonyms_collection.find({"agentName": agent_name})
+        return self.synonyms_collection.find({"agent_name": agent_name})
 
     def insert_synonyms(self, data):
         try:
@@ -16,4 +16,4 @@ class SynonymsRepository():
             return False 
     
     def delete_synonyms(self, agent_name):
-        self.synonyms_collection.delete_many({"agentName": agent_name})
+        self.synonyms_collection.delete_many({"agent_name": agent_name})

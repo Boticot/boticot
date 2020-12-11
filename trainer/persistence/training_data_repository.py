@@ -6,4 +6,4 @@ class TrainingDataRepository():
         self.trainingDataCollection = mongo.db.trainingData
         
     def find_agent_training_data(self, agentName):
-        return self.trainingDataCollection.find({"agentName": agentName})
+        return self.trainingDataCollection.find({"agent_name": agentName})

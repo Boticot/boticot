@@ -14,7 +14,7 @@ class TrainingCron:
         trained_agents = []
         for agent in all_agents:
             try :
-                if (agent.get("lastModified") > agent.get("lastTrain")):
+                if (agent.get("last_modified") > agent.get("last_train")):
                     bot = agent.get("name")
                     logger.info("Start training Agent: {0}".format(bot))
                     AgentsService.get_instance().train_agent(bot)

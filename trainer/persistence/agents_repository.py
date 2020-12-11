@@ -9,11 +9,11 @@ class AgentsRepository():
         self.agents_collection = mongo.db.agents
 
     def get_all_agents(self):
-        return self.agents_collection.find({}, {"_id": 0, "name": 1, "lastModified":1, "lastTrain":1})
+        return self.agents_collection.find({}, {"_id": 0, "name": 1, "last_modified":1, "last_train":1})
         
     def update_trained_agent(self, agentName, agent, versions, timestamp):
         try:
-            return self.agents_collection.update({"name": agentName}, {"$set": {"lastVersion" : agent.model_version, "versions": versions, "lastTrain" : timestamp, "intents" : agent.intents, "entities" : agent.entities}}, upsert = True)
+            return self.agents_collection.update({"name": agentName}, {"$set": {"last_version" : agent.model_version, "versions": versions, "last_train" : timestamp, "intents" : agent.intents, "entities" : agent.entities}}, upsert = True)
         except Exception as e:
             logger.error("Agent {0} Not updated in database with Exception {1}".format(agentName, e))
 
