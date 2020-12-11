@@ -24,7 +24,7 @@ class UserService(object):
     def add_new_user(self, email, first_name, last_name, password):
         salt = bcrypt.gensalt()
         hashed = bcrypt.hashpw(password.encode(), salt)
-        user = {"email": email, "firstName": first_name, "lastName": last_name, "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt())}
+        user = {"email": email, "first_name": first_name, "last_name": last_name, "password": bcrypt.hashpw(password.encode(), bcrypt.gensalt())}
         self.users_repository.add_user(user)
 
     def find_user(self, email):

@@ -13,21 +13,21 @@ class TrainingDataRepository():
 
     def find_agent_training_data(self, agent_name):
         """Find all training data linked to a specific agent"""
-        return self.training_data_collection.find({"agentName": agent_name})
+        return self.training_data_collection.find({"agent_name": agent_name})
 
     def count_agent_training_data(self, agent_name):
-        return self.training_data_collection.count({"agentName": agent_name})  
+        return self.training_data_collection.count({"agent_name": agent_name})  
 
     def delete_training_data(self, agent_name, id):
         try:
-            self.training_data_collection.delete_one({"agentName": agent_name, "_id": ObjectId(id)})
+            self.training_data_collection.delete_one({"agent_name": agent_name, "_id": ObjectId(id)})
             return True
         except:
             return False       
   
     def update_training_data(self, agent_name, id, data):
         try:
-            self.training_data_collection.update_one({"agentName": agent_name, "_id": ObjectId(id)}, {"$set": {"data": data}}, upsert = True)
+            self.training_data_collection.update_one({"agent_name": agent_name, "_id": ObjectId(id)}, {"$set": {"data": data}}, upsert = True)
             return True
         except:
             return False   
@@ -51,12 +51,12 @@ class TrainingDataRepository():
         if page_size > max_page_size:
             page_size = max_page_size
         if intent:
-            return self.training_data_collection.find({"agentName": agent_name, "data.intent": intent}, {"agentName": 0}).skip((page_number - 1) * page_size).limit(page_size)
+            return self.training_data_collection.find({"agent_name": agent_name, "data.intent": intent}, {"agent_name": 0}).skip((page_number - 1) * page_size).limit(page_size)
         else:
-            return self.training_data_collection.find({"agentName": agent_name}, {"agentName": 0}).skip((page_number - 1) * page_size).limit(page_size)
+            return self.training_data_collection.find({"agent_name": agent_name}, {"agent_name": 0}).skip((page_number - 1) * page_size).limit(page_size)
     
     def get_intent_by_text(self, text, agent_name):
-        return(self.training_data_collection.find_one({"agentName": agent_name, "data.text": text}, {"_id": 0, "data.intent": 1, "data.entities": 1}))
+        return(self.training_data_collection.find_one({"agent_name": agent_name, "data.text": text}, {"_id": 0, "data.intent": 1, "data.entities": 1}))
     
     def delete_all_training_data(self, agent_name):
-        self.training_data_collection.delete_many({"agentName": agent_name})
+        self.training_data_collection.delete_many({"agent_name": agent_name})

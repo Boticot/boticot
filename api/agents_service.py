@@ -47,7 +47,7 @@ class AgentsService(object):
             try:
                 agent_name = agent.get("name")
                 logger.info("Start loading Agent {0}".format(agent_name))
-                model_name = agent.get("currentVersion")
+                model_name = agent.get("current_version")
                 botsList.append(agent_name)
                 bot_dir = os.environ.get("MODELS_PATH") + agent_name + "/"
                 if model_name is None or model_name == "None" or model_name == "":
@@ -92,7 +92,7 @@ class AgentsService(object):
         responses = self.responses_repository.find_agent_responses(agent_name)
         for entry in responses:    
             del entry["_id"]
-            del entry["agentName"]
+            del entry["agent_name"]
             intent = entry["key"].replace("INTENT_","")
             fulfillment_text = entry["fulfillment_text"]
             tmp_data.append({"intent": intent, "fulfillment_text": fulfillment_text})
@@ -139,7 +139,7 @@ class AgentsService(object):
         intents = set()
         entities = set()
         for entry in data:
-            training_data.append({"agentName": agent_name, "data": entry})
+            training_data.append({"agent_name": agent_name, "data": entry})
             if entry.get("intent") is not None:
                 intents.add(entry.get("intent"))
             if entry.get("entities") is not None:
@@ -166,44 +166,44 @@ class AgentsService(object):
         }
         return intent_entities
 
-    def create_agent(self, name, lastTrain, config, nluData, fallback, responses, modelName):
+    def create_agent(self, name, last_train, config, nlu_data, fallback, responses, model_name):
         try:
-            lastTrain = 0
-            lastModified = 1
+            last_train = 0
+            last_modified = 1
 
             """Insert agent"""
             mappedData = {
                 "name": name,
-                "lastTrain": lastTrain,
+                "last_train": last_train,
                 "config": config,
                 "fallback": fallback,
-                "currentVersion": "",
-                "lastVersion": "",
-                "lastModified": lastModified     
+                "current_version": "",
+                "last_version": "",
+                "last_modified": last_modified     
             }
             self.agents_repository.insert_agent(mappedData)
 
             """Add nlu data"""
-            if nluData is not None:
-                train_data = nluData.get("rasa_nlu_data").get("common_examples")
+            if nlu_data is not None:
+                train_data = nlu_data.get("rasa_nlu_data").get("common_examples")
                 self.add_agent_training_data(name, train_data)
 
             """Add lookup tables"""
-            if nluData.get("rasa_nlu_data").get("lookup_tables") is not None:
-                self.add_agent_lookups(name, nluData.get("rasa_nlu_data").get("lookup_tables"))
+            if nlu_data.get("rasa_nlu_data").get("lookup_tables") is not None:
+                self.add_agent_lookups(name, nlu_data.get("rasa_nlu_data").get("lookup_tables"))
 
             """Add Synonyms"""
-            if nluData.get("rasa_nlu_data").get("entity_synonyms") is not None:
-                self.add_agent_synonyms(name, nluData.get("rasa_nlu_data").get("entity_synonyms"))
+            if nlu_data.get("rasa_nlu_data").get("entity_synonyms") is not None:
+                self.add_agent_synonyms(name, nlu_data.get("rasa_nlu_data").get("entity_synonyms"))
 
             """Add responses"""
             if responses is not None:
                 for response in responses:
-                    response["agentName"] = name
+                    response["agent_name"] = name
                     self.responses_repository.insert_response(response)
 
-            if modelName is None:
-                modelName = "None"
+            if model_name is None:
+                model_name = "None"
 
             self.bots[name] = Agent()
         except Exception as e:
@@ -279,7 +279,7 @@ class AgentsService(object):
 
     def add_agent_responses(self, agent_name, responses):
         for response in responses: 
-            response["agentName"]= agent_name
+            response["agent_name"]= agent_name
             self.responses_repository.insert_response(response)
 
     def load_agent(self, agent_name, model_name):
@@ -320,14 +320,14 @@ class AgentsService(object):
     def add_agent_lookups(self, agent_name, lookups):
         data = []
         for entry in lookups:
-            data.append({"agentName": agent_name, "lookups": entry})
+            data.append({"agent_name": agent_name, "lookups": entry})
         if self.lookups_repository.insert_lookups(data):
             self.agents_repository.agent_modified(agent_name)
 
     def add_agent_synonyms(self, agent_name, synonyms):
         data = []
         for entry in synonyms:
-            data.append({"agentName": agent_name, "synonyms": entry})
+            data.append({"agent_name": agent_name, "synonyms": entry})
         if self.synonyms_repository.insert_synonyms(data):
             self.agents_repository.agent_modified(agent_name)
 
@@ -345,26 +345,26 @@ class AgentsService(object):
     def store_user_input(self, agent_name, nlu_data, userId):
         try:
             user_input = {}
-            user_input["agentName"] = agent_name 
-            user_input["userId"] = userId
+            user_input["agent_name"] = agent_name 
+            user_input["user_id"] = userId
             user_input["text"] = nlu_data.get("text") 
             user_input["intent"] = nlu_data.get("intent") 
             user_input["entities"] = nlu_data.get("entities") 
-            user_input["fulfillmentText"] = nlu_data.get("fulfillment_text") 
+            user_input["fulfillment_text"] = nlu_data.get("fulfillment_text") 
             user_input["date"] = datetime.utcnow()
             self.users_repository.insert_user_input(user_input)
         except:
             logger.error("Can't insert user input for agent {0}. {1}".format(agent_name, e), exc_info=True)
     
-    def get_agent_inputs(self,agent_name, maxConfidence, minConfidence, pageNumber, pageSize):
-        dbUserInputs = self.users_repository.get_agent_inputs(agent_name, maxConfidence, minConfidence, pageNumber, pageSize)
-        usersInputs = []
-        for userInput in dbUserInputs:
-                usersInputs.append(json.loads(MongoJSONEncoder().encode(userInput)))
+    def get_agent_inputs(self,agent_name, max_confidence, min_confidence, page_number, page_size):
+        db_user_inputs = self.users_repository.get_agent_inputs(agent_name, max_confidence, min_confidence, page_number, page_size)
+        users_inputs = []
+        for db_user_input in db_user_inputs:
+                users_inputs.append(json.loads(MongoJSONEncoder().encode(db_user_input)))
         count_inputs = self.users_repository.count_user_inputs(agent_name)
         return { 
             "count" : count_inputs,
-            "items": usersInputs
+            "items": users_inputs
             }
     
     def get_user_inputs(self,agent_name, userId, maxConfidence, minConfidence, pageNumber, pageSize):
@@ -377,10 +377,10 @@ class AgentsService(object):
         trained_agents = []
         agents = self.agents_repository.get_all_agents()
         for agent in agents:
-            if (agent.get("lastTrain") > agent.get("lastModified")) and (agent.get("lastVersion") != agent.get("currentVersion")):
+            if (agent.get("last_train") > agent.get("last_modified")) and (agent.get("last_version") != agent.get("current_version")):
                 trained_agents.append({
                     "name": agent.get("name"),
-                    "lastVersion": agent.get("lastVersion")
+                    "last_version": agent.get("last_version")
                 })
         return trained_agents
 

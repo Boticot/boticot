@@ -16,22 +16,22 @@ class UsersRepository():
         return(self.users_inputs_collection.insert_one(data))
     
     def count_user_inputs(self, agent_name):
-        return self.users_inputs_collection.count({"agentName": agent_name})
+        return self.users_inputs_collection.count({"agent_name": agent_name})
 
     def get_agent_inputs(self, agent_name, max_confidence, min_confidence, page_number, page_size):
         max_page_size = int(os.environ.get("MAX_PAGE_SIZE", 200))
         if page_size > max_page_size:
             page_size = max_page_size
-        return(self.users_inputs_collection.find({"agentName": agent_name, "intent.confidence": {"$lte": max_confidence, "$gte": min_confidence}}, {"agentName": 0}).sort("timestamp", -1).skip((page_number - 1) * page_size).limit(page_size))
+        return(self.users_inputs_collection.find({"agent_name": agent_name, "intent.confidence": {"$lte": max_confidence, "$gte": min_confidence}}, {"agent_name": 0}).sort("timestamp", -1).skip((page_number - 1) * page_size).limit(page_size))
 
     def delete_users_inputs(self, agent_name):
-        self.users_inputs_collection.delete_many({"agentName": agent_name})
+        self.users_inputs_collection.delete_many({"agent_name": agent_name})
 
     def get_user_inputs(self, agent_name, user_id, max_confidence, min_confidence, page_number, page_size):
         max_page_size = int(os.environ.get("MAX_PAGE_SIZE", 200))
         if page_size > max_page_size:
             page_size = max_page_size
-        return(self.users_inputs_collection.find({"agentName": agent_name, "user_id": user_id, "intent.confidence": {"$lt": max_confidence, "$gt": min_confidence}}, {"agentName": 0}).skip((page_number - 1) * page_size).limit(page_size))
+        return(self.users_inputs_collection.find({"agent_name": agent_name, "user_id": user_id, "intent.confidence": {"$lt": max_confidence, "$gt": min_confidence}}, {"agent_name": 0}).skip((page_number - 1) * page_size).limit(page_size))
 
     def add_user(self, user):
         return(self.users_collection.insert_one(user))

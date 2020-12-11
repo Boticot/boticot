@@ -6,4 +6,4 @@ class SynonymsRepository():
         self.synonymsCollection = mongo.db.synonyms
 
     def find_agent_synonyms(self, agentName):
-        return self.synonymsCollection.find({"agentName": agentName})
+        return self.synonymsCollection.find({"agent_name": agentName})

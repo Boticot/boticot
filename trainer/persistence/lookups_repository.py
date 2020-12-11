@@ -6,4 +6,4 @@ class LookupsRepository():
         self.lookupCollection = mongo.db.lookup
 
     def find_agent_lookups(self, agentName):
-        return self.lookupCollection.find({"agentName": agentName})
+        return self.lookupCollection.find({"agent_name": agentName})

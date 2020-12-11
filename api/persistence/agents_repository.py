@@ -26,11 +26,11 @@ class AgentsRepository():
     def agent_modified(self, agent_name):
         """update last modified field by the current timestamp"""
         last_modified = int(datetime.timestamp(datetime.now()))
-        return self.agents_collection.update_one({"name": agent_name}, {"$set": {"lastModified" : last_modified}})
+        return self.agents_collection.update_one({"name": agent_name}, {"$set": {"last_modified" : last_modified}})
 
     def update_model(self, agent_name, model_name):
         """Specify model to load"""
-        return(self.agents_collection.update({"name": agent_name}, {"$set": {"currentVersion": model_name}}, upsert= True))
+        return(self.agents_collection.update({"name": agent_name}, {"$set": {"current_version": model_name}}, upsert= True))
 
     def get_versions(self, agent_name):
         return(self.agents_collection.find_one({"name" : agent_name}, {"_id": 0, "versions": 1}))

@@ -55,7 +55,7 @@ export default Vue.extend({
       const agentResponse = await getAgent(this.agentName);
       if (agentResponse.versions && agentResponse.versions.length !== 0) {
         this.versions = agentResponse.versions.map(
-          (e: any) => ({ name: e, current: (e === agentResponse.currentVersion) ? 'X' : '' }),
+          (e: any) => ({ name: e, current: (e === agentResponse.current_version) ? 'X' : '' }),
         );
         this.displayVersions = true;
       }

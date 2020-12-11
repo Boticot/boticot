@@ -67,10 +67,10 @@
       <h4>Existing Agents</h4>
       <el-table :data="agents" style="width: 100%">
         <el-table-column prop="name" label="Name" width="150"></el-table-column>
-        <el-table-column prop="currentVersion" label="Current Version" width="150"></el-table-column>
-        <el-table-column prop="lastVersion" label="Last Version" width="150"></el-table-column>
-        <el-table-column prop="lastTrain" label="Last Train" width="110"></el-table-column>
-        <el-table-column prop="lastModified" label="Last Modified" width="120"></el-table-column>
+        <el-table-column prop="current_version" label="Current Version" width="150"></el-table-column>
+        <el-table-column prop="last_version" label="Last Version" width="150"></el-table-column>
+        <el-table-column prop="last_train" label="Last Train" width="110"></el-table-column>
+        <el-table-column prop="last_modified" label="Last Modified" width="120"></el-table-column>
         <el-table-column fixed="right" width="90">
           <template slot-scope="scope">
             <el-button
