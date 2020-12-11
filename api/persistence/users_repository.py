@@ -7,7 +7,10 @@ class UsersRepository():
         self.users_collection = mongo.db.users
         self.users_inputs_collection = mongo.db.usersInputs
         ttl_users_inputs = 30*60*60*24 # 30 days in seconds
-        self.users_inputs_collection.ensure_index("date", expireAfterSeconds=ttl_users_inputs)
+        if os.environ.get("MONGODB_PROVIDER", "") == "CosmosDB":
+            self.users_inputs_collection.ensure_index("_ts", expireAfterSeconds=ttl_users_inputs)
+        else:
+            self.users_inputs_collection.ensure_index("date", expireAfterSeconds=ttl_users_inputs)
 
     def insert_user_input(self, data):
         return(self.users_inputs_collection.insert_one(data))
