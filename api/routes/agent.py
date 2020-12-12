@@ -44,7 +44,7 @@ def create_agent():
             return response_template(400, "Already existing agent with name {0}".format(agent_name))
         elif data.get("config") is None:
             return response_template(400, "Should Contains config field inside file data")
-        AgentsService.get_instance().create_agent(agent_name, 0, data.get("config"), data.get("nlu_data"), data.get("fallback"), data.get("responses"), data.get("current_version"))
+        AgentsService.get_instance().create_agent(agent_name, 0, data.get("config"), data.get("rasa_nlu_data"), data.get("fallback"), data.get("responses"), data.get("current_version"))
     elif request.get_data():
         """Create agent with data passed directly inside query"""
         request_data = json.loads((request.get_data()).decode())
@@ -55,7 +55,7 @@ def create_agent():
             return response_template(400, "Already existing agent with name {0}".format(agent_name))
         elif request_data.get("config") is None:
             return response_template(400, "Should Contains config field inside body request")
-        AgentsService.get_instance().create_agent(agent_name, 0, request_data.get("config"), request_data.get("nlu_data"), request_data.get("fallback"), request_data.get("responses"), request_data.get("current_version"))
+        AgentsService.get_instance().create_agent(agent_name, 0, request_data.get("config"), request_data.get("rasa_nlu_data"), request_data.get("fallback"), request_data.get("responses"), request_data.get("current_version"))
     else:
         return response_template(400, "Shoulds Contains a valid body or file of new Agent") 
     return response_template(201, "Agent {0} successfully created".format(agent_name))
