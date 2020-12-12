@@ -185,16 +185,17 @@ class AgentsService(object):
 
             """Add nlu data"""
             if nlu_data is not None:
-                train_data = nlu_data.get("rasa_nlu_data").get("common_examples")
-                self.add_agent_training_data(name, train_data)
+                """Add Common examples"""
+                if nlu_data.get("common_examples") is not None:
+                    self.add_agent_training_data(name, nlu_data.get("common_examples"))
 
-            """Add lookup tables"""
-            if nlu_data.get("rasa_nlu_data").get("lookup_tables") is not None:
-                self.add_agent_lookups(name, nlu_data.get("rasa_nlu_data").get("lookup_tables"))
+                """Add lookup tables"""
+                if nlu_data.get("lookup_tables") is not None:
+                    self.add_agent_lookups(name, nlu_data.get("lookup_tables"))
 
-            """Add Synonyms"""
-            if nlu_data.get("rasa_nlu_data").get("entity_synonyms") is not None:
-                self.add_agent_synonyms(name, nlu_data.get("rasa_nlu_data").get("entity_synonyms"))
+                """Add Synonyms"""
+                if nlu_data.get("entity_synonyms") is not None:
+                    self.add_agent_synonyms(name, nlu_data.get("entity_synonyms"))
 
             """Add responses"""
             if responses is not None:
