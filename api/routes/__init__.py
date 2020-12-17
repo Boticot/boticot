@@ -18,6 +18,7 @@ routes = Blueprint("routes", __name__)
 from .agent import *
 from .training_data import *
 from .user import *
+from .context import *
 
 from agents_service import AgentsService
 AgentsService.get_instance().starting_load_agents()

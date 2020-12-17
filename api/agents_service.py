@@ -9,6 +9,7 @@ from persistence.synonyms_repository import SynonymsRepository
 from persistence.training_data_repository import TrainingDataRepository
 from persistence.responses_repository import ResponsesRepository
 from persistence.users_repository import UsersRepository
+from persistence.contexts_repository import ContextsRepository
 from persistence.mongo_encoder import MongoJSONEncoder
 from models_loader import get_loader
 import logging
@@ -38,6 +39,7 @@ class AgentsService(object):
          self.synonyms_repository = SynonymsRepository()
          self.responses_repository = ResponsesRepository()
          self.users_repository = UsersRepository()
+         self.contexts_repository = ContextsRepository()
          AgentsService.__instance = self
 
     def starting_load_agents(self):
@@ -234,6 +236,7 @@ class AgentsService(object):
                 self.synonyms_repository.delete_synonyms(agent_name)
                 self.responses_repository.delete_responses(agent_name)
                 self.users_repository.delete_users_inputs(agent_name)
+                self.contexts_repository.delete_contexts(agent_name)
                 self.agents_repository.delete_agent(agent_name)
                 return True
             except Exception as e:
