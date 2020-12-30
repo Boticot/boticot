@@ -1,5 +1,7 @@
 from .mongodb import mongo
+import logging
 
+logger = logging.getLogger(__name__)
 class LookupsRepository():
     
     def __init__(self):
@@ -12,7 +14,8 @@ class LookupsRepository():
         try:
             self.lookup_collection.insert_many(data)
             return True
-        except:
+        except Exception as e:
+            logger.error("Exception when insert lookups {0}".format(e), exc_info=True)
             return False  
     
     def delete_lookups(self, agent_name):
