@@ -1,6 +1,8 @@
 import json, os
 from bson import ObjectId
 from datetime import datetime
+import numpy as np
+from itertools import groupby
 from agent import Agent
 from utils import remove_file_or_dir
 from persistence.agents_repository import AgentsRepository
@@ -74,12 +76,25 @@ class AgentsService(object):
         return tmp_data
 
     def get_agent_lookups(self, agent_name):
-        tmp_data = []
-        lookups = self.lookups_repository.find_agent_lookups(agent_name)
-        for entry in lookups:    
+        data = []
+        lookups_db = self.lookups_repository.find_agent_lookups(agent_name)
+        for entry in lookups_db:    
             del entry["_id"]
-            tmp_data.append(entry["lookups"])
-        return tmp_data
+            data.append(entry["lookups"])
+        lookups = []
+        if len(data) > 0 :
+            data.sort(key=lambda x: x["name"])
+            groups = []
+            for k, g in groupby(data, lambda x: x["name"]):
+                groups.append(list(g))
+            for entry in groups:
+                lookup_entry = {}
+                lookup_entry["name"] = entry[0].get("name")
+                lookup_entry["elements"] = []
+                for sub_entry in entry:
+                    lookup_entry["elements"].extend(sub_entry.get("elements"))
+                lookups.append(lookup_entry)
+        return lookups
 
     def get_agent_synonyms(self, agent_name):
         tmp_data = []
@@ -323,9 +338,20 @@ class AgentsService(object):
 
     def add_agent_lookups(self, agent_name, lookups):
         data = []
+        lookup_limit_size = int(os.environ.get("LOOKUP_LIMIT_SIZE", 5000))
+        is_agent_modified = False
         for entry in lookups:
-            data.append({"agent_name": agent_name, "lookups": entry})
-        if self.lookups_repository.insert_lookups(data):
+            elements_size = len(entry.get("elements"))
+            logger.debug("Lookup insert with size {0} and size limit {1}.".format(elements_size, lookup_limit_size))
+            if (elements_size < lookup_limit_size):
+                data.append({"agent_name": agent_name, "lookups": entry})
+            else:
+                split_size = int(elements_size / lookup_limit_size)
+                splitted_arr = np.array_split(entry.get("elements"), split_size)
+                for splitted_entry in splitted_arr:
+                    splitted_lookup = [{"agent_name": agent_name, "lookups": {"name": entry.get("name"),"elements": splitted_entry.tolist()}}]
+                    is_agent_modified = self.lookups_repository.insert_lookups(splitted_lookup)
+        if self.lookups_repository.insert_lookups(data) or is_agent_modified:
             self.agents_repository.agent_modified(agent_name)
 
     def add_agent_synonyms(self, agent_name, synonyms):
@@ -381,11 +407,14 @@ class AgentsService(object):
         trained_agents = []
         agents = self.agents_repository.get_all_agents()
         for agent in agents:
-            if (agent.get("last_train") > agent.get("last_modified")) and (agent.get("last_version") != agent.get("current_version")):
-                trained_agents.append({
-                    "name": agent.get("name"),
-                    "last_version": agent.get("last_version")
-                })
+            try:
+                if (agent.get("last_train") > agent.get("last_modified")) and (agent.get("last_version") != agent.get("current_version")):
+                    trained_agents.append({
+                        "name": agent.get("name"),
+                        "last_version": agent.get("last_version")
+                    })
+            except Exception:
+                logger.error("Exception when get trained agent {0}.".format(agent.get("name")), exc_info=True)
         return trained_agents
 
     def get_models(self, agent_name):

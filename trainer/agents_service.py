@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from itertools import groupby
 from agent import Agent
 from utils import create_file, remove_file_or_dir
 from persistence.agents_repository import AgentsRepository
@@ -33,25 +34,38 @@ class AgentsService(object):
          self.synonyms_repository = SynonymsRepository()
          AgentsService.__instance = self
 
-    def _get_agent_training_data(self, agentName):
+    def _get_agent_training_data(self, agent_name):
         tmp_data = []
-        train_data = self.training_data_repository.find_agent_training_data(agentName)
+        train_data = self.training_data_repository.find_agent_training_data(agent_name)
         for entry in train_data:    
             del entry["_id"]
             tmp_data.append(entry["data"])
         return tmp_data
 
-    def _get_agent_lookups(self, agentName):
-        tmp_data = []
-        lookups = self.lookups_repository.find_agent_lookups(agentName)
-        for entry in lookups:    
+    def _get_agent_lookups(self, agent_name):
+        data = []
+        lookups_db = self.lookups_repository.find_agent_lookups(agent_name)
+        for entry in lookups_db:    
             del entry["_id"]
-            tmp_data.append(entry["lookups"])
-        return tmp_data
+            data.append(entry["lookups"])
+        lookups = []
+        if len(data) > 0 :
+            data.sort(key=lambda x: x["name"])
+            groups = []
+            for k, g in groupby(data, lambda x: x["name"]):
+                groups.append(list(g))
+            for entry in groups:
+                lookup_entry = {}
+                lookup_entry["name"] = entry[0].get("name")
+                lookup_entry["elements"] = []
+                for sub_entry in entry:
+                    lookup_entry["elements"].extend(sub_entry.get("elements"))
+                lookups.append(lookup_entry)
+        return lookups
 
-    def _get_agent_synonyms(self, agentName):
+    def _get_agent_synonyms(self, agent_name):
         tmp_data = []
-        synonyms = self.synonyms_repository.find_agent_synonyms(agentName)
+        synonyms = self.synonyms_repository.find_agent_synonyms(agent_name)
         for entry in synonyms:    
             del entry["_id"]
             tmp_data.append(entry["synonyms"])
