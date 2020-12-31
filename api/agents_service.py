@@ -250,7 +250,6 @@ class AgentsService(object):
                 self.lookups_repository.delete_lookups(agent_name)
                 self.synonyms_repository.delete_synonyms(agent_name)
                 self.responses_repository.delete_responses(agent_name)
-                self.users_repository.delete_users_inputs(agent_name)
                 self.contexts_repository.delete_contexts(agent_name)
                 self.agents_repository.delete_agent(agent_name)
                 return True
@@ -342,7 +341,7 @@ class AgentsService(object):
         is_agent_modified = False
         for entry in lookups:
             elements_size = len(entry.get("elements"))
-            logger.debug("Lookup insert with size {0} and size limit {1}.".format(elements_size, lookup_limit_size))
+            logger.debug("Lookup {0} insertion for agent {1} with size {2} and size limit {3}.".format(entry.get("name"), agent_name, elements_size, lookup_limit_size))
             if (elements_size < lookup_limit_size):
                 data.append({"agent_name": agent_name, "lookups": entry})
             else:
