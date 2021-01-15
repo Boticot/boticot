@@ -41,6 +41,7 @@ class Agent(object):
 
     def handle(self, message, agent_name):
         from agents_service import AgentsService
+        from responses_service import ResponsesService
         nlu_data = {}
         nlu_data["intent"] = {}
         nlu_data["text"] = message
@@ -63,7 +64,7 @@ class Agent(object):
                     intent = "FALLBACK"
                     nlu_data["intent"]["name"] = intent
                     nlu_data["intent"]["confidence"] = 1
-        nlu_data["fulfillment_text"] = AgentsService.get_instance().get_response(agent_name, intent)
+        nlu_data["fulfillment_text"] = ResponsesService.get_instance().get_response(agent_name, intent)
         return nlu_data
 
 

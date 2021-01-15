@@ -5,6 +5,7 @@ import numpy as np
 from itertools import groupby
 from agent import Agent
 from utils import remove_file_or_dir
+from responses_service import ResponsesService
 from persistence.agents_repository import AgentsRepository
 from persistence.lookups_repository import LookupsRepository
 from persistence.synonyms_repository import SynonymsRepository
@@ -103,17 +104,6 @@ class AgentsService(object):
             del entry["_id"]
             tmp_data.append(entry["synonyms"])
         return tmp_data
-    
-    def get_agent_responses(self, agent_name):
-        tmp_data = []
-        responses = self.responses_repository.find_agent_responses(agent_name)
-        for entry in responses:    
-            del entry["_id"]
-            del entry["agent_name"]
-            intent = entry["key"].replace("INTENT_","")
-            fulfillment_text = entry["fulfillment_text"]
-            tmp_data.append({"intent": intent, "fulfillment_text": fulfillment_text})
-        return tmp_data
 
     def get_bots(self):
         """Get Bots loaded in memory""" 
@@ -183,14 +173,14 @@ class AgentsService(object):
         }
         return intent_entities
 
-    def create_agent(self, name, last_train, config, nlu_data, fallback, responses, model_name):
+    def create_agent(self, agent_name, last_train, config, nlu_data, fallback, responses, model_name):
         try:
             last_train = 0
             last_modified = 1
 
             """Insert agent"""
             mappedData = {
-                "name": name,
+                "name": agent_name,
                 "last_train": last_train,
                 "config": config,
                 "fallback": fallback,
@@ -204,28 +194,26 @@ class AgentsService(object):
             if nlu_data is not None:
                 """Add Common examples"""
                 if nlu_data.get("common_examples") is not None:
-                    self.add_agent_training_data(name, nlu_data.get("common_examples"))
+                    self.add_agent_training_data(agent_name, nlu_data.get("common_examples"))
 
                 """Add lookup tables"""
                 if nlu_data.get("lookup_tables") is not None:
-                    self.add_agent_lookups(name, nlu_data.get("lookup_tables"))
+                    self.add_agent_lookups(agent_name, nlu_data.get("lookup_tables"))
 
                 """Add Synonyms"""
                 if nlu_data.get("entity_synonyms") is not None:
-                    self.add_agent_synonyms(name, nlu_data.get("entity_synonyms"))
+                    self.add_agent_synonyms(agent_name, nlu_data.get("entity_synonyms"))
 
             """Add responses"""
             if responses is not None:
-                for response in responses:
-                    response["agent_name"] = name
-                    self.responses_repository.insert_response(response)
+                ResponsesService.get_instance().add_agent_responses(agent_name, responses)
 
             if model_name is None:
                 model_name = "None"
 
-            self.bots[name] = Agent()
+            self.bots[agent_name] = Agent()
         except Exception as e:
-            logger.error("Exception when creating agent {0}. {1}".format(name, e), exc_info=True)
+            logger.error("Exception when creating agent {0}. {1}".format(agent_name, e), exc_info=True)
 
     def delete_agent(self, agent_name):
         """ Remove entries in database """
@@ -249,7 +237,7 @@ class AgentsService(object):
                 self.training_data_repository.delete_all_training_data(agent_name)
                 self.lookups_repository.delete_lookups(agent_name)
                 self.synonyms_repository.delete_synonyms(agent_name)
-                self.responses_repository.delete_responses(agent_name)
+                self.responses_repository.delete_all_agent_responses(agent_name)
                 self.contexts_repository.delete_contexts(agent_name)
                 self.agents_repository.delete_agent(agent_name)
                 return True
@@ -295,11 +283,6 @@ class AgentsService(object):
             self.agents_repository.update_agent_entities(agent_name, mappedData.get("entities"))
             self.agents_repository.agent_modified(agent_name)
 
-    def add_agent_responses(self, agent_name, responses):
-        for response in responses: 
-            response["agent_name"]= agent_name
-            self.responses_repository.insert_response(response)
-
     def load_agent(self, agent_name, model_name):
         model_loader = get_loader(os.environ.get("MODEL_LOADER"))
         download_path = model_loader.retrieve(agent_name, model_name)
@@ -325,15 +308,6 @@ class AgentsService(object):
             return(True)
         else:
             return(False)
-
-    def get_response(self, agent_name, intent):
-        """Get response for an intent"""
-        try:
-            response = self.responses_repository.get_response_intent(agent_name, intent)[0]["fulfillment_text"]
-            return(response)
-        except Exception as e:
-            logger.warning("No response for agent {0} intent {1}, \n {2}".format(agent_name, intent, e))
-            return("")
 
     def add_agent_lookups(self, agent_name, lookups):
         data = []
@@ -368,7 +342,7 @@ class AgentsService(object):
         agent["rasa_nlu_data"]["common_examples"] = self.get_agent_training_data(agent_name)
         agent["rasa_nlu_data"]["lookup_tables"] = self.get_agent_lookups(agent_name)
         agent["rasa_nlu_data"]["entity_synonyms"] = self.get_agent_synonyms(agent_name)
-        agent["responses"] = self.get_agent_responses(agent_name)
+        agent["responses"] = ResponsesService.get_instance().get_agent_responses(agent_name)
         return agent
 
     def store_user_input(self, agent_name, nlu_data, userId):
