@@ -17,6 +17,7 @@ routes = Blueprint("routes", __name__)
 
 from .agent import *
 from .training_data import *
+from .response import *
 from .user import *
 from .context import *
 
