@@ -53,7 +53,7 @@ export default new Vuex.Store({
     },
     async updateAgent(state, agent) {
       const agentResponse = await getAgent(agent);
-      state.intents = agentResponse.intents;
+      state.intents = agentResponse.intents.sort();
       state.entities = initEntities(agentResponse.entities);
     },
     updateToken(state, userToken) {
