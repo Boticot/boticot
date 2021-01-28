@@ -11,6 +11,21 @@ const routes: Array<RouteConfig> = [
     component: () => import('../views/TryIt.vue'),
   },
   {
+    path: '/inputs/:agentName',
+    name: 'inputs',
+    component: () => import('../views/Inputs.vue'),
+  },
+  {
+    path: '/training-data/:agentName',
+    name: 'training-data',
+    component: () => import('../views/TrainingData.vue'),
+  },
+  {
+    path: '/responses/:agentName',
+    name: 'Responses',
+    component: () => import('../views/Responses.vue'),
+  },
+  {
     path: '/model/:agentName',
     name: 'Model',
     component: () => import('../views/Model.vue'),
@@ -19,16 +34,6 @@ const routes: Array<RouteConfig> = [
     path: '/agents',
     name: 'Agents',
     component: () => import('../views/Agents.vue'),
-  },
-  {
-    path: '/training-data/:agentName',
-    name: 'training-data',
-    component: () => import('../views/TrainingData.vue'),
-  },
-  {
-    path: '/inputs/:agentName',
-    name: 'inputs',
-    component: () => import('../views/Inputs.vue'),
   },
   {
     path: '/login',
