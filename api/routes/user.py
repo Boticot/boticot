@@ -7,6 +7,7 @@ from flask import current_app
 from user_service import UserService
 
 @current_app.route("/register", methods=["POST"])
+@jwt_required
 def register():
     request_data = json.loads((request.get_data()).decode())
     email = request_data.get("email")
@@ -18,7 +19,7 @@ def register():
         last_name = request_data.get("last_name")
         password = request_data.get("password")
         UserService.get_instance().add_new_user(email, first_name, last_name, password)
-        return response_template(201, "User added sucessfully")
+        return response_template(201, "User added successfully")
 
 @current_app.route("/login", methods=["POST"])
 def login():
@@ -36,6 +37,7 @@ def login():
         return response_template(401, "Wrong Email or Password")
 
 @current_app.route("/nlu/agents/<agent_name>/users/<user_id>", methods=["GET"])
+@jwt_required
 def get_user_inputs(agent_name, user_id):
         min_confidence = request.args.get("minConfidence", default = 0, type = float)
         max_confidence = request.args.get("maxConfidence", default = 1, type = float)
