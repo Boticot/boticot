@@ -39,18 +39,19 @@ class Agent(object):
             remove_file_or_dir(model_path)
             raise
 
-    def handle(self, message, agent_name):
+    def handle(self, message, agent_name, user_id):
         from agents_service import AgentsService
+        from context_service import ContextService
         from responses_service import ResponsesService
         nlu_data = {}
         nlu_data["intent"] = {}
         nlu_data["text"] = message
-        intent_from_base = AgentsService.get_instance().get_intent_by_text(message, agent_name)
-        if intent_from_base is not None:
-            intent = intent_from_base["data"]["intent"]
+        intent_from_db = AgentsService.get_instance().get_intent_by_text(message, agent_name)
+        if intent_from_db is not None:
+            intent = intent_from_db["data"]["intent"]
             nlu_data["intent"]["name"] = intent
             nlu_data["intent"]["confidence"] = 1
-            nlu_data["entities"] = intent_from_base["data"].get("entities")
+            nlu_data["entities"] = intent_from_db["data"].get("entities")
         else:
             if self.interpreter is None:
                 intent = "UNKNOWN"
@@ -65,6 +66,8 @@ class Agent(object):
                     nlu_data["intent"]["name"] = intent
                     nlu_data["intent"]["confidence"] = 1
         nlu_data["fulfillment_text"] = ResponsesService.get_instance().get_response(agent_name, intent)
+        if (user_id is not None):
+            nlu_data["context"] = ContextService.get_instance().get_user_context_key_value(agent_name, user_id).get("context")
         return nlu_data
 
 
