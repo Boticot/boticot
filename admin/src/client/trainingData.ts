@@ -1,4 +1,5 @@
 import * as request from 'request-promise';
+import store from '@/store';
 
 const getTrainingData = async (agentName: string, page: number): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH, VUE_APP_NLU_ENTRIES_PAGE_SIZE } = process.env;
@@ -8,6 +9,7 @@ const getTrainingData = async (agentName: string, page: number): Promise<any> =>
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     json: true,
   };
@@ -22,6 +24,7 @@ const deleteTrainingData = async (agentName: string, idTrainingData: string): Pr
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     json: true,
   };
@@ -36,6 +39,7 @@ const updateTrainingData = async (agentName: string, idTrainingData: string, dat
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     body: data,
     json: true,
@@ -51,6 +55,7 @@ const addTrainingData = async (agentName: string, data: any): Promise<any> => {
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     body: data,
     json: true,

@@ -45,6 +45,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { getAgentsNames } from '@/service/agentService';
+import { getAgent } from '@/client/agent';
 
 export default Vue.extend({
   name: 'app',
@@ -55,9 +56,9 @@ export default Vue.extend({
     };
   },
   watch: {
-    choices() {
+    async choices() {
       [this.selectedAgent] = this.choices; // Select the first as default value
-      this.$store.commit('updateAgent', this.selectedAgent);
+      this.$store.commit('updateAgent', await getAgent(this.selectedAgent));
     },
   },
   computed: {
@@ -66,12 +67,12 @@ export default Vue.extend({
     },
   },
   methods: {
-    selectAgent(value: string) {
+    async selectAgent(value: string) {
       this.selectedAgent = value;
       if (this.$router.currentRoute.path !== '/agents') {
         this.$router.replace(value);
       }
-      this.$store.commit('updateAgent', value);
+      this.$store.commit('updateAgent', await getAgent(value));
     },
     tabClick(obj: any) {
       if (obj.name === '/agents') { // Except agents tab
