@@ -73,7 +73,7 @@ def parse(agent_name):
         user_id = (json.loads((request.get_data()).decode())).get("user_id")
         bot = ((AgentsService.get_instance().get_bots()).get(agent_name))
         if bot is not None:
-            nlu_response = bot.handle(query, agent_name)
+            nlu_response = bot.handle(query, agent_name, user_id)
             if (request.args.get("test") is None or request.args.get("test").lower() != "true"):
                 AgentsService.get_instance().store_user_input(agent_name, dict(nlu_response), user_id)
             return jsonify(nlu_response)

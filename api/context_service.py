@@ -28,14 +28,29 @@ class ContextService(object):
     def remove_user_context(self, agent_name, user_id, context_name):
         self.contexts_repository.remove_context(agent_name, user_id, context_name)
 
-    def remove_all_user_contexts(self, agent_name, user_id):
+    def remove_all_user_context(self, agent_name, user_id):
         self.contexts_repository.remove_all_contexts(agent_name, user_id)
 
-    def get_user_contexts(self, agent_name, user_id):
+    def get_user_context(self, agent_name, user_id):
         db_contexts = self.contexts_repository.get_contexts(agent_name, user_id)
-        contexts = []
+        context = []
         for entry in db_contexts:
-            contexts.append(json.loads(MongoJSONEncoder().encode(entry)))
+            context.append(json.loads(MongoJSONEncoder().encode(entry)))
         return { 
-            "contexts" : contexts
+            "context" : context
+            }
+    
+    def get_user_context_key_value(self, agent_name, user_id):
+        db_contexts = self.contexts_repository.get_contexts(agent_name, user_id)
+        context = []
+        for entry in db_contexts:
+            data = json.loads(MongoJSONEncoder().encode(entry))
+            context.append(
+                {
+                    "context_name": data.get("context_name"),
+                    "context_value": data.get("context_value")
+                }
+            )
+        return { 
+            "context" : context
             }

@@ -23,10 +23,10 @@ def remove_context(agent_name, user_id, context_name):
 
 @current_app.route('/context/agents/<agent_name>/users/<user_id>', methods=["DELETE"])
 def remove_all_contexts(agent_name, user_id):
-    ContextService.get_instance().remove_all_user_contexts(agent_name, user_id)
+    ContextService.get_instance().remove_all_user_context(agent_name, user_id)
     return response_template(200, "All Contexts are successfully deleted for agent {0} and user_id {1}".format(agent_name, user_id))
 
 @current_app.route('/context/agents/<agent_name>/users/<user_id>', methods=["GET"])
 def get_all_contexts(agent_name, user_id):
-    contexts = ContextService.get_instance().get_user_contexts(agent_name, user_id)
+    contexts = ContextService.get_instance().get_user_context(agent_name, user_id)
     return jsonify(contexts)
