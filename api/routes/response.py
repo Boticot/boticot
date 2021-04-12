@@ -1,5 +1,6 @@
 from utils import response_template
 from flask import request, jsonify
+from flask_jwt_extended import jwt_required
 import json
 import sys
 sys.path.append("..")
@@ -7,12 +8,14 @@ from responses_service import ResponsesService
 from flask import current_app
 
 @current_app.route("/responses/agents/<agent_name>/intents/<intent>", methods=["GET"])
+@jwt_required
 def get_responses(agent_name, intent):
     """Get an array of responses by agent_name and intent"""
     data = ResponsesService.get_instance().get_agent_responses_by_intent(agent_name, intent)
     return jsonify(data)
 
 @current_app.route("/responses/agents/<agent_name>", methods=["PUT"])
+@jwt_required
 def add_response(agent_name):
     """Add a response associated to an agent name and intent"""
     if request.get_data():
@@ -26,6 +29,7 @@ def add_response(agent_name):
         return response_template(400, "A body is mandatory inside the request")
 
 @current_app.route("/responses/<id>", methods=["DELETE"])
+@jwt_required
 def delete_response(id):
     """Remove a response by id"""
     ResponsesService.get_instance().delete_response(id)

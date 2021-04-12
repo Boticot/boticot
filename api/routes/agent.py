@@ -1,6 +1,7 @@
 import os
 from utils import response_template, remove_file_or_dir, create_folder
 from flask import request, jsonify
+from flask_jwt_extended import jwt_required
 import json
 import sys
 sys.path.append("..")
@@ -8,17 +9,20 @@ from agents_service import AgentsService
 from flask import current_app, send_from_directory
 
 @current_app.route("/nlu/agents", methods=["GET"])
+@jwt_required
 def get_all_agents():
     agents = AgentsService.get_instance().get_agents()
     return jsonify(agents)
 
 @current_app.route("/nlu/agents/<agent_name>", methods=["GET"])
+@jwt_required
 def get_agent(agent_name):
     agent = AgentsService.get_instance().get_agent(agent_name)
     return jsonify(agent)
 
 
 @current_app.route("/nlu/agents/<agent_name>/export", methods=["GET"])
+@jwt_required
 def get_agent_file(agent_name):
     directory_name = os.environ.get("MODELS_PATH") + "export/" 
     file_name = agent_name + ".json"
@@ -31,6 +35,7 @@ def get_agent_file(agent_name):
     return(send_from_directory(directory = directory_name, filename = "./" + file_name, as_attachment = True))
 
 @current_app.route("/nlu/agents", methods=["PUT"])
+@jwt_required
 def create_agent():
     agent_name = ""
     if request.files:
@@ -61,6 +66,7 @@ def create_agent():
     return response_template(201, "Agent {0} successfully created".format(agent_name))
 
 @current_app.route("/nlu/agents/<agent_name>", methods=["DELETE"])
+@jwt_required
 def delete_agent(agent_name):
     AgentsService.get_instance().delete_agent(agent_name)
     return response_template(200, "Agent {0} successfully deleted".format(agent_name))
@@ -83,6 +89,7 @@ def parse(agent_name):
         return response_template(400, "A body is mandatory inside the request")
 
 @current_app.route("/nlu/agents/<agent_name>/inputs", methods=["GET"])
+@jwt_required
 def get_agent_inputs(agent_name):
     min_confidence = request.args.get("minConfidence", default = 0, type = float)
     max_confidence = request.args.get("maxConfidence", default = 1, type = float)
@@ -92,6 +99,7 @@ def get_agent_inputs(agent_name):
     return jsonify(agent_inputs)
 
 @current_app.route("/nlu/agents/<agent_name>/lookup", methods=["PUT"])
+@jwt_required
 def add_lookups(agent_name):
     if request.get_data():
         request_data = json.loads((request.get_data()).decode())
@@ -101,6 +109,7 @@ def add_lookups(agent_name):
         return response_template(400, "A body is mandatory inside the request")
 
 @current_app.route("/nlu/agents/<agent_name>/synonyms", methods = ["PUT"])
+@jwt_required
 def add_synonyms(agent_name):
     if request.get_data():
         request_data = json.loads((request.get_data()).decode())
@@ -110,6 +119,7 @@ def add_synonyms(agent_name):
         return response_template(400, "A body is mandatory inside the request")
 
 @current_app.route("/nlu/agents/<agent_name>/model", methods = ["PUT"])
+@jwt_required
 def set_specific_model(agent_name):
     if request.get_data():
         request_data = json.loads((request.get_data()).decode())
