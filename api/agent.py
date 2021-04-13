@@ -68,6 +68,10 @@ class Agent(object):
         nlu_data["fulfillment_text"] = ResponsesService.get_instance().get_response(agent_name, intent)
         if (user_id is not None):
             nlu_data["context"] = ContextService.get_instance().get_user_context_key_value(agent_name, user_id).get("context")
+            if (nlu_data["entities"] is not None):
+                for entity in nlu_data["entities"]:
+                    ContextService.get_instance().remove_user_context(agent_name, user_id, entity.get("entity"))
+                    ContextService.get_instance().insert_user_context(agent_name, user_id, entity.get("entity"), entity.get("value"))
         return nlu_data
 
 
