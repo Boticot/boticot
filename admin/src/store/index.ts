@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { initEntities, calculateEntityColor } from '@/service/entityService';
-import { getAgent } from '@/client/agent';
 import { GlobalEntity } from '@/types';
 import jwt from 'jsonwebtoken';
 
@@ -23,6 +22,7 @@ export default new Vuex.Store({
     entitiesNames: (state) => () => state.entities.map((element: GlobalEntity): string => element.entity),
     entityColor: (state) => (entity: string) => state.entities.find((e) => e.entity === entity)?.color,
     isLoggedIn: (state) => () => (state.token !== '' && getExpiration(state.token) >= new Date().getTime() / 1000),
+    authToken: (state) => () => state.token,
   },
   mutations: {
     initAgents(state, newAgents) {
@@ -51,8 +51,7 @@ export default new Vuex.Store({
         state.intents = [newIntent];
       }
     },
-    async updateAgent(state, agent) {
-      const agentResponse = await getAgent(agent);
+    async updateAgent(state, agentResponse) {
       state.intents = agentResponse.intents.sort();
       state.entities = initEntities(agentResponse.entities);
     },

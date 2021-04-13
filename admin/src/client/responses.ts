@@ -1,4 +1,5 @@
 import * as request from 'request-promise';
+import store from '@/store';
 
 const getResponses = async (agentName: string, intent: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL } = process.env;
@@ -7,6 +8,7 @@ const getResponses = async (agentName: string, intent: string): Promise<any> => 
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     json: true,
   };
@@ -21,6 +23,7 @@ const deleteResponse = async (idResponse: string): Promise<any> => {
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     json: true,
   };
@@ -35,6 +38,7 @@ const addResponse = async (agentName: string, responses: any): Promise<any> => {
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     body: responses,
     json: true,

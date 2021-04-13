@@ -1,4 +1,5 @@
 import * as request from 'request-promise';
+import store from '@/store';
 
 const getAgents = async (): Promise<Array<any>> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
@@ -7,6 +8,7 @@ const getAgents = async (): Promise<Array<any>> => {
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     json: true,
   };
@@ -21,6 +23,7 @@ const getAgent = async (agentName: string): Promise<any> => {
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     json: true,
   };
@@ -35,6 +38,7 @@ const getAgentFile = async (agentName: string): Promise<any> => {
     headers: {
       encoding: null,
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
   };
   const agent = await request.get(opt);
@@ -48,6 +52,7 @@ const addAgent = async (data: any): Promise<any> => {
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     body: data,
     json: true,
@@ -63,6 +68,7 @@ const deleteAgent = async (agentName: string): Promise<any> => {
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     json: true,
   };
@@ -78,6 +84,7 @@ const getInputs = async (agentName: string, page: number): Promise<any> => {
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
     },
     json: true,
   };
