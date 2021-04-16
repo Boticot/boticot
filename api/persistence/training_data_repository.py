@@ -1,6 +1,9 @@
 import os
 from .mongodb import mongo
 from bson import ObjectId
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TrainingDataRepository():
 
