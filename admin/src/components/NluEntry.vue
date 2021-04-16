@@ -90,7 +90,7 @@
           Fulfillment text: <b>{{ data.fulfillmentText }}</b>
         </el-row>
         <el-row type="flex" class="marginTopMedium" justify="end">
-          <el-button v-if="data.type === 'TrainingData'" type="danger" plain @click="remove()">
+          <el-button v-if="['TrainingData', 'Inputs'].includes(data.type)" type="danger" plain @click="remove()">
             Delete
           </el-button>
           <el-button type="primary" plain @click="validate()">Validate</el-button>
@@ -271,6 +271,9 @@ const NluEntryComponent = Vue.extend({
         }
       }
       updateElement(this.agentName, this.data);
+      if (this.data.type === 'Inputs') {
+        this.isHideElement = true;
+      }
     },
     remove(): void {
       deleteElement(this.data.type, this.agentName, this.data.id);

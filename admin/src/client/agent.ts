@@ -92,6 +92,21 @@ const getInputs = async (agentName: string, page: number): Promise<any> => {
   return response;
 };
 
+const deleteInput = async (agentName: string, idInput: string): Promise<any> => {
+  const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const opt = {
+    url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/inputs/${idInput}`,
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
+    },
+    json: true,
+  };
+  const response = await request.delete(opt);
+  return response;
+};
+
 const parseText = async (agentName: string, text: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
   const opt = {
@@ -110,5 +125,5 @@ const parseText = async (agentName: string, text: string): Promise<any> => {
 };
 
 export {
-  getAgents, addAgent, getInputs, parseText, getAgent, deleteAgent, getAgentFile,
+  getAgents, addAgent, getInputs, deleteInput, parseText, getAgent, deleteAgent, getAgentFile,
 };
