@@ -26,7 +26,7 @@ class UsersRepository():
         max_page_size = int(os.environ.get("MAX_PAGE_SIZE", 200))
         if page_size > max_page_size:
             page_size = max_page_size
-        return(self.users_inputs_collection.find({"agent_name": agent_name, "intent.confidence": {"$lte": max_confidence, "$gte": min_confidence}}, {"agent_name": 0}).sort("timestamp", -1).skip((page_number - 1) * page_size).limit(page_size))
+        return(self.users_inputs_collection.find({"agent_name": agent_name, "intent.confidence": {"$lte": max_confidence, "$gte": min_confidence}}, {"agent_name": 0}).sort("timestamp", -1).sort("date", -1).skip((page_number - 1) * page_size).limit(page_size))
 
     def delete_users_inputs(self, agent_name):
         self.users_inputs_collection.delete_many({"agent_name": agent_name})
