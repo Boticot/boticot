@@ -373,6 +373,9 @@ class AgentsService(object):
     def get_user_inputs(self,agent_name, userId, maxConfidence, minConfidence, pageNumber, pageSize):
         return(self.users_repository.get_user_inputs(agent_name, userId, maxConfidence, minConfidence, pageNumber, pageSize))
 
+    def delete_agent_user_input(self,agent_name, input_id):
+        return(self.users_repository.delete_user_input(agent_name, input_id))
+
     def get_intent_by_text(self, text, agent_name):
         return(self.training_data_repository.get_intent_by_text(text, agent_name))
 

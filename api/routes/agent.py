@@ -98,6 +98,12 @@ def get_agent_inputs(agent_name):
     agent_inputs = AgentsService.get_instance().get_agent_inputs(agent_name, max_confidence, min_confidence, page_number, page_size)
     return jsonify(agent_inputs)
 
+@current_app.route("/nlu/agents/<agent_name>/inputs/<id>", methods=["DELETE"])
+@jwt_required
+def delete_input(agent_name, id):
+    AgentsService.get_instance().delete_agent_user_input(agent_name, id)
+    return response_template(200, "User Input was successfully deleted for agent {0}".format(agent_name))
+
 @current_app.route("/nlu/agents/<agent_name>/lookup", methods=["PUT"])
 @jwt_required
 def add_lookups(agent_name):
