@@ -1,4 +1,4 @@
-import { getAgents, addAgent } from '@/client/agent';
+import { getAgents, addAgent, deleteInput } from '@/client/agent';
 import { deleteTrainingData, updateTrainingData, addTrainingData } from '@/client/trainingData';
 import { EntryType, NluData } from '@/types';
 
@@ -11,6 +11,8 @@ const getAgentsNames = async (): Promise<Array<string>> => {
 const deleteElement = async (type: EntryType, agentName: string, elementId: string): Promise<void> => {
   if (type === EntryType.TrainingData) {
     deleteTrainingData(agentName, elementId);
+  } else if (type === EntryType.Inputs) {
+    deleteInput(agentName, elementId);
   }
 };
 
@@ -29,7 +31,10 @@ const updateElement = async (agentName: string, nluData: NluData): Promise<void>
   const { type } = nluData;
   if (type === EntryType.TrainingData) {
     updateTrainingData(agentName, nluData.id, { data: body });
-  } else if (type === EntryType.Inputs || type === EntryType.TryIt) {
+  } else if (type === EntryType.Inputs) {
+    addTrainingData(agentName, { data: [body] });
+    deleteInput(agentName, nluData.id);
+  } else if (type === EntryType.TryIt) {
     addTrainingData(agentName, { data: [body] });
   }
 };
