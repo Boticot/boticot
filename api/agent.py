@@ -51,7 +51,8 @@ class Agent(object):
             intent = intent_from_db["data"]["intent"]
             nlu_data["intent"]["name"] = intent
             nlu_data["intent"]["confidence"] = 1
-            nlu_data["entities"] = intent_from_db["data"].get("entities")
+            if (intent_from_db["data"].get("entities") is not None):
+                nlu_data["entities"] = intent_from_db["data"].get("entities")
         else:
             if self.interpreter is None:
                 intent = "UNKNOWN"
@@ -68,10 +69,9 @@ class Agent(object):
         nlu_data["fulfillment_text"] = ResponsesService.get_instance().get_response(agent_name, intent)
         if (user_id is not None):
             nlu_data["context"] = ContextService.get_instance().get_user_context_key_value(agent_name, user_id).get("context")
-            if (nlu_data["entities"] is not None):
+            if (nlu_data.get("entities") is not None):
                 for entity in nlu_data["entities"]:
                     ContextService.get_instance().remove_user_context(agent_name, user_id, entity.get("entity"))
                     ContextService.get_instance().insert_user_context(agent_name, user_id, entity.get("entity"), entity.get("value"))
         return nlu_data
-
 
