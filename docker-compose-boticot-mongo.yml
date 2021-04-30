@@ -25,7 +25,7 @@ services:
 
     boticot-api:
         container_name: boticot-api
-        image: "boticot/api:0.4.0-alpha"
+        image: "boticot/api:0.4.0"
         restart: "always"
         environment:
             - "SERVER_HOST=0.0.0.0"
@@ -46,7 +46,7 @@ services:
 
     boticot-trainer:
         container_name: boticot-trainer
-        image: "boticot/trainer:0.4.0-alpha"
+        image: "boticot/trainer:0.4.0"
         restart: "always"
         environment:
             - "SERVER_HOST=0.0.0.0"
@@ -62,7 +62,7 @@ services:
 
     boticot-admin:
         container_name: boticot-admin
-        image: "boticot/admin:0.4.0-alpha"
+        image: "boticot/admin:0.4.0"
         restart: "always"
         environment:
             - "HOST=0.0.0.0"

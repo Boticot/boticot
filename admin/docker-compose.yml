@@ -3,7 +3,7 @@ version: '3'
 services:
   boticot-admin:
       container_name: boticot-admin
-      image: "boticot/admin:0.4.0-alpha"
+      image: "boticot/admin:0.4.0"
       restart: "always"
       build:
         context: .
