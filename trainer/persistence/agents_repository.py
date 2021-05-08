@@ -13,7 +13,7 @@ class AgentsRepository():
         
     def update_trained_agent(self, agentName, agent, versions, timestamp):
         try:
-            return self.agents_collection.update({"name": agentName}, {"$set": {"last_version" : agent.model_version, "versions": versions, "last_train" : timestamp, "intents" : agent.intents, "entities" : agent.entities}}, upsert = True)
+            return self.agents_collection.update({"name": agentName}, {"$set": {"last_version" : agent.model_version, "versions": versions, "last_train" : timestamp, "trained_intents" : agent.intents, "entities" : agent.entities}}, upsert = True)
         except Exception as e:
             logger.error("Agent {0} Not updated in database with Exception {1}".format(agentName, e))
 
