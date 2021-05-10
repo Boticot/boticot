@@ -39,14 +39,14 @@ class Agent(object):
             remove_file_or_dir(model_path)
             raise
 
-    def handle(self, message, agent_name, user_id):
+    def handle(self, text, agent_name, user_id):
         from agents_service import AgentsService
         from context_service import ContextService
         from responses_service import ResponsesService
         nlu_data = {}
         nlu_data["intent"] = {}
-        nlu_data["text"] = message
-        intent_from_db = AgentsService.get_instance().get_intent_by_text(message, agent_name)
+        nlu_data["text"] = text
+        intent_from_db = AgentsService.get_instance().get_intent_by_text(text, agent_name)
         if intent_from_db is not None:
             intent = intent_from_db["data"]["intent"]
             nlu_data["intent"]["name"] = intent
@@ -59,14 +59,14 @@ class Agent(object):
                 nlu_data["intent"]["name"] = "UNKNOWN"
                 nlu_data["intent"]["confidence"] = 1
             else:
-                nlu_data = self.interpreter.parse(message)
+                nlu_data = self.interpreter.parse(text)
                 confidence = float(nlu_data.get("intent").get("confidence"))
                 intent = nlu_data.get("intent").get("name")
                 if AgentsService.get_instance().is_fallback(agent_name, confidence):
                     intent = "FALLBACK"
                     nlu_data["intent"]["name"] = intent
                     nlu_data["intent"]["confidence"] = 1
-        nlu_data["fulfillment_text"] = ResponsesService.get_instance().get_response(agent_name, intent)
+        nlu_data["response"] = ResponsesService.get_instance().get_response(agent_name, intent)
         if (user_id is not None):
             nlu_data["context"] = ContextService.get_instance().get_user_context_key_value(agent_name, user_id).get("context")
             if (nlu_data.get("entities") is not None):
