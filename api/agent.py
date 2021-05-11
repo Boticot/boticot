@@ -39,7 +39,7 @@ class Agent(object):
             remove_file_or_dir(model_path)
             raise
 
-    def handle(self, text, agent_name, user_id):
+    def handle_text(self, text, agent_name, user_id):
         from agents_service import AgentsService
         from context_service import ContextService
         from responses_service import ResponsesService
@@ -75,3 +75,11 @@ class Agent(object):
                     ContextService.get_instance().insert_user_context(agent_name, user_id, entity.get("entity"), entity.get("value"))
         return nlu_data
 
+    def handle_intent(self, intent, agent_name):
+        from responses_service import ResponsesService
+        nlu_data = {}
+        nlu_data["intent"] = {}
+        nlu_data["intent"]["name"] = intent
+        nlu_data["intent"]["confidence"] = 1
+        nlu_data["response"] = ResponsesService.get_instance().get_response(agent_name, intent)
+        return nlu_data
