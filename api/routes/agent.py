@@ -75,13 +75,19 @@ def delete_agent(agent_name):
 def parse(agent_name):
     """Parse a text to get nlu response with intent/entities assosciated"""
     if request.get_data():
-        query = (json.loads((request.get_data()).decode()))["text"]
+        text_query = (json.loads((request.get_data()).decode())).get("text")
+        intent_query = (json.loads((request.get_data()).decode())).get("intent")
         user_id = (json.loads((request.get_data()).decode())).get("user_id")
         bot = ((AgentsService.get_instance().get_bots()).get(agent_name))
         if bot is not None:
-            nlu_response = bot.handle(query, agent_name, user_id)
-            if (request.args.get("test") is None or request.args.get("test").lower() != "true"):
-                AgentsService.get_instance().store_user_input(agent_name, dict(nlu_response), user_id)
+            if text_query:
+                nlu_response = bot.handle_text(text_query, agent_name, user_id)
+                if (request.args.get("test") is None or request.args.get("test").lower() != "true"):
+                    AgentsService.get_instance().store_user_input(agent_name, dict(nlu_response), user_id)
+            elif intent_query:
+                nlu_response = bot.handle_intent(intent_query, agent_name)
+            else:
+                return response_template(400, "A text field or an intent field are mandatory")
             return jsonify(nlu_response)
         else:
             return response_template(404, "Agent {0} not found".format(agent_name))
