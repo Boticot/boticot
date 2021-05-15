@@ -131,15 +131,24 @@ const trainingDataExample = {
 const responsesExample = [
   {
     intent: 'greetings_hello',
-    fulfillment_text: 'Hello !',
+    response_type: 'TEXT',
+    data: {
+      fulfillment_text: 'Hello !',
+    },
   },
   {
     intent: 'greetings_bye',
-    fulfillment_text: 'See you soon, bye !',
+    response_type: 'TEXT',
+    data: {
+      fulfillment_text: 'See you soon, bye !',
+    },
   },
   {
     intent: 'greetings_bye',
-    fulfillment_text: 'Bye !',
+    response_type: 'TEXT',
+    data: {
+      fulfillment_text: 'Bye !',
+    },
   },
 ];
 

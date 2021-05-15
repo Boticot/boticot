@@ -40,6 +40,10 @@
     margin-top: 25px;
 }
 
+.marginTopLarge {
+    margin-top: 45px;
+}
+
 .marginBottomMedium {
     margin-bottom: 25px;
 }
@@ -79,4 +83,9 @@
 
 .successMsg {
     color: green;
+}
+
+.header-row {
+    background: #e9eaed !important;
+    color: rgb(0, 0, 0);
 }
