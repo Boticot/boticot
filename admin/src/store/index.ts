@@ -47,6 +47,7 @@ export default new Vuex.Store({
     addIntent(state, newIntent) {
       if (state.intents) {
         state.intents.push(newIntent);
+        state.intents.sort();
       } else {
         state.intents = [newIntent];
       }
