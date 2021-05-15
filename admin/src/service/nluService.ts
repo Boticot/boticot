@@ -23,7 +23,7 @@ function convertToNluDataArray(entries: any, entryType: EntryType) {
         confidence: calculateConfidence(element.intent.confidence),
       },
       text: element.text,
-      fulfillmentText: element.fulfillment_text,
+      fulfillmentText: element.response ? element.response.fulfillment_text : '',
       splitTexts: [],
       entities: [],
     };
