@@ -2,7 +2,7 @@
   <div class="training-data" v-loading="loading">
     <h3 class="marginBottomMedium">Training Data for agent {{ agentName }}: {{ count }}</h3>
     <el-pagination v-if="count != 0" background layout="prev, pager, next" @current-change="pageChange"
-    :page-size="pageSize" :total="count">
+    :current-page="currentPage" :page-size="pageSize" :total="count">
     </el-pagination>
     <el-collapse
       v-model="activeNames"
@@ -14,6 +14,9 @@
         <NluEntryComponent :agentName='agentName' :data='data'  v-on:select-new-entity="updateActiveItem"/>
       </div>
     </el-collapse>
+    <el-pagination v-if="count != 0" background layout="prev, pager, next" @current-change="pageChange"
+    :current-page="currentPage" :page-size="pageSize" :total="count">
+    </el-pagination>
   </div>
 </template>
 
@@ -35,6 +38,7 @@ export default Vue.extend({
       activeNames: [''],
       count: 0,
       pageSize: 0,
+      currentPage: 1,
     };
   },
   methods: {
@@ -45,6 +49,7 @@ export default Vue.extend({
       this.loading = false;
     },
     pageChange(page: number) {
+      this.currentPage = page;
       this.updateTrainingData(page);
     },
     updateActiveItem(id: string) {
