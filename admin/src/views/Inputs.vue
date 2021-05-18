@@ -1,6 +1,15 @@
 <template>
   <div class="inputs" v-loading="loading">
-    <h3 class="marginBottomMedium">Users Inputs for agent {{ agentName }}: {{count}}</h3>
+    <h3 class="marginBottomMedium">
+      <span>Users Inputs for agent {{ agentName }}: {{count}}</span>
+      <el-button
+            type="primary"
+            @click="pageChange(1)"
+            icon="el-icon-refresh-right"
+            :style="{ marginLeft: '15px' }"
+            plain>
+      </el-button>
+    </h3>
     <el-pagination v-if="count != 0" background layout="prev, pager, next" @current-change="pageChange"
     :current-page="currentPage" :page-size="pageSize" :total="count">
     </el-pagination>
@@ -10,7 +19,7 @@
       accordion
     >
       <div v-for="data in inputs" :key="data.id">
-                <NluEntryComponent :agentName='agentName' :data='data' v-on:select-new-entity="updateActiveItem"/>
+        <NluEntryComponent :agentName='agentName' :data='data' v-on:select-new-entity="updateActiveItem"/>
       </div>
     </el-collapse>
     <el-pagination v-if="count != 0" background layout="prev, pager, next" @current-change="pageChange"
