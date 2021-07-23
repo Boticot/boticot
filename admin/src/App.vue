@@ -27,13 +27,13 @@
     <el-row v-if="isLoggedIn">
       <el-col>
         <div id="nav" style="padding: 10px">
-          <el-tabs @tab-click="tabClick">
-            <el-tab-pane label="Try it" name="/try-it"/>
-            <el-tab-pane label="Inputs" name="/inputs" />
-            <el-tab-pane label="Training Data" name="/training-data" />
-            <el-tab-pane label="Responses" name="/responses" />
-            <el-tab-pane label="Model" name="/model" />
-            <el-tab-pane label="Agents" name="/agents" />
+          <el-tabs v-model="activeName" @tab-click="tabClick">
+            <el-tab-pane label="Try it" name="try-it"/>
+            <el-tab-pane label="Inputs" name="inputs" />
+            <el-tab-pane label="Training Data" name="training-data" />
+            <el-tab-pane label="Responses" name="responses" />
+            <el-tab-pane label="Model" name="model" />
+            <el-tab-pane label="Agents" name="agents" />
           </el-tabs>
         </div>
       </el-col>
@@ -53,6 +53,7 @@ export default Vue.extend({
     return {
       choices: this.$store.state.agents,
       selectedAgent: '',
+      activeName: '',
     };
   },
   watch: {
@@ -75,10 +76,10 @@ export default Vue.extend({
       this.$store.commit('updateAgent', await getAgent(value));
     },
     tabClick(obj: any) {
-      if (obj.name === '/agents') { // Except agents tab
-        this.$router.replace(`${obj.name}`);
+      if (obj.name === 'agents') { // Except agents tab
+        this.$router.replace(`/${obj.name}`);
       } else {
-        this.$router.replace(`${obj.name}/${this.selectedAgent}`);
+        this.$router.replace(`/${obj.name}/${this.selectedAgent}`);
       }
     },
     logout() {
@@ -90,6 +91,7 @@ export default Vue.extend({
     if (this.$store.getters.isLoggedIn()) {
       getAgentsNames()
         .then((val) => {
+          this.activeName = this.$router.currentRoute.name?.toLowerCase() || 'try-it';
           if (val.length === 0) {
             this.$router.replace('/agents');
           } else {
