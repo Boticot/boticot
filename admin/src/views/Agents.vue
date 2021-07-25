@@ -193,7 +193,7 @@ export default Vue.extend({
                 JSON.parse(this.newAgent.pipeline),
                 this.newAgent.fallback,
                 JSON.parse(this.newAgent.trainingData),
-                JSON.parse(this.newAgent.responses),
+                this.newAgent.responses ? JSON.parse(this.newAgent.responses) : [],
               );
               this.textMsg = response.message;
               this.classMsg = 'successMsg';
