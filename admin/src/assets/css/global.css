@@ -77,6 +77,12 @@
     margin: auto;
 }
 
+.chartSize {
+    height: 40%;
+    width: 90%;
+    margin: auto;
+}
+
 .errorMsg {
     color: red;
 }
