@@ -1,4 +1,4 @@
-export const colorsArray = [
+const colorsArray = [
   'powderblue',
   'palegreen',
   'orange',
@@ -29,4 +29,15 @@ export const colorsArray = [
   'tan',
 ];
 
-export const newColorsArray = (): Array<string> => Object.assign([], colorsArray);
+const newColorsArray = (): Array<string> => Object.assign([], colorsArray);
+
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF'.split('');
+  let color = '#';
+  for (let i = 0; i < 6; i += 1) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
+export { newColorsArray, getRandomColor, colorsArray };

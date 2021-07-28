@@ -33,6 +33,7 @@
             <el-tab-pane label="Training Data" name="training-data" />
             <el-tab-pane label="Responses" name="responses" />
             <el-tab-pane label="Model" name="model" />
+            <el-tab-pane label="Analytics" name="analytics" />
             <el-tab-pane label="Agents" name="agents" />
           </el-tabs>
         </div>

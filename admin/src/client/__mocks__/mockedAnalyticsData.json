@@ -1,0 +1,181 @@
+{
+    "agent_name": "AgentName",
+    "analytics": [
+      {
+        "date": "Tue, 8 Aug 2021 00:00:00 GMT",
+        "intents_count":[
+           {
+             "count": 2,
+             "intent": "intent1"
+           },
+           {
+            "count": 1,
+            "intent": "intent2"
+           },
+           {
+            "count": 5,
+            "intent": "FALLBACK"
+           },
+           {
+             "count": 1,
+             "intent": "intent4"
+           }
+         ],
+         "traffic": 5,
+         "unique_users": 1
+      },
+      {
+        "date": "Tue, 7 Aug 2021 00:00:00 GMT",
+        "intents_count":[
+           {
+            "count": 1,
+            "intent": "intent2"
+           },
+           {
+            "count": 3,
+            "intent": "FALLBACK"
+           },
+           {
+             "count": 1,
+             "intent": "intent3"
+           }
+         ],
+         "traffic": 8,
+         "unique_users": 3
+      },
+      {
+        "date": "Tue, 6 Aug 2021 00:00:00 GMT",
+        "intents_count":[
+           {
+             "count": 4,
+             "intent": "intent1"
+           },
+           {
+            "count": 1,
+            "intent": "intent2"
+           },
+           {
+            "count": 1,
+            "intent": "FALLBACK"
+           },
+           {
+             "count": 0,
+             "intent": "intent3"
+           }
+         ],
+         "traffic": 4,
+         "unique_users": 3
+      },
+      {
+        "date": "Tue, 5 Aug 2021 00:00:00 GMT",
+        "intents_count":[
+           {
+             "count": 11,
+             "intent": "intent1"
+           },
+           {
+            "count": 1,
+            "intent": "intent2"
+           },
+           {
+            "count": 3,
+            "intent": "FALLBACK"
+           },
+           {
+             "count": 0,
+             "intent": "intent3"
+           }
+         ],
+         "traffic": 4,
+         "unique_users": 3
+      },
+      {
+        "date": "Tue, 4 Aug 2021 00:00:00 GMT",
+        "intents_count":[
+           {
+             "count": 8,
+             "intent": "intent1"
+           },
+           {
+            "count": 1,
+            "intent": "intent2"
+           },
+           {
+            "count": 3,
+            "intent": "FALLBACK"
+           },
+           {
+             "count": 0,
+             "intent": "intent3"
+           }
+         ],
+         "traffic": 4,
+         "unique_users": 3
+      },
+      {
+        "date": "Tue, 3 Aug 2021 00:00:00 GMT",
+        "intents_count":[
+           {
+             "count": 3,
+             "intent": "intent1"
+           },
+           {
+            "count": 1,
+            "intent": "intent2"
+           },
+           {
+            "count": 3,
+            "intent": "FALLBACK"
+           },
+           {
+             "count": 0,
+             "intent": "intent3"
+           }
+         ],
+         "traffic": 4,
+         "unique_users": 3
+      },
+      {
+        "date": "Tue, 2 Aug 2021 00:00:00 GMT",
+        "intents_count":[
+           {
+             "count": 2,
+             "intent": "intent1"
+           },
+           {
+            "count": 1,
+            "intent": "intent2"
+           },
+           {
+             "count": 0,
+             "intent": "intent3"
+           }
+         ],
+         "traffic": 2,
+         "unique_users": 11
+      },
+      {
+        "date": "Tue, 1 Aug 2021 00:00:00 GMT",
+        "intents_count":[
+           {
+             "count": 5,
+             "intent": "intent1"
+           },
+           {
+            "count": 1,
+            "intent": "intent2"
+           },
+           {
+            "count": 3,
+            "intent": "FALLBACK"
+           },
+           {
+             "count": 0,
+             "intent": "intent3"
+           }
+         ],
+         "traffic": 4,
+         "unique_users": 3
+      }
+    ]
+  }

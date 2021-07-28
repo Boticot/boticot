@@ -49,3 +49,43 @@ export enum EntryType {
   Inputs = 'Inputs',
   TryIt = 'TryIt',
 }
+
+export interface IntentsCountItem {
+  count: number;
+  intent: string;
+}
+
+export interface AnalyticItem {
+  date: Date | string;
+  intents_count: Array<IntentsCountItem>;
+  traffic: number;
+  unique_users: number;
+}
+
+export interface Analytics {
+  agent_name: string;
+  analytics: Array<AnalyticItem>;
+}
+
+export type PreparedAnalyticsData = {
+  intentDataList: Array<string>;
+  allDateDataList: Array<Date>;
+  allTrafficDataList: Array<number>;
+  allUniqueUsersDataList: Array<number>;
+  allFallbackDataList: Array<number>;
+};
+
+export type DataSetItem = {
+  label?: string;
+  data: Array<any>;
+  fill?: boolean;
+  borderColor?: string;
+  tension?: number;
+  backgroundColor?: string | Array<string>;
+  hoverOffset?: number;
+};
+
+export type ChartData = {
+  labels: Array<Date | string>;
+  datasets: Array<DataSetItem>;
+}
