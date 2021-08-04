@@ -7,7 +7,7 @@ Vue.use(VueRouter);
 const routes: Array<RouteConfig> = [
   {
     path: '/try-it/:agentName',
-    name: 'Try It',
+    name: 'try-it',
     component: () => import('../views/TryIt.vue'),
   },
   {
@@ -22,17 +22,17 @@ const routes: Array<RouteConfig> = [
   },
   {
     path: '/responses/:agentName',
-    name: 'Responses',
+    name: 'responses',
     component: () => import('../views/Responses.vue'),
   },
   {
     path: '/model/:agentName',
-    name: 'Model',
+    name: 'model',
     component: () => import('../views/Model.vue'),
   },
   {
     path: '/agents',
-    name: 'Agents',
+    name: 'agents',
     component: () => import('../views/Agents.vue'),
   },
   {
