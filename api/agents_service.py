@@ -177,6 +177,7 @@ class AgentsService(object):
         try:
             last_train = 0
             last_modified = 1
+            intents = ["FALLBACK"]
 
             """Insert agent"""
             mappedData = {
@@ -186,7 +187,8 @@ class AgentsService(object):
                 "fallback": fallback,
                 "current_version": "",
                 "last_version": "",
-                "last_modified": last_modified     
+                "last_modified": last_modified,
+                "intents": intents
             }
             self.agents_repository.insert_agent(mappedData)
 
