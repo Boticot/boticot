@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import jwt from 'jsonwebtoken';
 import { initEntities, calculateEntityColor } from '@/service/entityService';
 import { GlobalEntity } from '@/types';
-import jwt from 'jsonwebtoken';
 
 Vue.use(Vuex);
 

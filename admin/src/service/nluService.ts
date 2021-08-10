@@ -1,6 +1,6 @@
+import _ from 'lodash';
 import { getInputs, parseText } from '@/client/agent';
 import { getTrainingData } from '@/client/trainingData';
-import _ from 'lodash';
 import {
   NluData, Entity, SplitText, NluEntries, EntryType,
 } from '@/types';

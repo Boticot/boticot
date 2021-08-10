@@ -25,9 +25,9 @@
 
 <script lang='ts'>
 import Vue from 'vue';
+import _ from 'lodash';
 import NluEntryComponent from '@/components/NluEntry.vue';
 import { getNluEntryFromParseText } from '@/service/nluService';
-import _ from 'lodash';
 
 export default Vue.extend({
   name: 'try-it',
