@@ -27,7 +27,7 @@
     <el-row v-if="isLoggedIn">
       <el-col>
         <div id="nav" style="padding: 10px">
-          <el-tabs v-model="activeName" @tab-click="tabClick">
+          <el-tabs v-model="activeName" type="card" @tab-click="tabClick">
             <el-tab-pane label="Try it" name="try-it"/>
             <el-tab-pane label="Inputs" name="inputs" />
             <el-tab-pane label="Training Data" name="training-data" />
