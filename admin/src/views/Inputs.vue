@@ -58,6 +58,7 @@ export default Vue.extend({
     },
     pageChange(page: number) {
       this.currentPage = page;
+      this.loading = true;
       this.updateInputs(page);
     },
     updateActiveItem(id: string) {
