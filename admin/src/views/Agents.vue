@@ -1,6 +1,6 @@
 <template>
   <div class="agents halfSize">
-    <el-card class="box-card textAlignLeft">
+    <el-card class="box-card textAlignLeft" v-loading="loading">
       <h4 class="textAlignCenter">Create New Agent</h4>
       <el-form :model="newAgent" :rules="rules" ref="newAgent" label-width="120px">
         <el-row v-if="textMsg !== ''" :class="classMsg" class="marginBottomMedium marginLeftMedium">
@@ -177,6 +177,7 @@ export default Vue.extend({
       classMsg: '',
       agents: Array<any>(),
       isHideExistingAgents: false,
+      loading: false,
     };
   },
   methods: {
@@ -186,6 +187,7 @@ export default Vue.extend({
         async (valid: any) => {
           if (valid) {
             try {
+              this.loading = true;
               const response: any = await createNewAgent(
                 this.newAgent.name,
                 this.newAgent.configType,
@@ -197,6 +199,7 @@ export default Vue.extend({
               );
               this.textMsg = response.message;
               this.classMsg = 'successMsg';
+              this.loading = false;
             } catch (error) {
               if (error.statusCode === 400) {
                 if (error.error.message) {
@@ -206,6 +209,7 @@ export default Vue.extend({
                 this.textMsg = 'Creation Agent server Error, please retry later.';
               }
               this.classMsg = 'errorMsg';
+              this.loading = false; // spinner should also be closed even if there is an error
               return false;
             }
             this.agents.push({
