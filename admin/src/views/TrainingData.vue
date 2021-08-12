@@ -7,7 +7,6 @@
     <el-collapse
       v-model="activeNames"
       class="halfSize"
-      v-loading="loading"
       accordion
     >
       <div v-for="data in trainingData" :key="data.id">
@@ -50,6 +49,7 @@ export default Vue.extend({
     },
     pageChange(page: number) {
       this.currentPage = page;
+      this.loading = true;
       this.updateTrainingData(page);
     },
     updateActiveItem(id: string) {
