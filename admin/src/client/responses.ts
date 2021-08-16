@@ -1,50 +1,46 @@
-import * as request from 'request-promise';
+import axios from 'axios';
 import store from '@/store';
 
 const getResponses = async (agentName: string, intent: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}/responses/agents/${agentName}/intents/${intent}`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}/responses/agents/${agentName}/intents/${intent}`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
-    json: true,
   };
-  const response = await request.get(opt);
-  return response;
+  const response = await axios.get(url, opt);
+  return response.data;
 };
 
 const deleteResponse = async (idResponse: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}/responses/${idResponse}`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}/responses/${idResponse}`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
-    json: true,
   };
-  const response = await request.delete(opt);
-  return response;
+  const response = await axios.delete(url, opt);
+  return response.data;
 };
 
 const addResponse = async (agentName: string, responses: any): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}/responses/agents/${agentName}`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}/responses/agents/${agentName}`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
-    body: responses,
-    json: true,
   };
-  const response = await request.put(opt);
-  return response;
+  const response = await axios.put(url, responses, opt);
+  return response.data;
 };
 
 export {
