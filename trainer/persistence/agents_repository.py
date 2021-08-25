@@ -10,6 +10,9 @@ class AgentsRepository():
 
     def get_all_agents(self):
         return self.agents_collection.find({}, {"_id": 0, "name": 1, "last_modified":1, "last_train":1})
+
+    def get_all_agents_with_intents(self):
+        return self.agents_collection.find({}, {"_id": 0, "name": 1, "intents":1})
         
     def update_trained_agent(self, agentName, agent, versions, timestamp):
         try:
