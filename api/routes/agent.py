@@ -141,6 +141,3 @@ def set_specific_model(agent_name):
             return("Can't load model " + request_data.get("modelName") + "for bot " + agent_name)
     else:
         return response_template(400, "A body is mandatory inside the request")
-
-
-

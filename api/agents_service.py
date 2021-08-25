@@ -13,6 +13,7 @@ from persistence.training_data_repository import TrainingDataRepository
 from persistence.responses_repository import ResponsesRepository
 from persistence.users_repository import UsersRepository
 from persistence.contexts_repository import ContextsRepository
+from persistence.analytics_repository import AnalyticsRepository
 from persistence.mongo_encoder import MongoJSONEncoder
 from models_loader import get_loader
 import logging
@@ -43,6 +44,7 @@ class AgentsService(object):
          self.responses_repository = ResponsesRepository()
          self.users_repository = UsersRepository()
          self.contexts_repository = ContextsRepository()
+         self.analytics_repository = AnalyticsRepository()
          AgentsService.__instance = self
 
     def starting_load_agents(self):
@@ -397,3 +399,15 @@ class AgentsService(object):
 
     def get_models(self, agent_name):
         return self.agents_repository.get_versions(agent_name).get("versions")
+
+    def get_analytics(self, agent_name, days_number):
+        analytics_response = {
+            "agent_name": agent_name,
+            "analytics": []
+        }
+        analytics = self.analytics_repository.find_agent_analytics(agent_name, days_number)
+        for analytic in analytics:    
+            del analytic["_id"]
+            del analytic["agent_name"]
+            analytics_response.get("analytics").append(analytic)
+        return analytics_response
