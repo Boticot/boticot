@@ -1,101 +1,96 @@
-import * as request from 'request-promise';
+import axios from 'axios';
 import store from '@/store';
 
 const getAgents = async (): Promise<Array<any>> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
-    json: true,
   };
-  const agents = await request.get(opt);
-  return agents;
+  const agents = await axios.get(url, opt);
+  return agents.data;
 };
 
 const getAgent = async (agentName: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
-    json: true,
   };
-  const agent = await request.get(opt);
-  return agent;
+  const agent = await axios.get(url, opt);
+  return agent.data;
 };
 
 const getAgentFile = async (agentName: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
-  const opt = {
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/export`;
+  const agent = await axios.get(url, {
     url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/export`,
+    responseType: 'arraybuffer',
     headers: {
       encoding: null,
       'content-type': 'application/json',
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
-  };
-  const agent = await request.get(opt);
-  return agent;
+  });
+  return agent.data;
 };
 
-const addAgent = async (data: any): Promise<any> => {
+const addAgent = async (body: any): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
-    body: data,
-    json: true,
   };
-  const response = await request.put(opt);
-  return response;
+  const response = await axios.put(url, body, opt);
+  return response.data;
 };
 
 const deleteAgent = async (agentName: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
-    json: true,
   };
-  const response = await request.delete(opt);
-  return response;
+  const response = await axios.delete(url, opt);
+  return response.data;
 };
 
 const getInputs = async (agentName: string, page: number): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH, VUE_APP_NLU_ENTRIES_PAGE_SIZE } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/inputs`
+    + `?pageSize=${VUE_APP_NLU_ENTRIES_PAGE_SIZE}&pageNumber=${page}`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/inputs`
-    + `?pageSize=${VUE_APP_NLU_ENTRIES_PAGE_SIZE}&pageNumber=${page}`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
-    json: true,
   };
-  const response = await request.get(opt);
-  return response;
+  const response = await axios.get(url, opt);
+  return response.data;
 };
 
 const deleteInput = async (agentName: string, idInput: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/inputs/${idInput}`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/inputs/${idInput}`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
@@ -103,25 +98,24 @@ const deleteInput = async (agentName: string, idInput: string): Promise<any> => 
     },
     json: true,
   };
-  const response = await request.delete(opt);
-  return response;
+  const response = await axios.delete(url, opt);
+  return response.data;
 };
 
 const parseText = async (agentName: string, text: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/parse?test=true`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/parse?test=true`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
     },
-    body: {
-      text,
-    },
-    json: true,
   };
-  const response = await request.post(opt);
-  return response;
+  const body = {
+    text,
+  };
+  const response = await axios.post(url, body, opt);
+  return response.data;
 };
 
 export {

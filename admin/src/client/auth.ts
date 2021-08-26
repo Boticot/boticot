@@ -1,18 +1,16 @@
-import * as request from 'request-promise';
+import axios from 'axios';
 
 const authenticateUser = async (data: any): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}/login`;
   const opt = {
-    url: `${VUE_APP_NLU_SERVICE_URL}/login`,
     headers: {
       accept: 'application/json',
       'content-type': 'application/json',
     },
-    body: data,
-    json: true,
   };
-  const response = await request.post(opt);
-  return response;
+  const response = await axios.post(url, data, opt);
+  return response.data;
 };
 
 export {
