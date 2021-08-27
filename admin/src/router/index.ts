@@ -4,7 +4,7 @@ import store from '@/store';
 
 Vue.use(VueRouter);
 
-const routes: Array<RouteConfig> = [
+export const routes: Array<RouteConfig> = [
   {
     path: '/try-it/:agentName',
     name: 'try-it',
@@ -13,12 +13,12 @@ const routes: Array<RouteConfig> = [
   {
     path: '/inputs/:agentName',
     name: 'inputs',
-    component: () => import('../views/Inputs.vue'),
+    component: () => import('@/views/Inputs.vue'),
   },
   {
     path: '/training-data/:agentName',
     name: 'training-data',
-    component: () => import('../views/TrainingData.vue'),
+    component: () => import('@/views/TrainingData.vue'),
   },
   {
     path: '/responses/:agentName',
@@ -38,7 +38,7 @@ const routes: Array<RouteConfig> = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('../views/Login.vue'),
+    component: () => import('@/views/Login.vue'),
     meta: {
       guest: true,
     },
