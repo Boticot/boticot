@@ -9,39 +9,6 @@
         <el-form-item label="Agent name" prop='name'>
           <el-input v-model="newAgent.name"></el-input>
         </el-form-item>
-        <el-form-item label="NLU Conf">
-          <el-radio-group v-model="newAgent.configType" @change="selectConf">
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="Recommended when you have more than 1000 training data"
-              placement="top-start"
-            >
-              <el-radio label="supervised_embeddings">
-                Supervised Embeddings
-              </el-radio>
-            </el-tooltip>
-            <el-tooltip
-              class="item"
-              effect="dark"
-              content="Recommended when you need a specific nlu pipeline"
-              placement="top-start"
-            >
-              <el-radio label="specific_pipeline">
-                Specific Pipeline
-              </el-radio>
-            </el-tooltip>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="Language" :class="[isHideSpecificPipeline ? '' : 'displayNone']">
-          <el-select v-model="newAgent.language" placeholder="please select your zone">
-            <el-option label="English" value="en"></el-option>
-            <el-option label="French" value="fr"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Specific pipeline" :class="[isHideSpecificPipeline ? 'displayNone' : '']">
-          <el-input type="textarea" :rows="10" v-model="newAgent.pipeline"></el-input>
-        </el-form-item>
         <el-form-item label="Fallback">
           <el-tooltip
             class="item"
@@ -52,12 +19,70 @@
             <el-input-number v-model="newAgent.fallback" :min="0" :max="100"></el-input-number>
           </el-tooltip>
         </el-form-item>
-        <el-form-item label="Training Data">
-          <el-input type="textarea" :rows="7" v-model="newAgent.trainingData"></el-input>
+        <el-form-item>
+          <el-radio-group v-model="agentCreationOption" @change="resetDefaultValue">
+              <el-radio label="create_new_agent">
+                Create new Agent
+              </el-radio>
+              <el-radio label="import_agent">
+                Import Agent file
+              </el-radio>
+        </el-radio-group>
         </el-form-item>
-        <el-form-item label="Responses">
-          <el-input type="textarea" :rows="7" v-model="newAgent.responses"></el-input>
-        </el-form-item>
+         <div v-if="agentCreationOption === 'create_new_agent'">
+          <el-form-item label="NLU Conf">
+            <el-radio-group v-model="newAgent.configType" @change="selectConf">
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="Recommended when you have more than 1000 training data"
+                placement="top-start"
+              >
+                <el-radio label="supervised_embeddings">
+                  Supervised Embeddings
+                </el-radio>
+              </el-tooltip>
+              <el-tooltip
+                class="item"
+                effect="dark"
+                content="Recommended when you need a specific nlu pipeline"
+                placement="top-start"
+              >
+                <el-radio label="specific_pipeline">
+                  Specific Pipeline
+                </el-radio>
+              </el-tooltip>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="Language" :class="[isHideSpecificPipeline ? '' : 'displayNone']">
+            <el-select v-model="newAgent.language">
+              <el-option label="English" value="en"></el-option>
+              <el-option label="French" value="fr"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="Specific pipeline" :class="[isHideSpecificPipeline ? 'displayNone' : '']">
+            <el-input type="textarea" :rows="10" v-model="newAgent.pipeline"></el-input>
+          </el-form-item>
+          <el-form-item label="Training Data">
+            <el-input type="textarea" :rows="7" v-model="newAgent.trainingData"></el-input>
+          </el-form-item>
+          <el-form-item label="Responses">
+            <el-input type="textarea" :rows="7" v-model="newAgent.responses"></el-input>
+          </el-form-item>
+        </div>
+        <div v-else>
+          <el-form-item>
+            <el-upload
+              action=""
+              :auto-upload="false"
+              ref="upload"
+              :on-change="importAgent"
+              :on-remove="removeFile"
+              :limit="1">
+              <el-button slot="trigger" size="small" type="primary">Upload agent file</el-button>
+            </el-upload>
+          </el-form-item>
+        </div>
         <el-form-item>
           <el-button type="primary" @click="createAgent">Create Agent</el-button>
         </el-form-item>
@@ -156,12 +181,15 @@ export default Vue.extend({
   name: 'agents',
   data() {
     return {
+      file: null,
+      fileContent: null,
+      agentCreationOption: 'create_new_agent',
       newAgent: {
         name: '',
         language: 'en',
         configType: 'supervised_embeddings',
         pipeline: JSON.stringify(pipelineExample, null, 2),
-        fallback: 20,
+        fallback: 40,
         trainingData: JSON.stringify(trainingDataExample, null, 2),
         responses: JSON.stringify(responsesExample, null, 2),
       },
@@ -181,12 +209,96 @@ export default Vue.extend({
     };
   },
   methods: {
+    cleanUpFile() {
+      this.file = null;
+      this.fileContent = null;
+      (this.$refs.upload as any).clearFiles();
+    },
+    resetDefaultValue() {
+      this.textMsg = '';
+      this.classMsg = '';
+      if (this.agentCreationOption === 'create_new_agent') {
+        this.newAgent = {
+          ...this.newAgent,
+          language: 'en',
+          configType: 'supervised_embeddings',
+          pipeline: JSON.stringify(pipelineExample, null, 2),
+          fallback: 40,
+          trainingData: JSON.stringify(trainingDataExample, null, 2),
+          responses: JSON.stringify(responsesExample, null, 2),
+        };
+      } else if (this.agentCreationOption === 'import_agent') {
+        this.cleanUpFile();
+      }
+    },
+    checkIfJSONFile(file: any): boolean {
+      return file.name.includes('.json');
+    },
+    checkIfValidJsonFormat(fileContent: any): boolean {
+      if (!(Object.prototype.hasOwnProperty.call(fileContent, 'config')
+            && Object.prototype.hasOwnProperty.call(fileContent, 'rasa_nlu_data')
+            && Object.prototype.hasOwnProperty.call(fileContent, 'responses'))) {
+        return false;
+      }
+      return true;
+    },
+    importAgent(file: any) {
+      this.file = file;
+      this.textMsg = '';
+      this.classMsg = '';
+      if (!this.checkIfJSONFile(file)) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.readAsText(file.raw);
+      reader.onload = async (e) => {
+        try {
+          this.fileContent = JSON.parse(e.target?.result as string);
+          if (!this.checkIfValidJsonFormat(this.fileContent)) {
+            return;
+          }
+          this.newAgent.configType = Array.isArray((this.fileContent as any).config.pipeline)
+            ? 'specific_pipeline' : 'supervised_embeddings';
+          this.newAgent.language = (this.fileContent as any).config.language;
+          this.newAgent.pipeline = JSON.stringify((this.fileContent as any).config, null, 2);
+          this.newAgent.trainingData = JSON.stringify((this.fileContent as any).rasa_nlu_data, null, 2);
+          this.newAgent.responses = JSON.stringify((this.fileContent as any).responses, null, 2);
+        } catch (err) {
+          this.textMsg = 'System Error';
+          this.classMsg = 'errorMsg';
+        }
+      };
+    },
+    removeFile() {
+      this.cleanUpFile();
+      this.textMsg = '';
+      this.classMsg = '';
+    },
     async createAgent(e: any) {
       const { newAgent }: any = this.$refs;
       newAgent.validate(
         async (valid: any) => {
           if (valid) {
             try {
+              if (this.agentCreationOption === 'import_agent') {
+                if (this.file === null) {
+                  this.textMsg = 'Please upload an agent file';
+                  this.classMsg = 'errorMsg';
+                  return false;
+                }
+                if (!this.checkIfJSONFile(this.file)) {
+                  this.textMsg = 'Please upload a json file of your agent';
+                  this.classMsg = 'errorMsg';
+                  this.cleanUpFile();
+                  return false;
+                }
+                if (!this.checkIfValidJsonFormat(this.fileContent)) {
+                  this.textMsg = 'Please upload a valid agent file';
+                  this.classMsg = 'errorMsg';
+                  this.cleanUpFile();
+                  return false;
+                }
+              }
               this.loading = true;
               const response: any = await createNewAgent(
                 this.newAgent.name,
