@@ -19,7 +19,8 @@
 
 <script lang='ts'>
 import Vue from 'vue';
-import { authenticateUser } from '@/client/auth';
+import { authenticateUser, getUser, UserType } from '@/client/auth';
+import { mapGetters } from 'vuex';
 
 export default Vue.extend({
   name: 'login',
@@ -30,6 +31,11 @@ export default Vue.extend({
       error: '',
     };
   },
+  computed: {
+    ...mapGetters({
+      currentLogin: 'login',
+    }),
+  },
   methods: {
     async loginUser() {
       this.error = '';
@@ -39,8 +45,13 @@ export default Vue.extend({
           password: this.password,
         });
         this.$store.commit('updateToken', authUser.access_token);
-        this.$router.replace('/');
-        window.location.reload();
+        const currentUser: UserType = await getUser(this.currentLogin());
+        if (currentUser.is_first_login) {
+          this.$router.replace('/changePassword');
+        } else {
+          this.$router.replace('/');
+          window.location.reload();
+        }
       } catch (e) {
         if (e.statusCode === 401) {
           if (e.error.message) {

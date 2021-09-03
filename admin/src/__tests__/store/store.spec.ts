@@ -13,7 +13,10 @@ jest.mock('@/service/entityService', () => ({
 
 jest.mock('jsonwebtoken', () => ({
   decode: jest.fn().mockImplementation(
-    () => ({ exp: new Date().getTime() / 1000 + 1 }),
+    () => ({
+      exp: new Date().getTime() / 1000 + 1,
+      identity: 'fake-login',
+    }),
   ),
 }));
 
@@ -115,6 +118,12 @@ describe('store.ts', () => {
       const { authToken } = getters;
       const result = authToken(state);
       expect(result()).toEqual('test-token');
+    });
+
+    it('should return login when call login', () => {
+      const { login } = getters;
+      const result = login(state);
+      expect(result()).toEqual('fake-login');
     });
   });
 });
