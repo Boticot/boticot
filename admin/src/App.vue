@@ -35,6 +35,7 @@
             <el-tab-pane label="Model" name="model" />
             <el-tab-pane label="Analytics" name="analytics" />
             <el-tab-pane label="Agents" name="agents" />
+            <el-tab-pane label="Users" name="users" />
           </el-tabs>
         </div>
       </el-col>
@@ -79,7 +80,7 @@ export default Vue.extend({
       this.$store.commit('updateAgent', await getAgent(value));
     },
     tabClick(obj: any) {
-      if (obj.name === 'agents') { // Except agents tab
+      if (obj.name === 'agents' || obj.name === 'users') { // Except agents or users tab
         this.$router.replace(`/${obj.name}`);
       } else {
         this.$router.replace(`/${obj.name}/${this.selectedAgent}`);
