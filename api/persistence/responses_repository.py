@@ -25,6 +25,9 @@ class ResponsesRepository():
     def delete_all_agent_responses(self, agent_name):
         self.responses_collection.delete_many({"agent_name": agent_name})
 
+    def delete_agent_responses_by_intent(self, agent_name, intent_name):
+        self.responses_collection.delete_many({"agent_name": agent_name, "intent": intent_name})
+
     def delete_response_by_id(self, id):
         try:
             self.responses_collection.delete_one({"_id": ObjectId(id)})

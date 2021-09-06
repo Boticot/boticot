@@ -232,6 +232,11 @@ class AgentsService(object):
         
         self.delete_agent_from_memory(agent_name)
 
+    def delete_agent_intent(self, agent_name, intent_name):
+        self.agents_repository.delete_agent_intent(agent_name, intent_name)
+        self.training_data_repository.delete_agent_training_data_by_intent(agent_name, intent_name)
+        self.responses_repository.delete_agent_responses_by_intent(agent_name, intent_name)
+
     def cleanup_agent(self, agent_name):
         self.agents_repository.delete_agent(agent_name)
         counter = 0

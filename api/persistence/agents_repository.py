@@ -44,6 +44,12 @@ class AgentsRepository():
             {"name": agent_name}, 
             { "$addToSet": { "intents": {"$each":intents} } }
         )
+
+    def delete_agent_intent(self, agent_name, intent):
+        return self.agents_collection.update_one(
+            {"name": agent_name},
+            { "$pull": { "intents": intent } }
+        )
     
     def update_agent_entities(self, agent_name, entities):
         """Add/update agent entities"""

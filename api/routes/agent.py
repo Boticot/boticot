@@ -71,6 +71,12 @@ def delete_agent(agent_name):
     AgentsService.get_instance().delete_agent(agent_name)
     return response_template(200, "Agent {0} successfully deleted".format(agent_name))
 
+@current_app.route("/nlu/agents/<agent_name>/intents/<intent_name>", methods=["DELETE"])
+@jwt_required
+def delete_agent_intent(agent_name, intent_name):
+    AgentsService.get_instance().delete_agent_intent(agent_name, intent_name)
+    return response_template(200, "Intent {1} of agent {0} successfully deleted".format(agent_name, intent_name))
+
 @current_app.route("/nlu/agents/<agent_name>/parse", methods=["POST"])
 def parse(agent_name):
     """Parse a text to get nlu response with intent/entities assosciated"""
