@@ -63,3 +63,6 @@ class TrainingDataRepository():
     
     def delete_all_training_data(self, agent_name):
         self.training_data_collection.delete_many({"agent_name": agent_name})
+
+    def delete_agent_training_data_by_intent(self, agent_name, intent_name):
+        self.training_data_collection.delete_many({"agent_name": agent_name, "data.intent": intent_name})
