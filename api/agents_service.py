@@ -240,7 +240,7 @@ class AgentsService(object):
             try:
                 self.training_data_repository.delete_all_training_data(agent_name)
                 self.lookups_repository.delete_lookups(agent_name)
-                self.synonyms_repository.delete_synonyms(agent_name)
+                self.synonyms_repository.delete_agent_synonyms(agent_name)
                 self.responses_repository.delete_all_agent_responses(agent_name)
                 self.contexts_repository.delete_contexts(agent_name)
                 self.agents_repository.delete_agent(agent_name)
@@ -336,6 +336,20 @@ class AgentsService(object):
         for entry in synonyms:
             data.append({"agent_name": agent_name, "synonyms": entry})
         if self.synonyms_repository.insert_synonyms(data):
+            self.agents_repository.agent_modified(agent_name)
+
+    def synonym_exist(self, id):
+        if not ObjectId.is_valid(id) or self.synonyms_repository.find_synonym(id) is None:
+            return False
+        else:
+            return True
+
+    def delete_agent_synonym(self, agent_name, id):
+        if self.synonyms_repository.delete_synonym(agent_name, id):
+            self.agents_repository.agent_modified(agent_name)
+
+    def update_agent_synonym(self, agent_name, id, synonym):
+        if self.synonyms_repository.update_synonym(agent_name, id, synonym):
             self.agents_repository.agent_modified(agent_name)
 
     def create_agent_file(self, agent_name):
