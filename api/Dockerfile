@@ -9,6 +9,8 @@ RUN pip install flask-compress==1.5.0
 RUN pip install isodate==0.6.0
 RUN pip install flask_jwt_extended==3.24.1
 RUN pip install bcrypt==3.2.0
+RUN pip install pytest==6.2.5
+RUN pip install pytest-mock==3.6.1
 
 ADD . .
 

@@ -120,16 +120,6 @@ def add_lookups(agent_name):
     else:
         return response_template(400, "A body is mandatory inside the request")
 
-@current_app.route("/nlu/agents/<agent_name>/synonyms", methods = ["PUT"])
-@jwt_required
-def add_synonyms(agent_name):
-    if request.get_data():
-        request_data = json.loads((request.get_data()).decode())
-        AgentsService.get_instance().add_agent_synonyms(request_data["agent_name"], request_data["data"])
-        return response_template(200, "Synonyms successfully added for agent {0}".format(agent_name))
-    else:
-        return response_template(400, "A body is mandatory inside the request")
-
 @current_app.route("/nlu/agents/<agent_name>/model", methods = ["PUT"])
 @jwt_required
 def set_specific_model(agent_name):
