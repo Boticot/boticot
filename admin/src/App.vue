@@ -58,8 +58,10 @@ export default Vue.extend({
   },
   watch: {
     async choices() {
-      [this.selectedAgent] = this.choices; // Select the first as default value
-      this.$store.commit('updateAgent', await getAgent(this.selectedAgent));
+      if (!this.selectedAgent) {
+        [this.selectedAgent] = this.choices; // Select the first as default value
+        this.$store.commit('updateAgent', await getAgent(this.selectedAgent));
+      }
     },
   },
   computed: {
@@ -97,6 +99,7 @@ export default Vue.extend({
           } else {
             this.$store.commit('initAgents', val);
             this.choices = this.$store.state.agents;
+            this.selectedAgent = this.$route.params.agentName;
             if (this.$router.currentRoute.path === '/') {
               this.$router.replace(`/try-it/${this.choices[0]}`);
             }
