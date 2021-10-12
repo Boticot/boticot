@@ -12,12 +12,9 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
-    // "types": [
-    //   "webpack-env",
-    //   "mocha",
-    //   "chai"
-    // ],
-    "types": [],
+    "types": [
+      "jest",
+    ],
     "paths": {
       "@/*": [
         "src/*"
@@ -28,14 +25,14 @@
       "dom",
       "dom.iterable",
       "scripthost"
-    ]
+    ],
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "src/**/*.js",
   ],
   "exclude": [
     "node_modules"
