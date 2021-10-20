@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import mockedData from '@/client/__mocks__/mockedAnalyticsData.json';
 import {
   generateSingleChartData,
@@ -6,7 +7,6 @@ import {
   prepareAnalyticsData,
 } from '@/service/analyticsService';
 import { colorsArray } from '@/utils';
-import _ from 'lodash';
 
 describe('analyticsService.ts', () => {
   const chartColor = 'rgb(75, 192, 192)';

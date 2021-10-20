@@ -4,9 +4,9 @@ module.exports = {
     : '/',
   configureWebpack: {
     devServer: {
-      host: "localhost",
+      host: 'localhost',
       disableHostCheck: true,
     },
-    devtool: "source-map",
+    devtool: 'source-map',
   },
 };

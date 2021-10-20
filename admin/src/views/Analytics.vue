@@ -31,6 +31,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import _ from 'lodash';
 import LineChart from '@/components/analytics/LineChart.vue';
 import BarChart from '@/components/analytics/BarChart.vue';
 import DoghnutChart from '@/components/analytics/DoghnutChart.vue';
@@ -42,7 +43,6 @@ import {
   generateChartDataLineIntents,
   generateChartDoghnutIntents,
 } from '@/service/analyticsService';
-import _ from 'lodash';
 
 function handleIntentLegendClick(this: any, e: any, legendItem: any) {
   const index = legendItem.datasetIndex;

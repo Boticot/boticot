@@ -1,8 +1,8 @@
 import { createLocalVue, mount } from '@vue/test-utils';
 import ElementUI from 'element-ui';
+import VueRouter from 'vue-router';
 import App from '@/App.vue';
 import router from '@/router';
-import VueRouter from 'vue-router';
 import Login from '@/views/Login.vue';
 
 const localVue = createLocalVue();

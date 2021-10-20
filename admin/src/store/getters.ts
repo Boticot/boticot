@@ -1,5 +1,5 @@
-import { GlobalEntity } from '@/types';
 import jwt from 'jsonwebtoken';
+import { GlobalEntity } from '@/types';
 
 function getExpiration(token: string) {
   const decodedToken: any = jwt.decode(token);

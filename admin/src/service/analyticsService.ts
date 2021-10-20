@@ -1,8 +1,8 @@
+import _ from 'lodash';
+import dayjs from 'dayjs';
 import {
   Analytics, ChartData, PreparedAnalyticsData,
 } from '@/types';
-import _ from 'lodash';
-import dayjs from 'dayjs';
 import { colorsArray, getRandomColor } from '@/utils';
 
 const chartBorderColor = 'rgb(75, 192, 192)';
