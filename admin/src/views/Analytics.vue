@@ -192,10 +192,10 @@ export default Vue.extend({
       this.analyticsData = _.cloneDeep(response);
       this.isAnalyticsDataEmpty = (this.analyticsData as any).analytics.length === 0;
       if (this.isAnalyticsDataEmpty) {
-        this.$notify({
-          title: 'Empty Analytics Data',
-          message: 'Nothing to show',
-          duration: 0,
+        this.$notify.info({
+          title: 'Info',
+          message: 'Empty Analytics Data',
+          offset: 100,
         });
       } else {
         const preparedAnalyticsData = prepareAnalyticsData((this.analyticsData as unknown as Analytics));

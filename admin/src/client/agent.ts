@@ -72,6 +72,20 @@ const deleteAgent = async (agentName: string): Promise<any> => {
   return response.data;
 };
 
+const deleteAgentIntent = async (agentName: string, intent: string): Promise<any> => {
+  const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/intents/${intent}`;
+  const opt = {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
+    },
+  };
+  const response = await axios.delete(url, opt);
+  return response.data;
+};
+
 const getInputs = async (agentName: string, page: number): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH, VUE_APP_NLU_ENTRIES_PAGE_SIZE } = process.env;
   const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/inputs`
@@ -119,5 +133,5 @@ const parseText = async (agentName: string, text: string): Promise<any> => {
 };
 
 export {
-  getAgents, addAgent, getInputs, deleteInput, parseText, getAgent, deleteAgent, getAgentFile,
+  getAgents, addAgent, getInputs, deleteInput, parseText, getAgent, deleteAgent, deleteAgentIntent, getAgentFile,
 };

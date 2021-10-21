@@ -28,6 +28,11 @@ export default {
       state.intents = [newIntent];
     }
   },
+  deleteIntent(state: any, intent: any) {
+    if (state.intents) {
+      state.intents = state.intents.filter((i: any) => (i !== intent));
+    }
+  },
   async updateAgent(state: any, agentResponse: any) {
     state.intents = agentResponse.intents.sort();
     state.entities = initEntities(agentResponse.entities);

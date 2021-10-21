@@ -23,9 +23,20 @@
     </el-card>
     <el-card class="box-card" :class="[displayIntents ? '' : 'displayNone']">
       <h4>Intents</h4>
-      <div v-for="intent in intents" :key="intent">
-        <li class="textAlignLeft marginLeftMedium">{{intent}}</li>
-      </div>
+      <el-table :data="intents" style="width: 100%">
+        <el-table-column prop="intent" label="Intent"></el-table-column>
+        <el-table-column fixed="right" width="90">
+          <template slot-scope="scope">
+            <el-button
+            type="danger"
+            @click="deleteSelectedIntent(scope.row.intent)"
+            icon="el-icon-delete"
+            :style="{ marginLeft: '15px' }"
+            plain
+          ></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-card>
   </div>
 </template>
@@ -33,7 +44,7 @@
 <script lang='ts'>
 import Vue from 'vue';
 import { GlobalEntity } from '@/types';
-import { getAgent } from '@/client/agent';
+import { getAgent, deleteAgentIntent } from '@/client/agent';
 import { initEntities } from '@/service/entityService';
 
 export default Vue.extend({
@@ -60,7 +71,9 @@ export default Vue.extend({
         this.displayVersions = true;
       }
       if (agentResponse.intents && agentResponse.intents.length !== 0) {
-        this.intents = agentResponse.intents;
+        this.intents = agentResponse.intents.sort().map(
+          (intent: string) => ({ intent }),
+        );
         this.displayIntents = true;
       }
       if (agentResponse.entities && agentResponse.entities.length !== 0) {
@@ -68,6 +81,27 @@ export default Vue.extend({
         this.displayEntities = true;
       }
       this.config = JSON.stringify(agentResponse.config, null, 2);
+    },
+    async deleteSelectedIntent(intent: string) {
+      try {
+        await deleteAgentIntent(this.agentName, intent);
+        this.$store.commit('deleteIntent', intent);
+        this.intents = this.intents.filter((i: any) => (i.intent !== intent));
+        if (this.intents.length === 0) {
+          this.displayIntents = false;
+        }
+        this.$notify.success({
+          title: 'Success',
+          message: `Intent ${intent} removed`,
+          offset: 100,
+        });
+      } catch (e) {
+        this.$notify.error({
+          title: 'Error',
+          message: `Error when remove intent ${intent}`,
+          offset: 100,
+        });
+      }
     },
   },
   mounted() {
