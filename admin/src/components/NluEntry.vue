@@ -274,10 +274,20 @@ const NluEntryComponent = Vue.extend({
       if (this.data.type === 'Inputs') {
         this.isHideElement = true;
       }
+      this.$notify.success({
+        title: 'Success',
+        message: `Data added: '${this.data.text}'`,
+        offset: 100,
+      });
     },
     remove(): void {
       deleteElement(this.data.type, this.agentName, this.data.id);
       this.isHideElement = true;
+      this.$notify.info({
+        title: 'Info',
+        message: `Data removed: '${this.data.text}'`,
+        offset: 100,
+      });
     },
   },
 });
