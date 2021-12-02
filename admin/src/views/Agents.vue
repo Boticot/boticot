@@ -309,8 +309,11 @@ export default Vue.extend({
                 JSON.parse(this.newAgent.trainingData),
                 this.newAgent.responses ? JSON.parse(this.newAgent.responses) : [],
               );
-              this.textMsg = response.message;
-              this.classMsg = 'successMsg';
+              this.$notify.success({
+                title: 'Success',
+                message: response.message,
+                offset: 100,
+              });
               this.loading = false;
             } catch (error) {
               if (error.statusCode === 400) {
@@ -349,6 +352,11 @@ export default Vue.extend({
       if (this.agents.length === 0) {
         this.isHideExistingAgents = true;
       }
+      this.$notify.info({
+        title: 'Info',
+        message: `Agent '${name}' removed`,
+        offset: 100,
+      });
     },
     async downloadAgentFile(name: string) {
       const response = await getAgentFile(name);
