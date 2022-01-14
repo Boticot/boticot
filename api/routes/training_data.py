@@ -12,9 +12,10 @@ from flask import current_app
 def get_training_data(agent_name):
     """Get training Data by agent_name, filters existing in query params: intent, page size and page number"""
     intent = request.args.get("intent", default = None, type = str)
+    text = request.args.get("text", default = None, type = str)
     page_number = request.args.get("pageNumber", default = 1, type = int)
     page_size = request.args.get("pageSize", default = 30, type = int)
-    data = AgentsService.get_instance().get_training_data(agent_name, intent, page_number, page_size)
+    data = AgentsService.get_instance().get_training_data(agent_name, intent, text, page_number, page_size)
     return jsonify(data)
 
 @current_app.route("/nlu/agents/<agent_name>/training-data/<id>", methods=["DELETE"])

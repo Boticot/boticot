@@ -18,13 +18,14 @@ class TestAgentsService:
 
     @pytest.fixture(scope="function", autouse=True)
     def mock_functions(self, mocker):
-        mock_list = ["TrainingDataRepository", "ResponsesRepository",
-                     "UsersRepository", "ContextsRepository", "AnalyticsRepository", "AgentsRepository.agent_modified"]
+        mock_list = ["ResponsesRepository", "ContextsRepository", "AnalyticsRepository", "AgentsRepository.agent_modified"]
         for mock in mock_list:
             mocker.patch("agents_service.{}".format(mock))
         mocker.patch("agents_service.SynonymsRepository.__init__", lambda x: None)
         mocker.patch("agents_service.AgentsRepository.__init__", lambda x: None)
         mocker.patch("agents_service.LookupsRepository.__init__", lambda x: None)
+        mocker.patch("agents_service.TrainingDataRepository.__init__", lambda x: None)
+        mocker.patch("agents_service.UsersRepository.__init__", lambda x: None)
 
     def test_should_return_last_model_name(self, mocker):
         mocker.patch("os.environ.get", return_value="models")
@@ -75,3 +76,13 @@ class TestAgentsService:
         mocker.patch("agents_service.LookupsRepository.get_agent_lookups", return_value=["lookup1", "lookup2"])
         mocker.patch("agents_service.LookupsRepository.count_agent_lookups", return_value=2)
         assert agents_service.AgentsService.get_instance().get_lookups(self.agent_name) == {"count": 2, "items": ["lookup1", "lookup2"]}
+
+    def test_should_return_something_when_getting_training_data(self, mocker):
+        mocker.patch("agents_service.TrainingDataRepository.get_agent_training_data", return_value=["data1", "data2"])
+        mocker.patch("agents_service.TrainingDataRepository.count_agent_training_data", return_value=4)
+        assert agents_service.AgentsService.get_instance().get_training_data("test1") == {"count" : 4,"items": ["data1", "data2"]}
+
+    def test_should_return_something_when_getting_agent_inputs(self, mocker):
+        mocker.patch("agents_service.UsersRepository.get_agent_inputs", return_value=["data1", "data2"])
+        mocker.patch("agents_service.UsersRepository.count_user_inputs", return_value=4)
+        assert agents_service.AgentsService.get_instance().get_agent_inputs("test1", None, None, 1, 0, 1, 20) == {"count" : 4,"items": ["data1", "data2"]}
