@@ -31,6 +31,11 @@ const routes: Array<RouteConfig> = [
     component: () => import('../views/Model.vue'),
   },
   {
+    path: '/synonyms/:agentName',
+    name: 'synonyms',
+    component: () => import('../views/Synonyms.vue'),
+  },
+  {
     path: '/analytics/:agentName',
     name: 'analytics',
     component: () => import('../views/Analytics.vue'),

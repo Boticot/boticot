@@ -315,7 +315,7 @@ export default Vue.extend({
                 offset: 100,
               });
               this.loading = false;
-            } catch (error) {
+            } catch (error: any) {
               if (error.statusCode === 400) {
                 if (error.error.message) {
                   this.textMsg = error.error.message;
