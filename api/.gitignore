@@ -1,10 +1,12 @@
 # Models
 models
 
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
+.cache
+.pytest_cache
 
 # Environments
 .env

@@ -6,6 +6,7 @@ from itertools import groupby
 from agent import Agent
 from utils import remove_file_or_dir
 from responses_service import ResponsesService
+from synonyms_service import SynonymsService
 from persistence.agents_repository import AgentsRepository
 from persistence.lookups_repository import LookupsRepository
 from persistence.synonyms_repository import SynonymsRepository
@@ -98,14 +99,6 @@ class AgentsService(object):
                     lookup_entry["elements"].extend(sub_entry.get("elements"))
                 lookups.append(lookup_entry)
         return lookups
-
-    def get_agent_synonyms(self, agent_name):
-        tmp_data = []
-        synonyms = self.synonyms_repository.find_agent_synonyms(agent_name)
-        for entry in synonyms:    
-            del entry["_id"]
-            tmp_data.append(entry["synonyms"])
-        return tmp_data
 
     def get_bots(self):
         """Get Bots loaded in memory""" 
@@ -206,7 +199,7 @@ class AgentsService(object):
 
                 """Add Synonyms"""
                 if nlu_data.get("entity_synonyms") is not None:
-                    self.add_agent_synonyms(agent_name, nlu_data.get("entity_synonyms"))
+                    SynonymsService.get_instance().add_agent_synonyms(agent_name, nlu_data.get("entity_synonyms"))
 
             """Add responses"""
             if responses is not None:
@@ -336,27 +329,6 @@ class AgentsService(object):
         if self.lookups_repository.insert_lookups(data) or is_agent_modified:
             self.agents_repository.agent_modified(agent_name)
 
-    def add_agent_synonyms(self, agent_name, synonyms):
-        data = []
-        for entry in synonyms:
-            data.append({"agent_name": agent_name, "synonyms": entry})
-        if self.synonyms_repository.insert_synonyms(data):
-            self.agents_repository.agent_modified(agent_name)
-
-    def synonym_exist(self, id):
-        if not ObjectId.is_valid(id) or self.synonyms_repository.find_synonym(id) is None:
-            return False
-        else:
-            return True
-
-    def delete_agent_synonym(self, agent_name, id):
-        if self.synonyms_repository.delete_synonym(agent_name, id):
-            self.agents_repository.agent_modified(agent_name)
-
-    def update_agent_synonym(self, agent_name, id, synonym):
-        if self.synonyms_repository.update_synonym(agent_name, id, synonym):
-            self.agents_repository.agent_modified(agent_name)
-
     def create_agent_file(self, agent_name):
         agent_data = self.get_agent(agent_name)
         agent = {}
@@ -364,7 +336,7 @@ class AgentsService(object):
         agent["rasa_nlu_data"] = {}
         agent["rasa_nlu_data"]["common_examples"] = self.get_agent_training_data(agent_name)
         agent["rasa_nlu_data"]["lookup_tables"] = self.get_agent_lookups(agent_name)
-        agent["rasa_nlu_data"]["entity_synonyms"] = self.get_agent_synonyms(agent_name)
+        agent["rasa_nlu_data"]["entity_synonyms"] = SynonymsService.get_instance().get_agent_synonyms(agent_name)
         agent["responses"] = ResponsesService.get_instance().get_agent_responses(agent_name)
         return agent
 
