@@ -1,6 +1,9 @@
 # local models
 models
 
+# Python
+.cache
+
 # Editor directories and files
 .idea
 .vscode

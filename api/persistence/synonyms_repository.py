@@ -12,6 +12,9 @@ class SynonymsRepository():
     def find_agent_synonyms(self, agent_name):
         return self.synonyms_collection.find({"agent_name": agent_name})
 
+    def count_agent_synonyms(self, agent_name):
+        return self.synonyms_collection.count({"agent_name": agent_name})
+
     def insert_synonyms(self, data):
         try:
             self.synonyms_collection.insert_many(data)
@@ -31,7 +34,7 @@ class SynonymsRepository():
 
     def update_synonym(self, agent_name, id, data):
         try:
-            self.synonyms_collection.update_one({"agent_name": agent_name, "_id": ObjectId(id)}, {"$set": {"data": data}}, upsert = True)
+            self.synonyms_collection.update_one({"agent_name": agent_name, "_id": ObjectId(id)}, {"$set": {"synonyms": data}}, upsert = True)
             return True
         except:
             return False
