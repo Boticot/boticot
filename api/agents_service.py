@@ -374,12 +374,21 @@ class AgentsService(object):
     def get_intent_by_text(self, text, agent_name):
         return(self.training_data_repository.get_intent_by_text(text, agent_name))
 
+    def retrieve_last_model_name(self, agent_name):
+        model_dir = os.environ.get("MODELS_PATH") + agent_name + "/"
+        if not os.path.exists(model_dir):
+            logger.info("No existing model for agent {0}".format(agent_name))
+        else:
+            models_list = [file for file in os.listdir(model_dir) if os.path.isfile(os.path.join(model_dir, file))]
+            last_model_name = max(models_list).replace(".tar.gz", "")
+            return last_model_name
+
     def get_trained_agents(self):
         trained_agents = []
         agents = self.agents_repository.get_all_agents()
         for agent in agents:
             try:
-                if (agent.get("last_train") > agent.get("last_modified")) and (agent.get("last_version") != agent.get("current_version")):
+                if (agent.get("last_train") > agent.get("last_modified")) and (agent.get("last_version") != self.retrieve_last_model_name(agent.get("name"))):
                     trained_agents.append({
                         "name": agent.get("name"),
                         "last_version": agent.get("last_version")
