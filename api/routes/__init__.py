@@ -10,6 +10,7 @@ mongo.init_app(current_app)
 from flask_jwt_extended import JWTManager
 jwt = JWTManager(current_app)
 current_app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
+current_app.config["JWT_DECODE_LEEWAY"] = int(os.environ.get("JWT_DECODE_LEEWAY", 600)) # 600 seconds = 10 minutes
 
 from flask_cors import CORS
 CORS(current_app)
