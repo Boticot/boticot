@@ -13,7 +13,7 @@
   </el-select>
     <LineChart class="marginClass" :chartData="chartDataLineTraffic" :options="chartOptions" />
     <LineChart class="marginClass" :chartData="chartDataLineUniqueUsers" :options="chartOptions" />
-    <BarChart class="marginClass" :chartData="chartDataBarFallback" :options="chartOptions" />
+    <BarChart class="marginClass" :chartData="chartDataBarFallback" :options="chartOptionsRate" />
     <LineChart class="marginClass" :chartData="chartDataLineIntents"
       :options="chartDataLineIntentsOptions"  />
     <el-select v-model="doghnutPeriod"
@@ -58,6 +58,13 @@ function handleIntentLegendClick(this: any, e: any, legendItem: any) {
   ci.update();
 }
 
+function formatRate(value: number) {
+  return Number(value).toLocaleString(undefined, {
+    style: 'percent',
+    minimumFractionDigits: 2,
+  });
+}
+
 export default Vue.extend({
   name: 'analytics',
   components: {
@@ -91,6 +98,27 @@ export default Vue.extend({
         scales: {
           yAxes: [{
             ticks: {
+              beginAtZero: true,
+            },
+          }],
+        },
+      },
+      chartOptionsRate: {
+        responsive: true,
+        maintainAspectRatio: false,
+        tooltips: {
+          callbacks: {
+            label: (tooltipItem: any, data: any) => {
+              const { label } = data.datasets[tooltipItem.datasetIndex];
+              const value = formatRate(tooltipItem.yLabel);
+              return `${label}: ${value}`;
+            },
+          },
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              callback: (value: number) => formatRate(value),
               beginAtZero: true,
             },
           }],
