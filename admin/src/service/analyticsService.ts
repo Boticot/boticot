@@ -37,7 +37,7 @@ const generateSingleChartData = (
   ],
 });
 
-const generateChartDataLineIntents = (dateDataList: Array<Date| string>, period: string, analyticsData: Analytics):
+const generateChartDataLineIntents = (dateDataList: Array<Date | string>, period: string, analyticsData: Analytics):
   ChartData => {
   let limit;
   if (period === 'Last 7 days') {
@@ -101,7 +101,7 @@ const prepareAnalyticsData = (analyticsData: Analytics): PreparedAnalyticsData =
     .map((item: any) => {
       if (_.some(item.intents_count, { intent: 'FALLBACK' })) {
         const element = _.filter(item.intents_count, ['intent', 'FALLBACK']);
-        return element[0].count;
+        return element[0].count / item.traffic;
       }
       return 0;
     }) as any)) as any);
