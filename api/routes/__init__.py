@@ -34,6 +34,10 @@ exist_super_admin_user = UsersService.get_instance().exist_super_admin_user()
 if not exist_super_admin_user:
         UsersService.get_instance().add_new_user(os.environ.get("ADMIN_LOGIN", "admin@boticot.ai"), "Boticot", "Admin", os.environ.get("ADMIN_PWD", "B0tic0t!"), "super-admin", [])
 
+from custom_json_encoder import CustomJSONEncoder
+from flask.json import JSONEncoder
+JSONEncoder.default = CustomJSONEncoder.custom_default
+
 @current_app.route( "/", methods=["GET"])
 def index():
         return "Boticot API !"

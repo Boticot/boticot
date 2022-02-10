@@ -1,6 +1,7 @@
 import os, shutil
 from flask import jsonify
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -31,3 +32,10 @@ def remove_file_or_dir(path):
         shutil.rmtree(path)
     else:
         logger.warn("file {} is not a file or dir.".format(path))
+
+def string_to_date(date_string):
+    try:
+        return datetime.strptime(date_string, "%d-%m-%Y")
+    except ValueError:
+        logger.warning("{} is not valid, should be with DD-MM-YYYY format".format(date_string))
+        return None
