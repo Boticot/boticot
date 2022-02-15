@@ -1,11 +1,13 @@
 <template>
-  <el-dialog title="Change Password" :close-on-click-modal="false" :visible.sync="showChangePasswordForm">
+  <el-dialog title="Change Password" :close-on-click-modal="false"
+    :visible.sync="showChangePasswordForm"
+    :before-close="cancelChangePassword">
       <el-form :model="changePasswordModel" :rules="rules" ref="changePasswordModel" label-width="120px">
         <el-form-item label="User Login" prop="login">
           <el-input :disabled="true" placeholder="Enter Login" v-model="changePasswordModel.login"></el-input>
         </el-form-item>
         <el-form-item label="New Password" prop="password">
-          <el-input type="password" v-model="changePasswordModel.password" autocomplete="off"></el-input>
+          <el-input type="password" v-model="changePasswordModel.password" autocomplete="off" show-password></el-input>
         </el-form-item>
         <el-form-item label="Confirm" prop="checkPassword">
           <el-input type="password" v-model="changePasswordModel.checkPassword" autocomplete="off"></el-input>
@@ -59,7 +61,7 @@ export default Vue.extend({
           {
             required: true,
             pattern: /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/,
-            message: 'Please input Valid Password.',
+            message: 'Please enter a Valid Password. At least one number, one LowerCase and one Uppercase',
             trigger: 'blur',
           },
           {
@@ -85,7 +87,7 @@ export default Vue.extend({
                 message: 'Password reset successfully',
               });
               this.showChangePasswordForm = false;
-              this.$router.replace('/');
+              this.$emit('init');
             })
               .catch(() => {
                 this.$message.error('server error, please retry later !');
@@ -96,7 +98,7 @@ export default Vue.extend({
     },
     cancelChangePassword() {
       this.showChangePasswordForm = false;
-      this.$router.replace('login');
+      this.$emit('init');
     },
   },
 });

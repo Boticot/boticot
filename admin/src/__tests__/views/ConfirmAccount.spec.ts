@@ -61,7 +61,7 @@ describe('ConfirmAccount.vue', () => {
     await comp.$nextTick();
 
     // then
-    expect(router.currentRoute.path).toEqual('/login');
+    expect(router.currentRoute.path).toEqual('/');
     expect(comp.$data.showChangePasswordForm).toEqual(false);
   });
 });

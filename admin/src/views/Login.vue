@@ -19,7 +19,8 @@
 
 <script lang='ts'>
 import Vue from 'vue';
-import { authenticateUser, getUser, UserType } from '@/client/auth';
+import { authenticateUser } from '@/client/auth';
+import { getUser, UserType } from '@/client/users';
 import { mapGetters } from 'vuex';
 
 export default Vue.extend({
@@ -46,10 +47,10 @@ export default Vue.extend({
         });
         this.$store.commit('updateToken', authUser.access_token);
         const currentUser: UserType = await getUser(this.currentLogin());
+        this.$store.commit('updateRole', currentUser.role);
         if (currentUser.is_first_login) {
           this.$router.replace('/changePassword');
         } else {
-          this.$router.replace('/');
           window.location.reload();
         }
       } catch (e) {

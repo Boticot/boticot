@@ -21,4 +21,12 @@ export default {
   authToken: (state: any) => () => state.token,
 
   login: (state: any) => () => getLogin(state.token),
+
+  isSuperAdmin: (state: any) => () => state.role === 'super-admin',
+
+  isAdmin: (state: any) => () => state.role === 'admin',
+
+  isReadUser: (state: any) => () => state.role === 'read',
+
+  isWriteUser: (state: any) => () => state.role === 'write',
 };

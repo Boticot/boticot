@@ -5,12 +5,12 @@
       style="width: 304px; height: 84px; margin-top: 5px;"
       :src="require('@/assets/boticot.png')"
       fit="contain"></el-image>
-      <div v-if="isLoggedIn" class="marginTopMedium marginRightSmall" style="float: right;">
+      <div v-if="isLoggedIn()" class="marginTopMedium marginRightSmall" style="float: right;">
         <el-button icon="el-icon-switch-button" @click="logout()" circle></el-button>
       </div>
     </el-row>
     <el-row>
-      <el-col v-if="isLoggedIn">
+      <el-col v-if="isLoggedIn()">
         <div class="grid-content textAlignRight marginTopMedium">
           <span>Agent:</span>
           <el-select v-model="selectedAgent" placeholder="Select here" @change="selectAgent">
@@ -24,7 +24,7 @@
         </div>
       </el-col>
     </el-row>
-    <el-row v-if="isLoggedIn">
+    <el-row v-if="isLoggedIn()">
       <el-col>
         <div id="nav" style="padding: 10px">
           <el-tabs v-model="activeName" type="card" @tab-click="tabClick">
@@ -32,16 +32,16 @@
             <el-tab-pane label="Inputs" name="inputs" />
             <el-tab-pane label="Training Data" name="training-data" />
             <el-tab-pane label="Synonyms" name="synonyms" />
-            <el-tab-pane label="Responses" name="responses" />
+            <el-tab-pane v-if="!isReadUser()" label="Responses" name="responses" />
             <el-tab-pane label="Model" name="model" />
             <el-tab-pane label="Analytics" name="analytics" />
-            <el-tab-pane label="Agents" name="agents" />
-            <el-tab-pane label="Users" name="users" />
+            <el-tab-pane v-if="isSuperAdmin() || isAdmin()" label="Agents" name="agents" />
+            <el-tab-pane v-if="isSuperAdmin()" label="Users" name="users" />
           </el-tabs>
         </div>
       </el-col>
     </el-row>
-    <router-view :key="$route.name + ($route.params.agentName || '')" />
+    <router-view @init="handleInit" :key="$route.name + ($route.params.agentName || '')" />
   </div>
 </template>
 
@@ -49,6 +49,7 @@
 import Vue from 'vue';
 import { getAgentsNames } from '@/service/agentService';
 import { getAgent } from '@/client/agent';
+import { mapGetters } from 'vuex';
 
 export default Vue.extend({
   name: 'app',
@@ -68,11 +69,39 @@ export default Vue.extend({
     },
   },
   computed: {
-    isLoggedIn() {
-      return this.$store.getters.isLoggedIn();
-    },
+    ...mapGetters([
+      'isReadUser',
+      'isSuperAdmin',
+      'isAdmin',
+      'isLoggedIn',
+    ]),
   },
   methods: {
+    initCallback() {
+      if (this.isLoggedIn()) {
+        getAgentsNames()
+          .then((val) => {
+            this.activeName = this.$router.currentRoute.name?.toLowerCase() || 'try-it';
+            if (val.length === 0) {
+              this.$router.replace('/agents');
+            } else {
+              this.$store.commit('initAgents', val);
+              this.choices = this.$store.state.agents;
+              this.selectedAgent = this.$route.params.agentName;
+              if (this.$router.currentRoute.path === '/') {
+                this.$router.replace(`/try-it/${this.choices[0]}`);
+              }
+            }
+          })
+          .catch(() => {
+            this.choices = ['ERROR...'];
+          });
+      }
+    },
+    handleInit() {
+      this.$router.replace('/');
+      this.initCallback();
+    },
     async selectAgent(value: string) {
       this.selectedAgent = value;
       if (this.$router.currentRoute.path !== '/agents') {
@@ -89,29 +118,12 @@ export default Vue.extend({
     },
     logout() {
       this.$store.commit('updateToken', '');
+      this.$store.commit('updateRole', '');
       window.location.reload();
     },
   },
   mounted() {
-    if (this.$store.getters.isLoggedIn()) {
-      getAgentsNames()
-        .then((val) => {
-          this.activeName = this.$router.currentRoute.name?.toLowerCase() || 'try-it';
-          if (val.length === 0) {
-            this.$router.replace('/agents');
-          } else {
-            this.$store.commit('initAgents', val);
-            this.choices = this.$store.state.agents;
-            this.selectedAgent = this.$route.params.agentName;
-            if (this.$router.currentRoute.path === '/') {
-              this.$router.replace(`/try-it/${this.choices[0]}`);
-            }
-          }
-        })
-        .catch(() => {
-          this.choices = ['ERROR...'];
-        });
-    }
+    this.initCallback();
   },
 });
 </script>
