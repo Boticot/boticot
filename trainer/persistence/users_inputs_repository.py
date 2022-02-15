@@ -31,6 +31,15 @@ class UsersInputRepository():
                 }
             })
 
+    def get_agent_entities_count(self, agent_name, from_date, to_date):
+        return self.users_inputs_repository.aggregate(
+                [{"$match": {"agent_name": agent_name,
+                             "date": {"$gte": from_date,
+                                      "$lt": to_date}}},
+                 {"$unwind": {"path": "$entities"}},
+                 {"$group": {"_id": "$entities.entity",
+                             "count": {"$sum": 1}}}])
+
     def get_agent_unique_users_count(self, agent_name, from_date, to_date):
         return self.users_inputs_repository.distinct(
             "user_id", 
