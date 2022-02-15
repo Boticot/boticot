@@ -4,15 +4,18 @@ export default {
   initAgents(state: any, newAgents: any) {
     state.agents = newAgents;
   },
+
   addAgent(state: any, newAgent: any) {
     state.agents.push(newAgent);
   },
+
   deleteAgent(state: any, agentName: any) {
     const index = state.agents.indexOf(agentName);
     if (index > -1) {
       state.agents.splice(index, 1);
     }
   },
+
   addEntity(state: any, newEntity: any) {
     const usedColors = state.entities.map((e: any) => e.color);
     state.entities.push({
@@ -20,6 +23,7 @@ export default {
       color: calculateEntityColor(usedColors),
     });
   },
+
   addIntent(state: any, newIntent: any) {
     if (state.intents) {
       state.intents.push(newIntent);
@@ -33,12 +37,19 @@ export default {
       state.intents = state.intents.filter((i: any) => (i !== intent));
     }
   },
+
   async updateAgent(state: any, agentResponse: any) {
     state.intents = agentResponse.intents.sort();
     state.entities = initEntities(agentResponse.entities);
   },
+
   updateToken(state: any, userToken: any) {
     state.token = userToken;
     localStorage.setItem('token', userToken);
+  },
+
+  updateRole(state: any, role: any) {
+    state.role = role;
+    localStorage.setItem('role', role);
   },
 };

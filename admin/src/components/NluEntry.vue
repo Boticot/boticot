@@ -27,14 +27,14 @@
         </el-col>
         <el-col :span="8" v-if="!isAddNewEntity">
           <el-select v-model="newEntityValue" placeholder="Select Entity" @change="selectNewEntity">
-            <el-option v-for="choice in allEntities" :key="choice" :label="choice" :value="choice"></el-option>
+            <el-option v-for="choice in allEntities()" :key="choice" :label="choice" :value="choice"></el-option>
             <el-option label="Create New Entity" value="NEW_ENTITY"></el-option>
           </el-select>
         </el-col>
         <el-col :span="8" v-else>
           <el-input placeholder="New Entity Value" v-model="newEntity"></el-input>
         </el-col>
-        <el-col :span="8" :pull="1" :class="['textAlignLeft','marginLeftMedium']">
+        <el-col v-if="!isReadUser()" :span="8" :pull="1" :class="['textAlignLeft','marginLeftMedium']">
           <el-button type="success" icon="el-icon-check" @click="addEntity()" plain></el-button>
           <el-button type="danger" icon="el-icon-close" @click="closeAddEntity()" plain></el-button>
         </el-col>
@@ -47,7 +47,7 @@
           <el-col v-if="!isAddNewIntent">
             <el-select v-model="newIntentValue" filterable placeholder="Select Intent" @change="selectNewIntent">
               <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
-              <el-option label="Create New Intent" value="NEW_INTENT"></el-option>
+              <el-option v-if="!isReadUser()" label="Create New Intent" value="NEW_INTENT"></el-option>
             </el-select>
           </el-col>
           <el-col v-else>
@@ -60,7 +60,7 @@
         </el-row>
         <el-row class="marginTopSmall">
           <div v-for="entity in data.entities" :key="entity.value+entity.start" class="marginTopSmall">
-            <el-row :gutter="0" type="flex" justify="start" class>
+            <el-row v-if="!isReadUser()" :gutter="0" type="flex" justify="start" class>
               <el-col :span="10" class="marginRightSmall textAlignRight">
                 <el-button
                   :style="{
@@ -89,7 +89,7 @@
         <el-row v-if="data.type === 'TryIt' && data.fulfillmentText" class="marginTopSmall">
           Fulfillment text: <b>{{ data.fulfillmentText }}</b>
         </el-row>
-        <el-row type="flex" class="marginTopMedium" justify="end">
+        <el-row v-if="!isReadUser()" type="flex" class="marginTopMedium" justify="end">
           <el-button v-if="['TrainingData', 'Inputs'].includes(data.type)" type="danger" plain @click="remove()">
             Delete
           </el-button>
@@ -102,8 +102,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { mapGetters, mapState } from 'vuex';
 import { convertToNluData } from '@/service/nluService';
 import { deleteElement, updateElement } from '@/service/agentService';
+
 import { NluParseResult } from '../types';
 import '../assets/css/global.css';
 
@@ -145,12 +147,13 @@ const NluEntryComponent = Vue.extend({
     },
   },
   computed: {
-    allIntents() {
-      return this.$store.state.intents;
-    },
-    allEntities() {
-      return this.$store.getters.entitiesNames();
-    },
+    ...mapState({
+      allIntents: 'intents',
+    }),
+    ...mapGetters({
+      allEntities: 'entitiesNames',
+      isReadUser: 'isReadUser',
+    }),
   },
   methods: {
     intentText(intent: string, confidence?: number): string {

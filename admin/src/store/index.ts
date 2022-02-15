@@ -12,6 +12,7 @@ export default new Vuex.Store({
     intents: Array<string>(),
     entities: Array<GlobalEntity>(),
     token: localStorage.getItem('token') || '',
+    role: localStorage.getItem('role') || '',
   },
   getters,
   mutations,

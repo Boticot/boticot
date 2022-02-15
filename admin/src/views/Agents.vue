@@ -72,7 +72,7 @@
         </div>
         <div v-else>
           <el-form-item>
-            <el-upload
+            <el-upload v-if="!isReadUser()"
               action=""
               :auto-upload="false"
               ref="upload"
@@ -83,7 +83,7 @@
             </el-upload>
           </el-form-item>
         </div>
-        <el-form-item>
+        <el-form-item v-if="!isReadUser()">
           <el-button type="primary" @click="createAgent">Create Agent</el-button>
         </el-form-item>
       </el-form>
@@ -107,7 +107,7 @@
           ></el-button>
           </template>
         </el-table-column>
-        <el-table-column fixed="right" width="90">
+        <el-table-column v-if="!isReadUser()" fixed="right" width="90">
           <template slot-scope="scope">
             <el-button
             type="danger"
@@ -127,6 +127,7 @@
 import Vue from 'vue';
 import { createNewAgent } from '@/service/agentService';
 import { getAgents, deleteAgent, getAgentFile } from '@/client/agent';
+import { mapGetters } from 'vuex';
 
 const pipelineExample = {
   language: 'fr',
@@ -207,6 +208,12 @@ export default Vue.extend({
       isHideExistingAgents: false,
       loading: false,
     };
+  },
+  computed: {
+    ...mapGetters([
+      'isSuperAdmin',
+      'isReadUser',
+    ]),
   },
   methods: {
     cleanUpFile() {

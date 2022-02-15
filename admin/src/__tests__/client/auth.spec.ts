@@ -1,12 +1,13 @@
-import {
-  authenticateUser, createUser, deleteUser,
-  getAllUsers, getUser, resetPassword, updateUser,
-} from '@/client/auth';
 import axios from 'axios';
+import {
+  authenticateUser, resetPassword,
+} from '@/client/auth';
+import {
+  createUser, deleteUser,
+  getAllUsers, getUser, updateUser,
+} from '@/client/users';
 
 describe('auth.ts', () => {
-  const { VUE_APP_NLU_SERVICE_URL } = process.env;
-
   beforeEach(() => {
     jest.clearAllMocks();
   });

@@ -25,8 +25,8 @@
           <el-radio-group v-model="newUser.role">
             <el-radio :label="'super-admin'">Super Admin</el-radio>
             <el-radio :label="'admin'">Admin</el-radio>
+            <el-radio :label="'write'">Write</el-radio>
             <el-radio :label="'read'" >Read</el-radio>
-            <el-radio :label="'write'">write</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="!(newUser.role === 'super-admin')" label="Available Agents">
@@ -84,7 +84,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="Operations" width="150" fixed="right">
+        <el-table-column v-if="!isReadUser()" label="Operations" width="150" fixed="right">
           <template slot-scope="scope">
             <el-button
               size="mini"
@@ -138,11 +138,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { getAgents } from '@/client/agent';
 import { cloneDeep } from 'lodash';
+import { mapGetters } from 'vuex';
+import { getAgents } from '@/client/agent';
 import {
   createUser, deleteUser, getAllUsers, UserType, updateUser,
-} from '@/client/auth';
+} from '@/client/users';
 
 export default Vue.extend({
   name: 'users',
@@ -179,7 +180,7 @@ export default Vue.extend({
           {
             // eslint-disable-next-line max-len
             pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-            message: 'Please enter a valid login',
+            message: 'Please enter a valid login: email address',
             trigger: 'blur',
           },
         ],
@@ -196,14 +197,17 @@ export default Vue.extend({
       get(): any {
         if (this.newUser.email === '') return null;
         return this.newUser.email.charAt(0).toUpperCase()
-          + this.newUser.email.slice(1) + Math.floor(Math.random() * 10);
+          + this.newUser.email.slice(1) + Math.floor(Math.random() * 1000000);
       },
       set(): any {
         if (this.newUser.email === '') return null;
         return this.newUser.email.charAt(0).toUpperCase()
-          + this.newUser.email.slice(1) + Math.floor(Math.random() * 10);
+          + this.newUser.email.slice(1) + Math.floor(Math.random() * 1000000);
       },
     },
+    ...mapGetters([
+      'isReadUser',
+    ]),
   },
   methods: {
     async createUser() {
@@ -224,8 +228,12 @@ export default Vue.extend({
                   message: 'User Creation completed',
                 });
               })
-              .catch(() => {
-                this.errMsg = 'Server Error, please retry later.';
+              .catch((error) => {
+                if (error.response.status === 409) {
+                  this.errMsg = error.response.data.message;
+                } else {
+                  this.errMsg = 'Server Error, please retry later.';
+                }
                 this.$message.error(this.errMsg);
               });
           }
@@ -247,7 +255,7 @@ export default Vue.extend({
           if (this.users.length === 0) this.isHideExistingUsers = true;
         })
           .catch(() => {
-            this.$message.error('there is an error !');
+            this.$message.error('Cannot delete User, please retry later !');
           });
       }).catch(() => { // in case of cancel delete
         this.$message({

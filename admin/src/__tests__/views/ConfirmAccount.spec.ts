@@ -1,8 +1,8 @@
 import { createLocalVue, mount, Wrapper } from '@vue/test-utils';
 import ElementUI from 'element-ui';
+import VueRouter from 'vue-router';
 import ConfirmAccount from '@/views/ConfirmAccount.vue';
 import * as authModule from '@/client/auth';
-import VueRouter from 'vue-router';
 
 const localVue = createLocalVue();
 localVue.use(ElementUI);
@@ -61,7 +61,7 @@ describe('ConfirmAccount.vue', () => {
     await comp.$nextTick();
 
     // then
-    expect(router.currentRoute.path).toEqual('/login');
+    expect(router.currentRoute.path).toEqual('/');
     expect(comp.$data.showChangePasswordForm).toEqual(false);
   });
 });

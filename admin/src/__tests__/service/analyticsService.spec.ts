@@ -23,7 +23,7 @@ describe('analyticsService.ts', () => {
   ];
   const trafficDataList = [4, 2, 4, 4, 4, 4, 8, 5];
   const uniqueUsersDataList = [3, 11, 3, 3, 3, 3, 3, 1];
-  const fallbackDataList = [3, 0, 3, 3, 3, 1, 3, 5];
+  const fallbackDataList = [0.75, 0, 0.75, 0.75, 0.75, 0.25, 0.375, 1];
   it('should prepare analyticsa data', () => {
     const {
       intentDataList: intentDataListResult,

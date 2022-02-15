@@ -24,5 +24,4 @@ module.exports = {
     'jest-serializer-vue',
   ],
   setupFilesAfterEnv: ['<rootDir>/jest-setup-localStorage.js'],
-  setupFiles: ['<rootDir>/setEnvVars.js'],
 };
