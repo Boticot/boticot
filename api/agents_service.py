@@ -15,6 +15,7 @@ from persistence.responses_repository import ResponsesRepository
 from persistence.users_repository import UsersRepository
 from persistence.contexts_repository import ContextsRepository
 from persistence.analytics_repository import AnalyticsRepository
+from persistence.regex_repository import RegexRepository
 from persistence.mongo_encoder import MongoJSONEncoder
 from models_loader import get_loader
 import logging
@@ -46,6 +47,7 @@ class AgentsService(object):
          self.users_repository = UsersRepository()
          self.contexts_repository = ContextsRepository()
          self.analytics_repository = AnalyticsRepository()
+         self.regex_repository = RegexRepository()
          AgentsService.__instance = self
 
     def starting_load_agents(self):
@@ -100,6 +102,14 @@ class AgentsService(object):
                 lookups.append(lookup_entry)
         return lookups
 
+    def get_agent_regex(self, agent_name):
+        data = []
+        regex = self.regex_repository.find_agent_regex(agent_name)
+        for entry in regex:
+            del entry["_id"]
+            data.append(entry["regex"])
+        return data
+
     def get_bots(self):
         """Get Bots loaded in memory""" 
         return self.bots
@@ -120,6 +130,17 @@ class AgentsService(object):
         return { 
             "count" : count_training_data,
             "items": trainingData
+            }
+
+    def get_regex(self, agent_name):
+        db_regex = self.regex_repository.get_agent_regex(agent_name)
+        regex = []
+        for entry in db_regex:
+            regex.append(json.loads(MongoJSONEncoder().encode(entry)))
+        count_regex = self.regex_repository.count_agent_regex(agent_name)
+        return {
+            "count" : count_regex,
+            "items": regex
             }
 
     def get_agent(self, agent_name):
@@ -201,6 +222,10 @@ class AgentsService(object):
                 if nlu_data.get("entity_synonyms") is not None:
                     SynonymsService.get_instance().add_agent_synonyms(agent_name, nlu_data.get("entity_synonyms"))
 
+                """Add Regex"""
+                if nlu_data.get("regex_features") is not None:
+                    self.add_agent_regex(agent_name, nlu_data.get("regex_features"))
+
             """Add responses"""
             if responses is not None:
                 ResponsesService.get_instance().add_agent_responses(agent_name, responses)
@@ -241,6 +266,7 @@ class AgentsService(object):
                 self.synonyms_repository.delete_agent_synonyms(agent_name)
                 self.responses_repository.delete_all_agent_responses(agent_name)
                 self.contexts_repository.delete_contexts(agent_name)
+                self.regex_repository.delete_agent_regex(agent_name)
                 self.agents_repository.delete_agent(agent_name)
                 return True
             except Exception as e:
@@ -267,8 +293,18 @@ class AgentsService(object):
         else:
             return True
 
+    def regex_exist(self, id):
+        if not ObjectId.is_valid(id) or self.regex_repository.find_regex(id) is None:
+            return False
+        else:
+            return True
+
     def delete_agent_training_data(self, agent_name, id):
         if (self.training_data_repository.delete_training_data(agent_name, id)):
+            self.agents_repository.agent_modified(agent_name)
+
+    def delete_agent_regex(self, agent_name, id):
+        if self.regex_repository.delete_regex(agent_name, id):
             self.agents_repository.agent_modified(agent_name)
 
     def update_agent_training_data(self, agent_name, id, train_data):
@@ -276,6 +312,10 @@ class AgentsService(object):
             intents_entities = self.map_intent_and_entities(train_data)
             self.agents_repository.update_agent_intents(agent_name, [intents_entities.get("intent")])
             self.agents_repository.update_agent_entities(agent_name, intents_entities.get("entities"))
+            self.agents_repository.agent_modified(agent_name)
+
+    def update_agent_regex(self, agent_name, id, regex):
+        if self.regex_repository.update_regex(agent_name, id, regex):
             self.agents_repository.agent_modified(agent_name)
 
     def add_agent_training_data(self, agent_name, train_data):
@@ -329,6 +369,13 @@ class AgentsService(object):
         if self.lookups_repository.insert_lookups(data) or is_agent_modified:
             self.agents_repository.agent_modified(agent_name)
 
+    def add_agent_regex(self, agent_name, regex):
+        data = []
+        for entry in regex:
+            data.append({"agent_name": agent_name, "regex": entry})
+        if self.regex_repository.insert_regex(data):
+            self.agents_repository.agent_modified(agent_name)
+
     def create_agent_file(self, agent_name):
         agent_data = self.get_agent(agent_name)
         agent = {}
@@ -337,6 +384,7 @@ class AgentsService(object):
         agent["rasa_nlu_data"]["common_examples"] = self.get_agent_training_data(agent_name)
         agent["rasa_nlu_data"]["lookup_tables"] = self.get_agent_lookups(agent_name)
         agent["rasa_nlu_data"]["entity_synonyms"] = SynonymsService.get_instance().get_agent_synonyms(agent_name)
+        agent["rasa_nlu_data"]["regex_features"] = self.get_agent_regex(agent_name)
         agent["responses"] = ResponsesService.get_instance().get_agent_responses(agent_name)
         return agent
 
