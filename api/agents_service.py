@@ -122,6 +122,17 @@ class AgentsService(object):
             "items": trainingData
             }
 
+    def get_lookups(self, agent_name):
+        db_lookups = self.lookups_repository.get_agent_lookups(agent_name)
+        lookups = []
+        for entry in db_lookups:
+            lookups.append(json.loads(MongoJSONEncoder().encode(entry)))
+        count_lookups = self.lookups_repository.count_agent_lookups(agent_name)
+        return {
+            "count" : count_lookups,
+            "items": lookups
+            }
+
     def get_agent(self, agent_name):
         agent = self.agents_repository.find_agent(agent_name)
         try:
@@ -237,8 +248,8 @@ class AgentsService(object):
         while True:
             try:
                 self.training_data_repository.delete_all_training_data(agent_name)
-                self.lookups_repository.delete_lookups(agent_name)
                 self.synonyms_repository.delete_agent_synonyms(agent_name)
+                self.lookups_repository.delete_agent_lookups(agent_name)
                 self.responses_repository.delete_all_agent_responses(agent_name)
                 self.contexts_repository.delete_contexts(agent_name)
                 self.agents_repository.delete_agent(agent_name)
@@ -327,6 +338,17 @@ class AgentsService(object):
                     splitted_lookup = [{"agent_name": agent_name, "lookups": {"name": entry.get("name"),"elements": splitted_entry.tolist()}}]
                     is_agent_modified = self.lookups_repository.insert_lookups(splitted_lookup)
         if self.lookups_repository.insert_lookups(data) or is_agent_modified:
+            self.agents_repository.agent_modified(agent_name)
+
+    def lookup_exist(self, agent_name, lookup_name):
+        cursor = self.lookups_repository.find_lookup(agent_name, lookup_name)
+        if len(list(cursor)) == 0:
+            return False
+        else:
+            return True
+
+    def delete_agent_lookup(self, agent_name, lookup_name):
+        if self.lookups_repository.delete_lookup(agent_name, lookup_name):
             self.agents_repository.agent_modified(agent_name)
 
     def create_agent_file(self, agent_name):

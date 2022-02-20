@@ -116,16 +116,6 @@ def delete_input(agent_name, id):
     AgentsService.get_instance().delete_agent_user_input(agent_name, id)
     return response_template(200, "User Input was successfully deleted for agent {0}".format(agent_name))
 
-@current_app.route("/nlu/agents/<agent_name>/lookup", methods=["PUT"])
-@jwt_required
-def add_lookups(agent_name):
-    if request.get_data():
-        request_data = json.loads((request.get_data()).decode())
-        AgentsService.get_instance().add_agent_lookups(agent_name, request_data["data"])
-        return response_template(200, "Lookup successfully added for agent {0}".format(agent_name))
-    else:
-        return response_template(400, "A body is mandatory inside the request")
-
 @current_app.route("/nlu/agents/<agent_name>/model", methods = ["PUT"])
 @jwt_required
 def set_specific_model(agent_name):
