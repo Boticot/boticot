@@ -45,5 +45,8 @@ services:
         restart: "always"
         environment:
             - "HOST=0.0.0.0"
+            - "VUE_APP_NLU_SERVICE_URL=http://localhost:8010"
+            - "VUE_APP_NLU_PATH=/nlu/agents"
+            - "VUE_APP_NLU_ENTRIES_PAGE_SIZE=10"
         ports:
             - "8012:80"

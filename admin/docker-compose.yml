@@ -7,8 +7,3 @@ services:
       restart: "always"
       build:
         context: .
-        args:
-          - VUE_APP_NLU_SERVICE_URL=http://127.0.0.1:8010
-          - VUE_APP_NLU_PATH=/nlu/agents
-          - VUE_APP_NLU_ENTRIES_PAGE_SIZE=10
-          - PUBLIC_PATH=/
