@@ -48,6 +48,10 @@ const routes: Array<RouteConfig> = [
       guest: true,
     },
   },
+  {
+    path: '*',
+    component: () => import('../views/TryIt.vue'),
+  },
 ];
 
 const router = new VueRouter({
