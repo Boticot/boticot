@@ -31,6 +31,7 @@
             <el-tab-pane label="Try it" name="try-it"/>
             <el-tab-pane label="Inputs" name="inputs" />
             <el-tab-pane label="Training Data" name="training-data" />
+            <el-tab-pane label="Synonyms" name="synonyms" />
             <el-tab-pane label="Responses" name="responses" />
             <el-tab-pane label="Model" name="model" />
             <el-tab-pane label="Analytics" name="analytics" />

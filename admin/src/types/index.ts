@@ -89,3 +89,18 @@ export type ChartData = {
   labels: Array<Date | string>;
   datasets: Array<DataSetItem>;
 }
+
+export type SynonymElement = {
+  synonyms: Array<string>;
+  value: string;
+}
+
+export type SynonymsItemData = {
+  _id: string;
+  synonyms: SynonymElement;
+}
+
+export type SynonymsData = {
+  count: number;
+  items: Array<SynonymsItemData>;
+}
