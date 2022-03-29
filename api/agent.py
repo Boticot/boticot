@@ -1,6 +1,6 @@
 from rasa.nlu.model import Interpreter
 from rasa.model import unpack_model
-from utils import remove_file_or_dir
+from utils import remove_file_or_dir, check_entity_overlap
 import os
 import logging
 
@@ -66,6 +66,10 @@ class Agent(object):
                     intent = "FALLBACK"
                     nlu_data["intent"]["name"] = intent
                     nlu_data["intent"]["confidence"] = 1
+                if nlu_data.get("entities"):
+                    duckling_entities = list(filter(lambda entity: entity["extractor"] == "DucklingHTTPExtractor", nlu_data.get("entities")))
+                    if duckling_entities:
+                        nlu_data["entities"] = check_entity_overlap(nlu_data.get("entities"), duckling_entities)
         nlu_data["response"] = ResponsesService.get_instance().get_response(agent_name, intent)
         if (user_id is not None):
             nlu_data["context"] = ContextService.get_instance().get_user_context_key_value(agent_name, user_id).get("context")

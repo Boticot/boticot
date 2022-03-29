@@ -203,6 +203,7 @@ class AgentsService(object):
                 "intents": intents
             }
             self.agents_repository.insert_agent(mappedData)
+            self.agents_repository.check_agent_config(agent_name)
 
             """Add nlu data"""
             if nlu_data is not None:

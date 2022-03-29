@@ -31,3 +31,14 @@ def remove_file_or_dir(path):
         shutil.rmtree(path)
     else:
         logger.warn("file {} is not a file or dir.".format(path))
+
+def check_entity_overlap(entities, duckling_entities):
+    entities_to_remove = []
+    for duckling_entity in duckling_entities:
+        for entity in entities:
+            if duckling_entity["start"] < entity["end"] and duckling_entity["end"] > entity["start"] and entity["extractor"] != "DucklingHTTPExtractor":
+                entities_to_remove.append(duckling_entity["value"])
+    if entities_to_remove:
+        return list(filter(lambda entity: entity["value"] not in entities_to_remove, entities))
+    else:
+        return entities
