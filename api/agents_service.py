@@ -111,15 +111,15 @@ class AgentsService(object):
             agents.append(json.loads(MongoJSONEncoder().encode(entry)))
         return agents
 
-    def get_training_data(self, agent_name, intent=None, pageNumber=30, pageSize=30):
-        db_training_data = self.training_data_repository.get_agent_training_data(agent_name, intent, pageNumber, pageSize)
-        trainingData = []
+    def get_training_data(self, agent_name, intent=None, text=None, page_number=30, page_size=30):
+        db_training_data = self.training_data_repository.get_agent_training_data(agent_name, intent, text, page_number, page_size)
+        training_data = []
         for entry in db_training_data:
-            trainingData.append(json.loads(MongoJSONEncoder().encode(entry)))
-        count_training_data = self.training_data_repository.count_agent_training_data(agent_name)
+            training_data.append(json.loads(MongoJSONEncoder().encode(entry)))
+        count_training_data = self.training_data_repository.count_agent_training_data(agent_name, intent, text)
         return { 
             "count" : count_training_data,
-            "items": trainingData
+            "items": training_data
             }
 
     def get_lookups(self, agent_name):
@@ -376,12 +376,12 @@ class AgentsService(object):
         except:
             logger.error("Can't insert user input for agent {0}. {1}".format(agent_name, e), exc_info=True)
     
-    def get_agent_inputs(self,agent_name, max_confidence, min_confidence, page_number, page_size):
-        db_user_inputs = self.users_repository.get_agent_inputs(agent_name, max_confidence, min_confidence, page_number, page_size)
+    def get_agent_inputs(self,agent_name, intent, text, max_confidence, min_confidence, page_number, page_size):
+        db_user_inputs = self.users_repository.get_agent_inputs(agent_name, intent, text, max_confidence, min_confidence, page_number, page_size)
         users_inputs = []
         for db_user_input in db_user_inputs:
-                users_inputs.append(json.loads(MongoJSONEncoder().encode(db_user_input)))
-        count_inputs = self.users_repository.count_user_inputs(agent_name)
+            users_inputs.append(json.loads(MongoJSONEncoder().encode(db_user_input)))
+        count_inputs = self.users_repository.count_user_inputs(agent_name, intent, text)
         return { 
             "count" : count_inputs,
             "items": users_inputs

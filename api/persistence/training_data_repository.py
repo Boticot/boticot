@@ -18,8 +18,15 @@ class TrainingDataRepository():
         """Find all training data linked to a specific agent"""
         return self.training_data_collection.find({"agent_name": agent_name})
 
-    def count_agent_training_data(self, agent_name):
-        return self.training_data_collection.count({"agent_name": agent_name})  
+    def count_agent_training_data(self, agent_name, intent, text):
+        if intent and text:
+            return self.training_data_collection.count({"agent_name": agent_name, "data.intent": intent, "data.text": {"$regex": ".*" + text + ".*", "$options" : "-i"}})
+        elif intent:
+            return self.training_data_collection.count({"agent_name": agent_name, "data.intent": intent})
+        elif text:
+            return self.training_data_collection.count({"agent_name": agent_name, "data.text": {"$regex": ".*" + text + ".*", "$options": "-i"}})
+        else:
+            return self.training_data_collection.count({"agent_name": agent_name})
 
     def delete_training_data(self, agent_name, id):
         try:
@@ -48,13 +55,20 @@ class TrainingDataRepository():
             logger.error("Can't insert data {0}".format(e), exc_info=True)
             return(False)  
 
-    def get_agent_training_data(self, agent_name, intent, page_number, page_size):
+    def get_agent_training_data(self, agent_name, intent, text, page_number, page_size):
         """retrieve training data based on filters: intent, page size and page number"""
         max_page_size = int(os.environ.get("MAX_PAGE_SIZE", 200))
         if page_size > max_page_size:
             page_size = max_page_size
-        if intent:
-            return self.training_data_collection.find({"agent_name": agent_name, "data.intent": intent}, {"agent_name": 0}).skip((page_number - 1) * page_size).limit(page_size)
+        if intent and text:
+            return self.training_data_collection.find({"agent_name": agent_name, "data.intent": intent, "data.text": {"$regex": ".*" + text + ".*", "$options" : "-i"}},
+                        {"agent_name": 0}).skip((page_number - 1) * page_size).limit(page_size)
+        elif intent:
+            return self.training_data_collection.find({"agent_name": agent_name, "data.intent": intent},
+                        {"agent_name": 0}).skip((page_number - 1) * page_size).limit(page_size)
+        elif text:
+            return self.training_data_collection.find({"agent_name": agent_name, "data.text": {"$regex": ".*" + text + ".*", "$options" : "-i"}},
+                        {"agent_name": 0}).skip((page_number - 1) * page_size).limit(page_size)
         else:
             return self.training_data_collection.find({"agent_name": agent_name}, {"agent_name": 0}).skip((page_number - 1) * page_size).limit(page_size)
     

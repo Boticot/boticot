@@ -103,11 +103,13 @@ def parse(agent_name):
 @current_app.route("/nlu/agents/<agent_name>/inputs", methods=["GET"])
 @jwt_required
 def get_agent_inputs(agent_name):
+    intent = request.args.get("intent", default = None, type = str)
+    text = request.args.get("text", default = None, type = str)
     min_confidence = request.args.get("minConfidence", default = 0, type = float)
     max_confidence = request.args.get("maxConfidence", default = 1, type = float)
     page_number = request.args.get("pageNumber", default = 1, type = int)
     page_size = request.args.get("pageSize", default = 20, type = int)
-    agent_inputs = AgentsService.get_instance().get_agent_inputs(agent_name, max_confidence, min_confidence, page_number, page_size)
+    agent_inputs = AgentsService.get_instance().get_agent_inputs(agent_name, intent, text, max_confidence, min_confidence, page_number, page_size)
     return jsonify(agent_inputs)
 
 @current_app.route("/nlu/agents/<agent_name>/inputs/<id>", methods=["DELETE"])
