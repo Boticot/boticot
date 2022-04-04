@@ -1,10 +1,10 @@
 import axios from 'axios';
 import store from '@/store';
 
-const getTrainingData = async (agentName: string, page: number): Promise<any> => {
+const getTrainingData = async (agentName: string, intentName: string, text: string, page: number): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH, VUE_APP_NLU_ENTRIES_PAGE_SIZE } = process.env;
   const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/training-data`
-    + `?pageSize=${VUE_APP_NLU_ENTRIES_PAGE_SIZE}&pageNumber=${page}`;
+    + `?intent=${intentName}&text=${text}&pageSize=${VUE_APP_NLU_ENTRIES_PAGE_SIZE}&pageNumber=${page}`;
   const opt = {
     headers: {
       accept: 'application/json',
