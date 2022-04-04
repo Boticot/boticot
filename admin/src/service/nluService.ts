@@ -90,8 +90,9 @@ const convertToNluData = (entry: any, entryType: EntryType): NluData => {
   return nluDataArray[0];
 };
 
-const getAgentTrainingData = async (agentName: string, page: number): Promise<NluEntries> => {
-  const response: any = await getTrainingData(agentName, page);
+const getAgentTrainingData = async (agentName: string, intentName: string,
+  text: string, page: number): Promise<NluEntries> => {
+  const response: any = await getTrainingData(agentName, intentName, text, page);
   const trainings: any = response.items;
   const data = trainings.map((element: any) => ({ _id: element._id, ...element.data }));
   const nluDataArray: Array<NluData> = convertToNluDataArray(data, EntryType.TrainingData);
@@ -102,8 +103,9 @@ const getAgentTrainingData = async (agentName: string, page: number): Promise<Nl
   return nluEntries;
 };
 
-const getAgentInputs = async (agentName: string, page: number): Promise<NluEntries> => {
-  const response: any = await getInputs(agentName, page);
+const getAgentInputs = async (agentName: string, intentName: string,
+  text: string, page: number): Promise<NluEntries> => {
+  const response: any = await getInputs(agentName, intentName, text, page);
   const agentInputs: any = response.items;
   const nluDataArray: Array<NluData> = convertToNluDataArray(agentInputs, EntryType.Inputs);
   const nluEntries: NluEntries = {
