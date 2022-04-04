@@ -2,6 +2,12 @@
 
 # Bot Interface and Conversational Toolkit
 
+[![Release Date](https://img.shields.io/github/v/release/boticot/boticot)](https://github.com/boticot/boticot/releases)
+[![Release Date](https://img.shields.io/github/release-date/boticot/boticot)](https://github.com/boticot/boticot/releases)
+
+[![Contributors](https://img.shields.io/github/contributors-anon/boticot/boticot)](https://github.com/boticot/boticot/graphs/contributors)
+[![License](https://img.shields.io/github/license/boticot/boticot)](https://github.com/boticot/boticot/blob/master/LICENSE)
+
 ## Boticot API QuickStart
 
 ### Project setup
