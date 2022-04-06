@@ -7,12 +7,14 @@ from agent import Agent
 from utils import remove_file_or_dir
 from responses_service import ResponsesService
 from synonyms_service import SynonymsService
+from users_service import UsersService
 from persistence.agents_repository import AgentsRepository
 from persistence.lookups_repository import LookupsRepository
 from persistence.synonyms_repository import SynonymsRepository
 from persistence.training_data_repository import TrainingDataRepository
 from persistence.responses_repository import ResponsesRepository
 from persistence.users_repository import UsersRepository
+from persistence.users_inputs_repository import UsersInputsRepository
 from persistence.contexts_repository import ContextsRepository
 from persistence.analytics_repository import AnalyticsRepository
 from persistence.mongo_encoder import MongoJSONEncoder
@@ -44,6 +46,7 @@ class AgentsService(object):
          self.synonyms_repository = SynonymsRepository()
          self.responses_repository = ResponsesRepository()
          self.users_repository = UsersRepository()
+         self.users_inputs_repository = UsersInputsRepository()
          self.contexts_repository = ContextsRepository()
          self.analytics_repository = AnalyticsRepository()
          AgentsService.__instance = self
@@ -104,8 +107,11 @@ class AgentsService(object):
         """Get Bots loaded in memory""" 
         return self.bots
 
-    def get_agents(self):
+    def get_agents(self, user_email):
         db_agents = self.agents_repository.get_all_agents()
+        user = UsersService.get_instance().find_user(user_email)
+        if (not UsersService.get_instance().is_role_super_admin(user.get("role"))):
+            db_agents = filter(lambda agent: agent.get("name") in user.get("agents"), list(db_agents))
         agents = []
         for entry in db_agents:
             agents.append(json.loads(MongoJSONEncoder().encode(entry)))
@@ -179,7 +185,7 @@ class AgentsService(object):
         }
         return intent_entities
 
-    def create_agent(self, agent_name, last_train, config, nlu_data, fallback, responses, model_name):
+    def create_agent(self, user_email, agent_name, last_train, config, nlu_data, fallback, responses, model_name):
         try:
             last_train = 0
             last_modified = 1
@@ -215,6 +221,9 @@ class AgentsService(object):
             """Add responses"""
             if responses is not None:
                 ResponsesService.get_instance().add_agent_responses(agent_name, responses)
+            
+            """Add agent access to user"""
+            self.users_repository.update_user_agent_access(user_email, agent_name)
 
             if model_name is None:
                 model_name = "None"
@@ -253,6 +262,7 @@ class AgentsService(object):
                 self.responses_repository.delete_all_agent_responses(agent_name)
                 self.contexts_repository.delete_contexts(agent_name)
                 self.agents_repository.delete_agent(agent_name)
+                UsersService.get_instance().remove_agent_from_all_attached_users(agent_name)
                 return True
             except Exception as e:
                 if e.__class__.__name__ == "OperationFailure":
@@ -372,26 +382,26 @@ class AgentsService(object):
             user_input["entities"] = nlu_data.get("entities") 
             user_input["fulfillment_text"] = nlu_data.get("fulfillment_text") 
             user_input["date"] = datetime.utcnow()
-            self.users_repository.insert_user_input(user_input)
+            self.users_inputs_repository.insert_user_input(user_input)
         except:
             logger.error("Can't insert user input for agent {0}. {1}".format(agent_name, e), exc_info=True)
     
     def get_agent_inputs(self,agent_name, intent, text, max_confidence, min_confidence, page_number, page_size):
-        db_user_inputs = self.users_repository.get_agent_inputs(agent_name, intent, text, max_confidence, min_confidence, page_number, page_size)
+        db_user_inputs = self.users_inputs_repository.get_agent_inputs(agent_name, intent, text, max_confidence, min_confidence, page_number, page_size)
         users_inputs = []
         for db_user_input in db_user_inputs:
             users_inputs.append(json.loads(MongoJSONEncoder().encode(db_user_input)))
-        count_inputs = self.users_repository.count_user_inputs(agent_name, intent, text)
+        count_inputs = self.users_inputs_repository.count_user_inputs(agent_name, intent, text)
         return { 
             "count" : count_inputs,
             "items": users_inputs
             }
     
     def get_user_inputs(self,agent_name, userId, maxConfidence, minConfidence, pageNumber, pageSize):
-        return(self.users_repository.get_user_inputs(agent_name, userId, maxConfidence, minConfidence, pageNumber, pageSize))
+        return(self.users_inputs_repository.get_user_inputs(agent_name, userId, maxConfidence, minConfidence, pageNumber, pageSize))
 
     def delete_agent_user_input(self,agent_name, input_id):
-        return(self.users_repository.delete_user_input(agent_name, input_id))
+        return(self.users_inputs_repository.delete_user_input(agent_name, input_id))
 
     def get_intent_by_text(self, text, agent_name):
         return(self.training_data_repository.get_intent_by_text(text, agent_name))

@@ -1,7 +1,7 @@
 import os
 from utils import response_template, remove_file_or_dir, create_folder
 from flask import request, jsonify
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 import json
 import sys
 sys.path.append("..")
@@ -11,7 +11,7 @@ from flask import current_app, send_from_directory
 @current_app.route("/nlu/agents", methods=["GET"])
 @jwt_required
 def get_all_agents():
-    agents = AgentsService.get_instance().get_agents()
+    agents = AgentsService.get_instance().get_agents(get_jwt_identity())
     return jsonify(agents)
 
 @current_app.route("/nlu/agents/<agent_name>", methods=["GET"])
@@ -49,7 +49,7 @@ def create_agent():
             return response_template(400, "Already existing agent with name {0}".format(agent_name))
         elif data.get("config") is None:
             return response_template(400, "Should Contains config field inside file data")
-        AgentsService.get_instance().create_agent(agent_name, 0, data.get("config"), data.get("rasa_nlu_data"), data.get("fallback"), data.get("responses"), data.get("current_version"))
+        AgentsService.get_instance().create_agent(get_jwt_identity(), agent_name, 0, data.get("config"), data.get("rasa_nlu_data"), data.get("fallback"), data.get("responses"), data.get("current_version"))
     elif request.get_data():
         """Create agent with data passed directly inside query"""
         request_data = json.loads((request.get_data()).decode())
@@ -60,7 +60,7 @@ def create_agent():
             return response_template(400, "Already existing agent with name {0}".format(agent_name))
         elif request_data.get("config") is None:
             return response_template(400, "Should Contains config field inside body request")
-        AgentsService.get_instance().create_agent(agent_name, 0, request_data.get("config"), request_data.get("rasa_nlu_data"), request_data.get("fallback"), request_data.get("responses"), request_data.get("current_version"))
+        AgentsService.get_instance().create_agent(get_jwt_identity(), agent_name, 0, request_data.get("config"), request_data.get("rasa_nlu_data"), request_data.get("fallback"), request_data.get("responses"), request_data.get("current_version"))
     else:
         return response_template(400, "Shoulds Contains a valid body or file of new Agent") 
     return response_template(201, "Agent {0} successfully created".format(agent_name))
