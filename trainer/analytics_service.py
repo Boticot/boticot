@@ -55,6 +55,7 @@ class AnalyticsService(object):
             unique_users_count = len(unique_users)
             agent_traffic = self.users_inputs_repository.get_agent_traffic(agent_name, date_midnight, one_day_after_date_midnight)
             intents_count = []
+            entities_count = []
             if intents:
                 for intent in intents:
                     intent_count = self.users_inputs_repository.get_agent_intent_count(agent_name, intent, date_midnight, one_day_after_date_midnight)
@@ -62,12 +63,20 @@ class AnalyticsService(object):
                         "intent" : intent,
                         "count": intent_count
                     })
+            entities = self.users_inputs_repository.get_agent_entities_count(agent_name, date_midnight, one_day_after_date_midnight)
+            if entities is not None:
+                for entity in entities:
+                    entities_count.append({
+                        "entity": entity["_id"],
+                        "count": entity["count"]
+                    })
             agent_analytics = {
                 "agent_name": agent_name,
                 "date": date_midnight,
                 "traffic": agent_traffic,
                 "unique_users": unique_users_count,
-                "intents_count": intents_count
+                "intents_count": intents_count,
+                "entities_count": entities_count
             }
             logger.debug("Insert analytics for agent {0} and date {1}".format(agent_name, date_midnight))
             self.analytics_repository.insert_analytics(agent_analytics)
