@@ -10,7 +10,7 @@
       :label="item"
       :value="item">
     </el-option>
-  </el-select>
+    </el-select>
     <LineChart class="marginClass" :chartData="chartDataLineTraffic" :options="chartOptions" />
     <LineChart class="marginClass" :chartData="chartDataLineUniqueUsers" :options="chartOptions" />
     <BarChart class="marginClass" :chartData="chartDataBarFallback" :options="chartOptionsRate" />
@@ -24,7 +24,7 @@
       :label="item"
       :value="item">
     </el-option>
-  </el-select>
+    </el-select>
     <DoghnutChart class="marginClass" :chartData="chartDoghnutIntents" :options="doghnutOptions"/>
   </div>
 </template>
@@ -157,6 +157,15 @@ export default Vue.extend({
           text: 'Cumulative Intents',
           fontSize: 15,
           fontStyle: 'normal',
+        },
+        tooltips: {
+          callbacks: {
+            label: (tooltipItem: any, data: any) => {
+              const label = data.labels[tooltipItem.index];
+              const value = formatRate(data.datasets[0].data[tooltipItem.index]);
+              return `${label}: ${value}`;
+            },
+          },
         },
       },
     };
