@@ -4,7 +4,7 @@
       <h4 class="textAlignCenter">Agent Responses</h4>
       <el-form :model="newResponse" :rules="rules" ref="newResponse" label-width="120px">
         <el-form-item label="Intent" prop='selectedIntent'>
-          <el-select v-model="newResponse.selectedIntent" placeholder="Select Intent" @change="selectIntent">
+          <el-select v-model="newResponse.selectedIntent" filterable placeholder="Select Intent" @change="selectIntent">
             <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
           </el-select>
         </el-form-item>
@@ -43,7 +43,7 @@
           </el-form-item>
           <el-form-item label="Intent" prop='suggestionIntent'
           :class="[isHideSuggestionIntent ? 'displayNone' : '']">
-            <el-select v-model="newResponse.suggestionIntent" placeholder="Select an intent"
+            <el-select v-model="newResponse.suggestionIntent" filterable placeholder="Select an intent"
             @change="selectSuggestionIntent">
               <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
               <el-option label="Create New Intent" value="NEW_INTENT"></el-option>

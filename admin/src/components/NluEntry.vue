@@ -45,7 +45,7 @@
       >
         <el-row>
           <el-col v-if="!isAddNewIntent">
-            <el-select v-model="newIntentValue" placeholder="Select Intent" @change="selectNewIntent">
+            <el-select v-model="newIntentValue" filterable placeholder="Select Intent" @change="selectNewIntent">
               <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
               <el-option label="Create New Intent" value="NEW_INTENT"></el-option>
             </el-select>
