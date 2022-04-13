@@ -3,28 +3,64 @@
     <el-row v-if="textMsg !== ''" :class="classMsg" class="marginBottomMedium marginLeftMedium">
           {{ textMsg }}
     </el-row>
-    <el-select class="marginClass" v-model="period" placeholder="Select Period" @change="selectPeriod">
-    <el-option
-      v-for="item in ['Last 7 days', 'Last 30 days']"
-      :key="item.value"
-      :label="item"
-      :value="item">
-    </el-option>
-  </el-select>
+    <el-row class="marginClass">
+      <el-select v-model="period" placeholder="Select Period" @change="selectPeriod">
+        <el-option
+          v-for="item in ['Last 7 days', 'Last 30 days', 'Last 60 days', 'Custom filter']"
+          :key="item.value"
+          :label="item"
+          :value="item">
+        </el-option>
+      </el-select>
+    </el-row>
+    <el-row justify="space-around" class="marginClass" style="margin-left: 350px" v-if="filterDateEnabled">
+      <el-col :span="11">
+        <el-date-picker
+          v-model="filterDate"
+          type="daterange"
+          format="dd-MM-yyyy"
+          value-format="dd-MM-yyyy"
+          range-separator="To"
+          start-placeholder="Start date"
+          end-placeholder="End date">
+        </el-date-picker>
+      </el-col>
+      <el-col :span="5">
+        <el-button type="primary" @click="onSubmitFilterDate" :disabled="!filterDate">Filter</el-button>
+      </el-col>
+    </el-row>
     <LineChart class="marginClass" :chartData="chartDataLineTraffic" :options="chartOptions" />
     <LineChart class="marginClass" :chartData="chartDataLineUniqueUsers" :options="chartOptions" />
     <BarChart class="marginClass" :chartData="chartDataBarFallback" :options="chartOptionsRate" />
     <LineChart class="marginClass" :chartData="chartDataLineIntents"
       :options="chartDataLineIntentsOptions"  />
-    <el-select v-model="doghnutPeriod"
-      placeholder="Select Period" @change="selectPeriodForDoghnut">
-    <el-option
-      v-for="item in ['Last day', 'Last 7 days', 'Last 30 days']"
-      :key="item.value"
-      :label="item"
-      :value="item">
-    </el-option>
-  </el-select>
+    <el-row class="marginClass">
+      <el-select v-model="doghnutPeriod" placeholder="Select Period" @change="selectPeriodForDoghnut">
+        <el-option
+          v-for="item in ['Last day', 'Last 7 days', 'Last 30 days', 'Last 60 days', 'Custom filter']"
+          :key="item.value"
+          :label="item"
+          :value="item">
+        </el-option>
+      </el-select>
+    </el-row>
+    <el-row justify="space-around"  class="marginClass" style="margin-left: 350px" v-if="filterDateDoghnutEnabled">
+      <el-col :span="11">
+        <el-date-picker
+          v-model="filterDateDoghnut"
+          type="daterange"
+          format="dd-MM-yyyy"
+          value-format="dd-MM-yyyy"
+          range-separator="To"
+          start-placeholder="Start date"
+          end-placeholder="End date">
+        </el-date-picker>
+      </el-col>
+      <el-col :span="5">
+        <el-button type="primary" @click="onSubmitFilterDateDoghnut"
+          :disabled="!filterDateDoghnut">Filter</el-button>
+      </el-col>
+    </el-row>
     <DoghnutChart class="marginClass" :chartData="chartDoghnutIntents" :options="doghnutOptions"/>
   </div>
 </template>
@@ -74,14 +110,18 @@ export default Vue.extend({
   },
   data() {
     return {
+      filterDateEnabled: false,
+      filterDateDoghnutEnabled: false,
+      filterDate: [],
+      filterDateDoghnut: [],
       loading: true,
       isAnalyticsDataEmpty: false,
       agentName: this.$route.params.agentName,
       textMsg: '',
       classMsg: '',
       analyticsData: '',
-      period: 'Last 30 days',
-      doghnutPeriod: 'Last 30 days',
+      period: 'Last 60 days',
+      doghnutPeriod: 'Last 60 days',
       dateDataList: Array<Date>(),
       trafficDataList: Array<number>(),
       uniqueUsersDataList: Array<number>(),
@@ -186,21 +226,40 @@ export default Vue.extend({
       this.fallbackDataList = (this.allFallbackDataList as any).slice(size);
     },
     selectPeriod(value: string) {
+      if (value === 'Custom filter') {
+        this.filterDateEnabled = true;
+        return;
+      }
       if (value === 'Last 7 days') {
+        this.filterDateEnabled = false;
         this.sliceData(-7);
       } else if (value === 'Last 30 days') {
+        this.filterDateEnabled = false;
         this.sliceData(-30);
+      } else if (value === 'Last 60 days') {
+        this.filterDateEnabled = false;
+        this.sliceData(-60);
       }
     },
     selectPeriodForDoghnut(value: string) {
+      if (value === 'Custom filter') {
+        this.filterDateDoghnutEnabled = true;
+        return;
+      }
       let limitedResult;
       this.countDataList = [];
       if (value === 'Last day') {
+        this.filterDateDoghnutEnabled = false;
         limitedResult = _.takeRight((this.analyticsData as any).analytics, 1);
       } else if (value === 'Last 7 days') {
+        this.filterDateDoghnutEnabled = false;
         limitedResult = _.takeRight((this.analyticsData as any).analytics, 7);
       } else if (value === 'Last 30 days') {
+        this.filterDateDoghnutEnabled = false;
         limitedResult = _.takeRight((this.analyticsData as any).analytics, 30);
+      } else if (value === 'Last 60 days') {
+        this.filterDateDoghnutEnabled = false;
+        limitedResult = _.takeRight((this.analyticsData as any).analytics, 60);
       }
       const flatResult = _.flatMap(limitedResult, 'intents_count');
       for (let i = 0; i < this.intentDataList.length; i += 1) {
@@ -213,32 +272,41 @@ export default Vue.extend({
         this.countDataList.push(sum);
       }
     },
+    onSubmitFilterDate() {
+      this.initiliazeAnalytics(this.filterDate[0], this.filterDate[1]);
+    },
+    onSubmitFilterDateDoghnut() {
+      this.initiliazeAnalytics(this.filterDateDoghnut[0], this.filterDateDoghnut[1]);
+    },
+    initiliazeAnalytics(startDate?: string, endDate?: string) {
+      getAnalytics(this.agentName, 60, startDate, endDate).then((response) => {
+        this.loading = false;
+        this.analyticsData = _.cloneDeep(response);
+        this.isAnalyticsDataEmpty = (this.analyticsData as any).analytics.length === 0;
+        if (this.isAnalyticsDataEmpty) {
+          this.$notify.info({
+            title: 'Info',
+            message: 'Empty Analytics Data',
+            offset: 100,
+          });
+        } else {
+          const preparedAnalyticsData = prepareAnalyticsData((this.analyticsData as unknown as Analytics));
+          this.intentDataList = preparedAnalyticsData.intentDataList;
+          this.allDateDataList = preparedAnalyticsData.allDateDataList;
+          this.allTrafficDataList = preparedAnalyticsData.allTrafficDataList;
+          this.allUniqueUsersDataList = preparedAnalyticsData.allUniqueUsersDataList as any;
+          this.allFallbackDataList = preparedAnalyticsData.allFallbackDataList as any;
+          this.selectPeriod(this.period);
+          this.selectPeriodForDoghnut(this.doghnutPeriod);
+        }
+      }).catch(() => {
+        this.textMsg = 'error when loading analytics';
+        this.classMsg = 'errorMsg';
+      });
+    },
   },
   mounted() {
-    getAnalytics(this.agentName, 30).then((response) => {
-      this.loading = false;
-      this.analyticsData = _.cloneDeep(response);
-      this.isAnalyticsDataEmpty = (this.analyticsData as any).analytics.length === 0;
-      if (this.isAnalyticsDataEmpty) {
-        this.$notify.info({
-          title: 'Info',
-          message: 'Empty Analytics Data',
-          offset: 100,
-        });
-      } else {
-        const preparedAnalyticsData = prepareAnalyticsData((this.analyticsData as unknown as Analytics));
-        this.intentDataList = preparedAnalyticsData.intentDataList;
-        this.allDateDataList = preparedAnalyticsData.allDateDataList;
-        this.allTrafficDataList = preparedAnalyticsData.allTrafficDataList;
-        this.allUniqueUsersDataList = preparedAnalyticsData.allUniqueUsersDataList as any;
-        this.allFallbackDataList = preparedAnalyticsData.allFallbackDataList as any;
-        this.selectPeriod('Last 30 days');
-        this.selectPeriodForDoghnut('Last 30 days');
-      }
-    }).catch(() => {
-      this.textMsg = 'error when loading analytics';
-      this.classMsg = 'errorMsg';
-    });
+    this.initiliazeAnalytics();
   },
 });
 </script>

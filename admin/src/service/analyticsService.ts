@@ -44,6 +44,8 @@ const generateChartDataLineIntents = (dateDataList: Array<Date | string>, period
     limit = 7;
   } else if (period === 'Last 30 days') {
     limit = 30;
+  } else if (period === 'Last 60 days' || period === 'Custom filter') {
+    limit = 60;
   }
   const limitedAnalyticsData = _.takeRight((analyticsData as any).analytics, limit);
   const intentsDatasets = _((analyticsData as any).analytics)
