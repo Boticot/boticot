@@ -64,16 +64,19 @@ const generateChartDataLineIntents = (dateDataList: Array<Date | string>, period
   };
 };
 
-const generateChartDoghnutIntents = (intentDataList: Array<string>, countDataList: Array<number>): ChartData => ({
-  labels: intentDataList,
-  datasets: [
-    {
-      data: countDataList,
-      backgroundColor: [...colorsArray, ...colorsArray],
-      hoverOffset: 4,
-    },
-  ],
-});
+const generateChartDoghnutIntents = (intentDataList: Array<string>, countDataList: Array<number>): ChartData => {
+  const totalSum = _.sum(countDataList);
+  return {
+    labels: intentDataList,
+    datasets: [
+      {
+        data: countDataList.map((item: number) => item / totalSum),
+        backgroundColor: [...colorsArray, ...colorsArray],
+        hoverOffset: 4,
+      },
+    ],
+  };
+};
 
 const prepareAnalyticsData = (analyticsData: Analytics): PreparedAnalyticsData => {
   const result: PreparedAnalyticsData = {

@@ -4,13 +4,13 @@
           {{ textMsg }}
     </el-row>
     <el-select class="marginClass" v-model="period" placeholder="Select Period" @change="selectPeriod">
-    <el-option
-      v-for="item in ['Last 7 days', 'Last 30 days']"
-      :key="item.value"
-      :label="item"
-      :value="item">
-    </el-option>
-  </el-select>
+      <el-option
+        v-for="item in ['Last 7 days', 'Last 30 days']"
+        :key="item.value"
+        :label="item"
+        :value="item">
+      </el-option>
+    </el-select>
     <LineChart class="marginClass" :chartData="chartDataLineTraffic" :options="chartOptions" />
     <LineChart class="marginClass" :chartData="chartDataLineUniqueUsers" :options="chartOptions" />
     <BarChart class="marginClass" :chartData="chartDataBarFallback" :options="chartOptionsRate" />
@@ -18,13 +18,13 @@
       :options="chartDataLineIntentsOptions"  />
     <el-select v-model="doghnutPeriod"
       placeholder="Select Period" @change="selectPeriodForDoghnut">
-    <el-option
-      v-for="item in ['Last day', 'Last 7 days', 'Last 30 days']"
-      :key="item.value"
-      :label="item"
-      :value="item">
-    </el-option>
-  </el-select>
+      <el-option
+        v-for="item in ['Last day', 'Last 7 days', 'Last 30 days']"
+        :key="item.value"
+        :label="item"
+        :value="item">
+      </el-option>
+    </el-select>
     <DoghnutChart class="marginClass" :chartData="chartDoghnutIntents" :options="doghnutOptions"/>
   </div>
 </template>
@@ -157,6 +157,15 @@ export default Vue.extend({
           text: 'Cumulative Intents',
           fontSize: 15,
           fontStyle: 'normal',
+        },
+        tooltips: {
+          callbacks: {
+            label: (tooltipItem: any, data: any) => {
+              const label = data.labels[tooltipItem.index];
+              const value = formatRate(data.datasets[0].data[tooltipItem.index]);
+              return `${label}: ${value}`;
+            },
+          },
         },
       },
     };
