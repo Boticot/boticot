@@ -19,6 +19,17 @@ function getCountsOfIntent(intentName: string, analyticsData: any) {
     }) as any)) as any);
 }
 
+function getCountsOfEntity(entityName: string, analyticsData: any) {
+  return ([].concat(...(analyticsData
+    .map((item: any) => {
+      if (_.some(item.entities_count, { entity: entityName })) {
+        const element = _.filter(item.entities_count, ['entity', entityName]);
+        return element[0].count;
+      }
+      return 0;
+    }) as any)) as any);
+}
+
 const generateSingleChartData = (
   datasetLabel: string,
   dateDataList: Array<Date | string>,
@@ -64,6 +75,34 @@ const generateChartDataLineIntents = (dateDataList: Array<Date | string>, period
   };
 };
 
+const generateChartDataLineEntities = (dateDataList: Array<Date | string>, period: string, analyticsData: Analytics):
+  ChartData => {
+  let limit;
+  if (period === 'Last 7 days') {
+    limit = 7;
+  } else if (period === 'Last 30 days') {
+    limit = 30;
+  }
+  const limitedAnalyticsData = _.takeRight((analyticsData as any).analytics, limit);
+  const entitiesDatasets = _((analyticsData as any).analytics)
+    .takeRight(limit)
+    .filter('entities_count')
+    .flatMap('entities_count')
+    .uniqBy('entity')
+    .map((item: any) => ({
+      label: item.entity,
+      data: getCountsOfEntity(item.entity, limitedAnalyticsData),
+      fill: false,
+      borderColor: getRandomColor(),
+      tension: 0.1,
+    }))
+    .value();
+  return {
+    labels: _.takeRight(dateDataList, limit),
+    datasets: entitiesDatasets,
+  };
+};
+
 const generateChartDoghnutIntents = (intentDataList: Array<string>, countDataList: Array<number>): ChartData => ({
   labels: intentDataList,
   datasets: [
@@ -78,6 +117,7 @@ const generateChartDoghnutIntents = (intentDataList: Array<string>, countDataLis
 const prepareAnalyticsData = (analyticsData: Analytics): PreparedAnalyticsData => {
   const result: PreparedAnalyticsData = {
     intentDataList: [],
+    entitiesDataList: [],
     allDateDataList: [],
     allTrafficDataList: [],
     allUniqueUsersDataList: [],
@@ -88,6 +128,13 @@ const prepareAnalyticsData = (analyticsData: Analytics): PreparedAnalyticsData =
     .flatMap('intents_count')
     .uniqBy('intent')
     .map((item: any) => item.intent)
+    .value() as any);
+
+  const entitiesDataList = (_((analyticsData as any).analytics)
+    .filter('entities_count')
+    .flatMap('entities_count')
+    .uniqBy('entity')
+    .map((item: any) => item.entity)
     .value() as any);
 
   const allDateDataList = (analyticsData as any).analytics
@@ -107,6 +154,7 @@ const prepareAnalyticsData = (analyticsData: Analytics): PreparedAnalyticsData =
     }) as any)) as any);
 
   result.intentDataList = intentDataList;
+  result.entitiesDataList = entitiesDataList;
   result.allDateDataList = allDateDataList;
   result.allTrafficDataList = allTrafficDataList;
   result.allUniqueUsersDataList = allUniqueUsersDataList;
@@ -118,5 +166,6 @@ export {
   prepareAnalyticsData,
   generateSingleChartData,
   generateChartDataLineIntents,
+  generateChartDataLineEntities,
   generateChartDoghnutIntents,
 };

@@ -55,9 +55,15 @@ export interface IntentsCountItem {
   intent: string;
 }
 
+export interface EntitiesCountItem {
+  count: number;
+  entity: string;
+}
+
 export interface AnalyticItem {
   date: Date | string;
   intents_count: Array<IntentsCountItem>;
+  entities_count?: Array<EntitiesCountItem>;
   traffic: number;
   unique_users: number;
 }
@@ -69,6 +75,7 @@ export interface Analytics {
 
 export type PreparedAnalyticsData = {
   intentDataList: Array<string>;
+  entitiesDataList: Array<string>;
   allDateDataList: Array<Date>;
   allTrafficDataList: Array<number>;
   allUniqueUsersDataList: Array<number>;
