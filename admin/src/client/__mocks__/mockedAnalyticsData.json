@@ -3,6 +3,12 @@
     "analytics": [
       {
         "date": "Tue, 8 Aug 2021 00:00:00 GMT",
+        "entities_count": [
+          {
+              "count": 4.0,
+              "entity": "city"
+          }
+        ],
         "intents_count":[
            {
              "count": 2,
@@ -26,6 +32,12 @@
       },
       {
         "date": "Tue, 7 Aug 2021 00:00:00 GMT",
+        "entities_count": [
+          {
+              "count": 4.0,
+              "entity": "city"
+          }
+        ],
         "intents_count":[
            {
             "count": 1,
@@ -45,6 +57,12 @@
       },
       {
         "date": "Tue, 6 Aug 2021 00:00:00 GMT",
+        "entities_count": [
+          {
+              "count": 4.0,
+              "entity": "city"
+          }
+        ],
         "intents_count":[
            {
              "count": 4,
@@ -68,6 +86,12 @@
       },
       {
         "date": "Tue, 5 Aug 2021 00:00:00 GMT",
+        "entities_count": [
+          {
+              "count": 4.0,
+              "entity": "city"
+          }
+        ],
         "intents_count":[
            {
              "count": 11,

@@ -16,6 +16,8 @@
     <BarChart class="marginClass" :chartData="chartDataBarFallback" :options="chartOptionsRate" />
     <LineChart class="marginClass" :chartData="chartDataLineIntents"
       :options="chartDataLineIntentsOptions"  />
+    <LineChart class="marginClass" :chartData="chartDataLineEntities"
+      :options="chartDataLineEntitiesOptions"  />
     <el-select v-model="doghnutPeriod"
       placeholder="Select Period" @change="selectPeriodForDoghnut">
     <el-option
@@ -41,6 +43,7 @@ import {
   prepareAnalyticsData,
   generateSingleChartData,
   generateChartDataLineIntents,
+  generateChartDataLineEntities,
   generateChartDoghnutIntents,
 } from '@/service/analyticsService';
 
@@ -87,6 +90,7 @@ export default Vue.extend({
       uniqueUsersDataList: Array<number>(),
       fallbackDataList: Array<number>(),
       intentDataList: Array<string>(),
+      entitiesDataList: Array<string>(),
       countDataList: Array<any>(),
       allDateDataList: Array<Date>(),
       allTrafficDataList: Array<number>(),
@@ -146,6 +150,28 @@ export default Vue.extend({
           fontStyle: 'normal',
         },
       },
+      chartDataLineEntitiesOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{
+            display: false,
+            ticks: {
+              stepSize: 1,
+              beginAtZero: true,
+            },
+          }],
+        },
+        legend: {
+          onClick: handleIntentLegendClick,
+        },
+        title: {
+          display: true,
+          text: 'Entities',
+          fontSize: 15,
+          fontStyle: 'normal',
+        },
+      },
       doghnutOptions: {
         responsive: true,
         maintainAspectRatio: false,
@@ -173,6 +199,9 @@ export default Vue.extend({
     },
     chartDataLineIntents(): any {
       return generateChartDataLineIntents(this.dateDataList, this.period, this.analyticsData as unknown as Analytics);
+    },
+    chartDataLineEntities(): any {
+      return generateChartDataLineEntities(this.dateDataList, this.period, this.analyticsData as unknown as Analytics);
     },
     chartDoghnutIntents(): any {
       return generateChartDoghnutIntents(this.intentDataList, this.countDataList);
@@ -228,6 +257,7 @@ export default Vue.extend({
       } else {
         const preparedAnalyticsData = prepareAnalyticsData((this.analyticsData as unknown as Analytics));
         this.intentDataList = preparedAnalyticsData.intentDataList;
+        this.entitiesDataList = preparedAnalyticsData.entitiesDataList;
         this.allDateDataList = preparedAnalyticsData.allDateDataList;
         this.allTrafficDataList = preparedAnalyticsData.allTrafficDataList;
         this.allUniqueUsersDataList = preparedAnalyticsData.allUniqueUsersDataList as any;
