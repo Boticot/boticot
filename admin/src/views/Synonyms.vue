@@ -1,30 +1,30 @@
 <template>
   <div class="synonyms halfSize">
     <el-card class="box-card">
-      <h4>Synonyms</h4>
       <el-button type="primary"
-        style="margin-left: 320px;"
-        @click="openAddOrEditSynonymDialog()" plain>
-        Add Synonym
-    </el-button>
+       class="textAlignCenter"
+        @click="openAddOrEditSynonymDialog()">
+        Add Synonyms
+      </el-button>
       <el-table :class="[isHideExistingSynonyms ? 'displayNone' : '']"
         v-if="synonymsData"
         :data="synonymsData.items"
-        style="width: 100%"
-        max-height="250">
-        <el-table-column prop="synonyms.value" label="Name"></el-table-column>
-        <el-table-column prop="synonyms.synonyms" label="synonyms">
-          <template slot-scope="scope">
-            <el-tag size="medium" slot="reference" class="name-wrapper"
-              v-for="item in scope.row.synonyms.synonyms"
-              :key="item.id"
-              style="margin-left: 5px; margin-bottom: 5px"
+        >
+        <el-table-column prop="synonyms.value" label="Name" width="100"></el-table-column>
+        <el-table-column prop="synonyms.synonyms" label="Synonyms" width="300">
+          <template slot-scope="scope" >
+            <div style="{height: 70px; max-height: 120px; overflow-y: auto;}">
+              <el-tag size="medium" slot="reference" class="name-wrapper"
+                v-for="item in scope.row.synonyms.synonyms"
+                :key="item.id"
+                style="margin-left: 5px; margin-bottom: 5px; width=90px"
               >
-              {{ item }}
-            </el-tag>
+                {{ item }}
+              </el-tag>
+            </div>
          </template>
         </el-table-column>
-        <el-table-column fixed="right">
+        <el-table-column fixed="right" width="150">
           <template slot-scope="scope">
             <el-button
             type="primary"
