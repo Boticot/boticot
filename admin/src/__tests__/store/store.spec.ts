@@ -13,11 +13,14 @@ jest.mock('@/service/entityService', () => ({
 
 jest.mock('jsonwebtoken', () => ({
   decode: jest.fn().mockImplementation(
-    () => ({ exp: new Date().getTime() / 1000 + 1 }),
+    () => ({
+      exp: new Date().getTime() / 1000 + 1,
+      identity: 'fake-login',
+    }),
   ),
 }));
 
-describe('store.ts', () => {
+describe('should test store functionality', () => {
   let state: any;
   describe('Testing mutations', () => {
     beforeEach(() => {
@@ -82,6 +85,19 @@ describe('store.ts', () => {
       expect(state.token).toEqual(testToken);
       expect(localStorage.getItem('token')).toEqual(testToken);
     });
+
+    it('should update role when call updateRole', () => {
+      // given
+      const newRole = 'new-role';
+      const { updateRole } = mutations;
+
+      // when
+      updateRole(state, newRole);
+
+      // then
+      expect(state.role).toEqual(newRole);
+      expect(localStorage.getItem('role')).toEqual(newRole);
+    });
   });
 
   describe('Testing getters', () => {
@@ -115,6 +131,48 @@ describe('store.ts', () => {
       const { authToken } = getters;
       const result = authToken(state);
       expect(result()).toEqual('test-token');
+    });
+
+    it('should return login when call login', () => {
+      const { login } = getters;
+      const result = login(state);
+      expect(result()).toEqual('fake-login');
+    });
+
+    it('should return true when role is super-admin', () => {
+      // given
+      state = { ...state, role: 'super-admin' };
+
+      // when
+      const { isSuperAdmin } = getters;
+      const role = isSuperAdmin(state);
+
+      // then
+      expect(role()).toBeTruthy();
+    });
+
+    it('should return true when role is admin', () => {
+      // given
+      state = { ...state, role: 'admin' };
+
+      // when
+      const { isAdmin } = getters;
+      const role = isAdmin(state);
+
+      // then
+      expect(role()).toBeTruthy();
+    });
+
+    it('should return true when role is read', () => {
+      // given
+      state = { ...state, role: 'read' };
+
+      // when
+      const { isReadUser } = getters;
+      const role = isReadUser(state);
+
+      // then
+      expect(role()).toBeTruthy();
     });
   });
 });

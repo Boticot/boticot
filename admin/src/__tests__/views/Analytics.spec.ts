@@ -49,7 +49,7 @@ describe('Analytics.vue', () => {
       expect(comp.$data.allTrafficDataList).toEqual(allTraficDataList);
       const allUniqueUsersDataList = [3, 11, 3, 3, 3, 3, 3, 1];
       expect(comp.$data.allUniqueUsersDataList).toEqual(allUniqueUsersDataList);
-      const allFallbackDataList = [3, 0, 3, 3, 3, 1, 3, 5];
+      const allFallbackDataList = [0.75, 0, 0.75, 0.75, 0.75, 0.25, 0.375, 1];
       expect(comp.$data.allFallbackDataList).toEqual(allFallbackDataList);
     });
   });
@@ -103,7 +103,16 @@ describe('Analytics.vue', () => {
       expect(chartDataBarFallbackComputedProperty.labels).toEqual(comp.$data.dateDataList);
       expect(chartDataBarFallbackComputedProperty.datasets[0].label).toEqual('Fallback');
       expect(chartDataBarFallbackComputedProperty.datasets[0].data).toEqual(
-        [3, 0, 3, 3, 3, 1, 3, 5],
+        [
+          0.75,
+          0,
+          0.75,
+          0.75,
+          0.75,
+          0.25,
+          0.375,
+          1,
+        ],
       );
 
       (comp as any).selectPeriod('Last 7 days'); // trigger last 7 days selection

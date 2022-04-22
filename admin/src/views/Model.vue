@@ -25,7 +25,7 @@
       <h4>Intents</h4>
       <el-table :data="intents" style="width: 100%">
         <el-table-column prop="intent" label="Intent"></el-table-column>
-        <el-table-column fixed="right" width="90">
+        <el-table-column v-if="!isReadUser()" fixed="right" width="90">
           <template slot-scope="scope">
             <el-button
             type="danger"
@@ -43,6 +43,7 @@
 
 <script lang='ts'>
 import Vue from 'vue';
+import { mapGetters } from 'vuex';
 import { GlobalEntity } from '@/types';
 import { getAgent, deleteAgentIntent } from '@/client/agent';
 import { initEntities } from '@/service/entityService';
@@ -60,6 +61,11 @@ export default Vue.extend({
       versions: Array<unknown>(),
       config: '',
     };
+  },
+  computed: {
+    ...mapGetters([
+      'isReadUser',
+    ]),
   },
   methods: {
     async updateModelDetails() {
