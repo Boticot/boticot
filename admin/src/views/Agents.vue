@@ -1,5 +1,5 @@
 <template>
-  <div class="agents halfSize">
+  <div class="agents tableSize">
     <el-card class="box-card textAlignLeft" v-loading="loading">
       <h4 class="textAlignCenter">Create New Agent</h4>
       <el-form :model="newAgent" :rules="rules" ref="newAgent" label-width="120px">
@@ -91,7 +91,7 @@
     <el-card class="box-card" :class="[isHideExistingAgents ? 'displayNone' : '']">
       <h4>Existing Agents</h4>
       <el-table :data="agents" style="width: 100%">
-        <el-table-column prop="name" label="Name" width="150"></el-table-column>
+        <el-table-column prop="name" label="Name" min-width="150"></el-table-column>
         <el-table-column prop="current_version" label="Current Version" width="150"></el-table-column>
         <el-table-column prop="last_version" label="Last Version" width="150"></el-table-column>
         <el-table-column prop="last_train" label="Last Train" width="110"></el-table-column>

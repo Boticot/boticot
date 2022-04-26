@@ -1,5 +1,5 @@
 <template>
-  <div class="users halfSize">
+  <div class="users tableSize">
     <el-card class="box-card textAlignLeft">
       <h4>Create new User</h4>
       <el-form :model="newUser" :rules="rules" ref="newUser" label-width="120px">
@@ -48,9 +48,9 @@
     <el-card class="box-card" :class="[isHideExistingUsers ? 'displayNone' : '']">
       <h4>Existing Users</h4>
       <el-table :data="users" style="width: 100%">
-        <el-table-column prop="first_name" label="First Name" width="150"></el-table-column>
-        <el-table-column prop="last_name" label="Last Name" width="150"></el-table-column>
-        <el-table-column prop="email" label="Login" width="150"></el-table-column>
+        <el-table-column prop="first_name" label="First Name" width="120"></el-table-column>
+        <el-table-column prop="last_name" label="Last Name" width="120"></el-table-column>
+        <el-table-column prop="email" label="Login" min-width="150"></el-table-column>
         <el-table-column prop="role" label="Right" width="150">
           <template slot-scope="scope" v-if="scope.row.role">
             <div slot="reference" class="name-wrapper">
