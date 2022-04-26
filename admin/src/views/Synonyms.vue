@@ -1,5 +1,5 @@
 <template>
-  <div class="synonyms halfSize">
+  <div class="synonyms tableSize">
     <el-card class="box-card">
       <el-button type="primary"
        class="textAlignCenter"
@@ -9,9 +9,10 @@
       <el-table :class="[isHideExistingSynonyms ? 'displayNone' : '']"
         v-if="synonymsData"
         :data="synonymsData.items"
+        style="width: 100%"
         >
-        <el-table-column prop="synonyms.value" label="Name" width="100"></el-table-column>
-        <el-table-column prop="synonyms.synonyms" label="Synonyms" width="300">
+        <el-table-column prop="synonyms.value" label="Name" width="120"></el-table-column>
+        <el-table-column prop="synonyms.synonyms" label="Synonyms" min-width="300">
           <template slot-scope="scope" >
             <div style="{height: 70px; max-height: 120px; overflow-y: auto;}">
               <el-tag size="medium" slot="reference" class="name-wrapper"
