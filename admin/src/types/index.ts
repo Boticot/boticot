@@ -104,3 +104,18 @@ export type SynonymsData = {
   count: number;
   items: Array<SynonymsItemData>;
 }
+
+export type LookupElement = {
+  elements: Array<string>;
+  name: string;
+}
+
+export type LookupsItemData = {
+  _id: string;
+  lookups: LookupElement;
+}
+
+export type LookupsData = {
+  count: number;
+  items: Array<LookupsItemData>;
+}

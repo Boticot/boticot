@@ -72,6 +72,17 @@ const routes: Array<RouteConfig> = [
     },
   },
   {
+    path: '/lookups/:agentName',
+    name: 'lookups',
+    component: () => import('../views/Lookup.vue'),
+    meta: {
+      requiresSuperAdmin: true,
+      requiresAdmin: true,
+      requiresWrite: true,
+      requiresRead: true,
+    },
+  },
+  {
     path: '/analytics/:agentName',
     name: 'analytics',
     component: () => import('../views/Analytics.vue'),
