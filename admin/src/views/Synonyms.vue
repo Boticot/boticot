@@ -13,7 +13,7 @@
         >
         <el-table-column prop="synonyms.value" label="Name" width="120"></el-table-column>
         <el-table-column prop="synonyms.synonyms" label="Synonyms" min-width="300">
-          <template slot-scope="scope" >
+          <template slot-scope="scope" style="{height: 70px; max-height: 120px; overflow-y: auto;}">
             <div style="{height: 70px; max-height: 120px; overflow-y: auto;}">
               <el-tag size="medium" slot="reference" class="name-wrapper"
                 v-for="item in scope.row.synonyms.synonyms"
@@ -25,7 +25,7 @@
             </div>
          </template>
         </el-table-column>
-        <el-table-column fixed="right" width="150">
+        <el-table-column fixed="right" width="90">
           <template slot-scope="scope">
             <el-button
             type="primary"
@@ -33,6 +33,10 @@
             icon="el-icon-edit"
             plain
           ></el-button>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" width="90">
+          <template slot-scope="scope">
             <el-button
             type="danger"
             @click="deleteSelectedSynonym(scope.row)"

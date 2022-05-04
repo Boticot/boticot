@@ -125,9 +125,9 @@
 
 <script lang='ts'>
 import Vue from 'vue';
+import { mapGetters } from 'vuex';
 import { createNewAgent } from '@/service/agentService';
 import { getAgents, deleteAgent, getAgentFile } from '@/client/agent';
-import { mapGetters } from 'vuex';
 
 const pipelineExample = {
   language: 'fr',
