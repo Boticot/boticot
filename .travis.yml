@@ -20,3 +20,7 @@ after_success:
   - docker push boticot/api:${VERSION}
   - docker push boticot/trainer:${VERSION}
   - docker push boticot/admin:${VERSION}
+
+branches:
+  only:
+  - master
