@@ -13,6 +13,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-    - run: docker build -t boticot/api:0.8.0-alpha ./api
-    - run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PWD}}
-    - run: docker push boticot/api:0.8.0-alpha
+      run: docker build -t boticot/api:0.8.0-alpha ./api
