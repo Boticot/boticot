@@ -10,3 +10,4 @@ JWT_ACCESS_TOKEN_EXPIRES=240
 ADMIN_LOGIN=admin@boticot.ai
 ADMIN_PWD=B0tic0t!
 TF_XLA_FLAGS=--tf_xla_cpu_global_jit
+API_KEY={"your_client_id": "your_client_secret_key"}
