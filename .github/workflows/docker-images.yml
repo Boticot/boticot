@@ -1,0 +1,36 @@
+name: Docker Images CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+
+  build-and-push:
+
+    runs-on: ubuntu-latest
+    env:
+      VERSION: 0.8.0-alpha
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build the boticot api Docker image
+      run: docker build -t boticot/api:$VERSION ./api
+
+    - name: Build the boticot trainer Docker image
+      run: docker build -t boticot/trainer:$VERSION ./trainer
+
+    - name: Build the boticot admin Docker image
+      run: docker build -t boticot/admin:$VERSION ./admin
+
+    - name: Login to Docker regitry
+      run: docker login -u ${{secrets.DOCKER_USERNAME}} -p ${{secrets.DOCKER_PWD}}
+
+    - name: Push the boticot api to Docker regitry
+      run: docker push boticot/api:$VERSION
+
+    - name: Push the boticot trainer to Docker regitry
+      run: docker push boticot/trainer:$VERSION
+      
+    - name: Push the boticot admin to Docker regitry
+      run: docker push boticot/admin:$VERSION
