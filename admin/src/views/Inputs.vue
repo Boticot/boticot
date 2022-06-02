@@ -1,7 +1,20 @@
 <template>
-  <div class="inputs" v-loading="loading">
+  <div class="inputs halfSize" v-loading="loading">
+    <el-row :gutter="10">
+        <el-col :span="10">
+          <el-select v-model="intentName" clearable="true" placeholder="Search by intent">
+            <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
+          </el-select>
+        </el-col>
+        <el-col :span="10">
+          <el-input placeholder="Search by text" v-model="text"></el-input>
+        </el-col>
+        <el-col :span="4" :style="{ textAlign: 'left'}">
+          <el-button type="primary" @click="updateInputs(1)">Search</el-button>
+        </el-col>
+    </el-row>
     <h3 class="marginBottomMedium">
-      <span>Users Inputs for agent {{ agentName }}: {{count}}</span>
+      <span>Users Inputs count: {{count}}</span>
       <el-button
             type="primary"
             @click="pageChange(1)"
@@ -15,7 +28,6 @@
     </el-pagination>
      <el-collapse
       v-model="activeNames"
-      class="halfSize"
       accordion
     >
       <div v-for="data in inputs" :key="data.id">
@@ -30,6 +42,7 @@
 
 <script lang='ts'>
 import Vue from 'vue';
+import { mapState } from 'vuex';
 import NluEntryComponent from '@/components/NluEntry.vue';
 import { getAgentInputs } from '@/service/nluService';
 
@@ -44,14 +57,23 @@ export default Vue.extend({
       inputs: {},
       loading: true,
       activeNames: [''],
+      intentName: '',
+      text: '',
       count: 0,
       pageSize: 0,
       currentPage: 1,
     };
   },
+  computed: {
+    ...mapState({
+      allIntents: 'intents',
+    }),
+  },
   methods: {
     async updateInputs(page: number) {
-      const resp = await getAgentInputs(this.agentName, page);
+      this.loading = true;
+      const resp = await getAgentInputs(this.agentName, this.intentName,
+        this.text, page);
       this.inputs = resp.items;
       this.count = resp.count;
       this.loading = false;
