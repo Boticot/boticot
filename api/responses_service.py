@@ -44,6 +44,7 @@ class ResponsesService(object):
         text_responses = []
         suggestion_responses = []
         link_responses = []
+        image_responses = []
         for entry in db_responses:    
             if (entry.get("response_type") == "TEXT"):
                 db_text = json.loads(MongoJSONEncoder().encode(entry))
@@ -60,9 +61,15 @@ class ResponsesService(object):
                 link = db_link.get("data")
                 link["_id"] = db_link.get("_id")
                 link_responses.append(link)
+            elif (entry.get("response_type") == "IMAGE"):
+                db_image = json.loads(MongoJSONEncoder().encode(entry))
+                image = db_image.get("data")
+                image["_id"] = db_image.get("_id")
+                image_responses.append(image)
         responses["texts"] = text_responses
         responses["suggestions"] = suggestion_responses
         responses["links"] = link_responses
+        responses["images"] = image_responses
         return responses
 
     def add_agent_responses(self, agent_name, responses):
