@@ -100,3 +100,7 @@
     background: #e9eaed !important;
     color: rgb(0, 0, 0);
 }
+
+.w-100 {
+    width:100%;
+}
