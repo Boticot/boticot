@@ -2,7 +2,7 @@
   <div class="inputs halfSize" v-loading="loading">
     <el-row :gutter="10">
         <el-col :span="10">
-          <el-select v-model="intentName" clearable="true" placeholder="Search by intent">
+          <el-select class="w-100" v-model="intentName" clearable="true" placeholder="Search by intent">
             <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
           </el-select>
         </el-col>
@@ -10,7 +10,7 @@
           <el-input placeholder="Search by text" v-model="text"></el-input>
         </el-col>
         <el-col :span="4" :style="{ textAlign: 'left'}">
-          <el-button type="primary" @click="updateInputs(1)">Search</el-button>
+          <el-button class="w-100" type="primary" @click="updateInputs(1)">Search</el-button>
         </el-col>
     </el-row>
     <h3 class="marginBottomMedium">

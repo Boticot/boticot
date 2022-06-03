@@ -64,8 +64,8 @@ export default Vue.extend({
     async choices() {
       if (!this.selectedAgent) {
         [this.selectedAgent] = this.choices; // Select the first as default value
-        this.$store.commit('updateAgent', await getAgent(this.selectedAgent));
       }
+      this.$store.commit('updateAgent', await getAgent(this.selectedAgent));
     },
   },
   computed: {
