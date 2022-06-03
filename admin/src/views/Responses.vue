@@ -2,6 +2,7 @@
   <div class="responses halfSize">
     <el-card class="box-card textAlignLeft">
       <h4 class="textAlignCenter">Agent Responses</h4>
+
       <el-form :model="newResponse" :rules="rules" ref="newResponse" label-width="120px">
         <el-form-item label="Intent" prop='selectedIntent'>
           <el-select v-model="newResponse.selectedIntent" filterable placeholder="Select Intent" @change="selectIntent">
@@ -9,7 +10,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="Response type">
-          <el-radio-group v-model="newResponse.type" @change="selectResponseType">
+          <el-radio-group v-model="newResponse.type">
             <el-radio label="TEXT">
               Text
             </el-radio>
@@ -19,14 +20,17 @@
             <el-radio label="LINK">
               Link
             </el-radio>
+            <el-radio label="IMAGE">
+              Image
+            </el-radio>
           </el-radio-group>
         </el-form-item>
-        <div :class="[isHideTextResponse ? 'displayNone' : '']">
+        <div v-if="showTextForm" key="text">
           <el-form-item label="Text Response" prop='text'>
             <el-input type="textarea" :rows="4" v-model="newResponse.text"></el-input>
           </el-form-item>
         </div>
-        <div :class="[isHideSuggestionsResponse ? 'displayNone' : '']">
+        <div v-if="showSuggestionForm" key="suggestion">
           <el-form-item label="Suggesion Text" prop='suggestionText'>
             <el-input v-model="newResponse.suggestionText"></el-input>
           </el-form-item>
@@ -37,24 +41,21 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="Code" prop='suggestionCode'
-          :class="[isHideSuggestionCode ? 'displayNone' : '']">
+          <el-form-item  v-if="showSuggestionCodeForm" label="Code" prop='suggestionCode'>
             <el-input v-model="newResponse.suggestionCode"></el-input>
           </el-form-item>
-          <el-form-item label="Intent" prop='suggestionIntent'
-          :class="[isHideSuggestionIntent ? 'displayNone' : '']">
-            <el-select v-model="newResponse.suggestionIntent" filterable placeholder="Select an intent"
-            @change="selectSuggestionIntent">
+          <el-form-item v-if="showSuggestionIntentForm" label="Intent" prop='suggestionIntent'>
+            <el-select v-model="newResponse.suggestionIntent" filterable placeholder="Select an intent">
               <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
               <el-option label="Create New Intent" value="NEW_INTENT"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item :class="[isHideSuggestionNewIntent ? 'displayNone' : '']" label="New intent"
+          <el-form-item v-if="showSuggestionNewIntentForm" label="New intent"
           prop='suggestionNewIntent'>
             <el-input v-model="newResponse.suggestionNewIntent"></el-input>
           </el-form-item>
         </div>
-        <div :class="[isHideLinkResponse ? 'displayNone' : '']">
+        <div v-if="showLinkForm" key="link">
           <el-form-item label="Link name" prop='linkName'>
             <el-input v-model="newResponse.linkName"></el-input>
           </el-form-item>
@@ -62,16 +63,24 @@
             <el-input v-model="newResponse.url"></el-input>
           </el-form-item>
         </div>
+        <div v-if="showImageForm" key="image">
+          <el-form-item label="Image name" prop='imageName'>
+            <el-input v-model="newResponse.imageName"></el-input>
+          </el-form-item>
+          <el-form-item label="URL" prop='imageUrl'>
+            <el-input v-model="newResponse.imageUrl"></el-input>
+          </el-form-item>
+        </div>
         <el-form-item>
           <el-button type="primary" @click="addResponse">Add Response</el-button>
         </el-form-item>
       </el-form>
     </el-card>
-    <el-card class="box-card" :class="[isHideExistingResponses ? 'displayNone' : '']">
+    <el-card v-if="hasResponses" class="box-card">
       <h4>Intent "{{newResponse.selectedIntent}}" Responses</h4>
       <el-table :data="responses.texts" row-key="_id" max-height="250" style="width: 100%"
       :class="[responses.texts.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
-        <el-table-column prop="fulfillment_text" label="Text" width="750"></el-table-column>
+        <el-table-column prop="fulfillment_text" label="Text"></el-table-column>
         <el-table-column fixed="right" width="90">
           <template slot-scope="scope">
             <el-button
@@ -86,7 +95,7 @@
       </el-table>
       <el-table :data="responses.suggestions" row-key="_id" max-height="250" class="marginTopLarge" style="width: 100%"
       :class="[responses.suggestions.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
-        <el-table-column prop="suggestion_text" label="Suggestion" width="200"></el-table-column>
+        <el-table-column prop="suggestion_text" label="Suggestion"></el-table-column>
         <el-table-column prop="linked_to" label="Linked To" width="150"></el-table-column>
         <el-table-column prop="suggestion_code" label="Code" width="200"></el-table-column>
         <el-table-column prop="suggestion_intent" label="Intent" width="200"></el-table-column>
@@ -104,8 +113,24 @@
       </el-table>
       <el-table :data="responses.links" row-key="_id" max-height="250" class="marginTopLarge" style="width: 100%"
       :class="[responses.links.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
-        <el-table-column prop="link_name" label="Link name" width="250"></el-table-column>
-        <el-table-column prop="url" label="URL" width="500"></el-table-column>
+        <el-table-column prop="link_name" label="Link name" width="200"></el-table-column>
+        <el-table-column prop="url" label="URL"></el-table-column>
+        <el-table-column fixed="right" width="90">
+          <template slot-scope="scope">
+            <el-button
+            type="danger"
+            @click="deleteResponseById(scope.row._id)"
+            icon="el-icon-delete"
+            :style="{ marginLeft: '15px' }"
+            plain
+          ></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-table :data="responses.images" row-key="_id" max-height="250" class="marginTopLarge" style="width: 100%"
+      :class="[responses.images.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
+        <el-table-column prop="image_name" label="Image name" width="200"></el-table-column>
+        <el-table-column prop="image_url" label="URL (gif, jpg, png)"></el-table-column>
         <el-table-column fixed="right" width="90">
           <template slot-scope="scope">
             <el-button
@@ -124,7 +149,11 @@
 
 <script lang='ts'>
 import Vue from 'vue';
-import { getResponses, addResponse, deleteResponse } from '@/client/responses';
+import {
+  getResponses,
+  addResponse,
+  deleteResponse,
+} from '../client/responses';
 
 export default Vue.extend({
   name: 'responses',
@@ -170,6 +199,16 @@ export default Vue.extend({
     const checkUrl = (rule: any, value: string, callback: any) => {
       validateField(value, 'LINK', 'Please input url', callback);
     };
+    const checkImageName = (rule: any, value: string, callback: any) => {
+      validateField(value, 'IMAGE', 'Please input image name', callback);
+    };
+    const checkImageUrl = (rule: any, value: string, callback: any) => {
+      if (!/\.(gif|png|jpg)$/.test(value)) {
+        return callback(new Error('Please input a valid image (gif, png or jpg)'));
+      }
+
+      return callback();
+    };
     return {
       newResponse: {
         selectedIntent: '',
@@ -182,6 +221,8 @@ export default Vue.extend({
         suggestionNewIntent: '',
         linkName: '',
         url: '',
+        imageName: '',
+        imageUrl: '',
       },
       rules: {
         selectedIntent: [
@@ -208,14 +249,14 @@ export default Vue.extend({
         url: [
           { required: true, validator: checkUrl, trigger: 'blur' },
         ],
+        imageName: [
+          { required: true, validator: checkImageName, trigger: 'blur' },
+        ],
+        imageUrl: [
+          { required: true, validator: checkImageUrl, trigger: 'blur' },
+        ],
       },
       agentName: this.$route.params.agentName,
-      isHideTextResponse: false,
-      isHideSuggestionsResponse: true,
-      isHideLinkResponse: true,
-      isHideSuggestionCode: true,
-      isHideSuggestionIntent: true,
-      isHideSuggestionNewIntent: true,
       suggestionsLinkedToList: [
         {
           value: 'NONE',
@@ -234,25 +275,62 @@ export default Vue.extend({
         texts: Array<any>(),
         suggestions: Array<any>(),
         links: Array<any>(),
+        images: Array<any>(),
       },
-      isHideExistingResponses: true,
     };
   },
   computed: {
-    allIntents() {
+    allIntents(): boolean {
       return this.$store.state.intents;
     },
+    showTextForm(): boolean {
+      return this.newResponse.type === 'TEXT';
+    },
+    showSuggestionForm(): boolean {
+      return this.newResponse.type === 'SUGGESTION';
+    },
+    showSuggestionIntentForm(): boolean {
+      return this.newResponse.suggestionLinkedTo !== 'CODE';
+    },
+    showSuggestionCodeForm(): boolean {
+      return this.newResponse.suggestionLinkedTo === 'CODE';
+    },
+    showSuggestionNewIntentForm(): boolean {
+      return this.newResponse.suggestionIntent === 'NEW_INTENT' && this.newResponse.suggestionLinkedTo === 'INTENT';
+    },
+    showLinkForm(): boolean {
+      return this.newResponse.type === 'LINK';
+    },
+    showImageForm(): boolean {
+      return this.newResponse.type === 'IMAGE';
+    },
+    hasResponses(): boolean {
+      return typeof Object.values(this.responses).find((table: any[]) => table.length) !== 'undefined';
+    },
+  },
+  created() {
+    this.clearForm();
   },
   methods: {
+    clearForm() {
+      this.newResponse = {
+        selectedIntent: this.newResponse?.selectedIntent,
+        type: 'TEXT',
+        text: '',
+        suggestionText: '',
+        suggestionLinkedTo: 'NONE',
+        suggestionCode: '',
+        suggestionIntent: '',
+        suggestionNewIntent: '',
+        linkName: '',
+        url: '',
+        imageName: '',
+        imageUrl: '',
+      };
+    },
     async selectIntent(value: string) {
       this.newResponse.selectedIntent = value;
       this.responses = await getResponses(this.agentName, value);
-      if (this.responses.texts.length === 0 && this.responses.suggestions.length === 0
-      && this.responses.links.length === 0) {
-        this.isHideExistingResponses = true;
-      } else {
-        this.isHideExistingResponses = false;
-      }
     },
     async addResponse(e: any) {
       const { newResponse }: any = this.$refs;
@@ -322,16 +400,24 @@ export default Vue.extend({
                 ],
               };
               await addResponse(this.agentName, responsesBody);
+            } else if (this.newResponse.type === 'IMAGE') {
+              const responsesBody = {
+                responses: [
+                  {
+                    intent: this.newResponse.selectedIntent,
+                    response_type: this.newResponse.type,
+                    data: {
+                      image_name: this.newResponse.imageName,
+                      image_url: this.newResponse.imageUrl,
+                    },
+                  },
+                ],
+              };
+              await addResponse(this.agentName, responsesBody);
             }
-            this.newResponse.text = '';
-            this.newResponse.suggestionText = '';
-            this.newResponse.suggestionCode = '';
-            this.newResponse.suggestionIntent = '';
-            this.newResponse.suggestionNewIntent = '';
-            this.newResponse.linkName = '';
-            this.newResponse.url = '';
-            this.isHideExistingResponses = false;
-            this.isHideSuggestionNewIntent = true;
+
+            this.clearForm();
+
             this.responses = await getResponses(this.agentName, this.newResponse.selectedIntent);
             e.preventDefault();
           }
@@ -342,49 +428,10 @@ export default Vue.extend({
     async deleteResponseById(id: string) {
       await deleteResponse(id);
       this.responses = await getResponses(this.agentName, this.newResponse.selectedIntent);
-      if (this.responses.texts.length === 0 && this.responses.suggestions.length === 0
-      && this.responses.links.length === 0) {
-        this.isHideExistingResponses = true;
-      } else {
-        this.isHideExistingResponses = false;
-      }
-    },
-    selectResponseType() {
-      if (this.newResponse.type === 'TEXT') {
-        this.isHideTextResponse = false;
-        this.isHideSuggestionsResponse = true;
-        this.isHideLinkResponse = true;
-      } else if (this.newResponse.type === 'SUGGESTION') {
-        this.isHideTextResponse = true;
-        this.isHideSuggestionsResponse = false;
-        this.isHideLinkResponse = true;
-      } else if (this.newResponse.type === 'LINK') {
-        this.isHideTextResponse = true;
-        this.isHideSuggestionsResponse = true;
-        this.isHideLinkResponse = false;
-      }
     },
     selectSuggestionLinkedTo() {
-      if (this.newResponse.suggestionLinkedTo === 'CODE') {
-        this.isHideSuggestionCode = false;
-        this.isHideSuggestionIntent = true;
-        this.isHideSuggestionNewIntent = true;
-      } else if ((this.newResponse.suggestionLinkedTo === 'INTENT')) {
+      if (this.newResponse.suggestionLinkedTo === 'INTENT') {
         this.newResponse.suggestionIntent = '';
-        this.isHideSuggestionCode = true;
-        this.isHideSuggestionIntent = false;
-        this.isHideSuggestionNewIntent = true;
-      } else {
-        this.isHideSuggestionCode = true;
-        this.isHideSuggestionIntent = true;
-        this.isHideSuggestionNewIntent = true;
-      }
-    },
-    selectSuggestionIntent(value: string) {
-      if (value === 'NEW_INTENT') {
-        this.isHideSuggestionNewIntent = false;
-      } else {
-        this.isHideSuggestionNewIntent = true;
       }
     },
   },
