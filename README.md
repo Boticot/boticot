@@ -8,6 +8,23 @@
 [![Contributors](https://img.shields.io/github/contributors-anon/boticot/boticot)](https://github.com/boticot/boticot/graphs/contributors)
 [![License](https://img.shields.io/github/license/boticot/boticot)](https://github.com/boticot/boticot/blob/master/LICENSE)
 
+Boticot is an open source natural language understanding toolkit. You can use it to create virtual assistant, chatbot and NLU agents.
+Boticot helps to manage conversations contexts and manage multiple agents in the same time.
+It helps also to improve your user experience based on analytics and tracking tools provided with Boticot Admin.
+
+<img alt="Boticot" src="https://github.com/Boticot/boticot/blob/master/admin/src/assets/boticot-tutorial.gif"><br>
+
+Features provided by Boticot:
+* Manage training data and creating intents and entities using user interface
+* Track in real time users inputs and improve you agent model based on real user data
+* Manage automatic responses for intents: texts, suggestions, links and images
+* Manage synonyms
+* Supervise agent performance with provided analytics
+* Manage multiple agents
+* Manage users with roles
+
+Boticot is based on rasa NLU (version 1.5.3).
+
 ## Boticot API QuickStart
 
 ### Project setup
