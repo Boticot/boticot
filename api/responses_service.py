@@ -91,6 +91,8 @@ class ResponsesService(object):
             response["suggestions"] = responses.get("suggestions")
         if (len(responses.get("links")) != 0):
             response["links"] = responses.get("links")
+        if (len(responses.get("images")) != 0):
+            response["images"] = responses.get("images")
         return response
     
     def delete_response(self, id):
