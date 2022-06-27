@@ -14,7 +14,15 @@ function getLogin(token: string) {
 export default {
   entitiesNames: (state: any) => () => state.entities.map((element: GlobalEntity): string => element.entity),
 
-  entityColor: (state: any) => (entity: string) => state.entities.find((e: any) => e.entity === entity)?.color,
+  entityColor: (state: any) => (entityName: string) => {
+    const entity = state.entities.find((e: any) => e.entity === entityName);
+
+    if (entity) {
+      return entity.color;
+    }
+
+    return null;
+  },
 
   isLoggedIn: (state: any) => () => (state.token !== '' && getExpiration(state.token) >= new Date().getTime() / 1000),
 

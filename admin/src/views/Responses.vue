@@ -314,7 +314,7 @@ export default Vue.extend({
   methods: {
     clearForm() {
       this.newResponse = {
-        selectedIntent: this.newResponse?.selectedIntent,
+        selectedIntent: this.newResponse ? this.newResponse.selectedIntent : '',
         type: 'TEXT',
         text: '',
         suggestionText: '',

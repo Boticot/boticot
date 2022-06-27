@@ -81,7 +81,7 @@ export default Vue.extend({
       if (this.isLoggedIn()) {
         getAgentsNames()
           .then((val) => {
-            this.activeName = this.$router.currentRoute.name?.toLowerCase() || 'try-it';
+            this.activeName = this.$router.currentRoute.name ? this.$router.currentRoute.name.toLowerCase() : 'try-it';
             if (val.length === 0) {
               this.$router.replace('/agents');
             } else {

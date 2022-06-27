@@ -260,7 +260,7 @@ export default Vue.extend({
       reader.readAsText(file.raw);
       reader.onload = async (e) => {
         try {
-          this.fileContent = JSON.parse(e.target?.result as string);
+          this.fileContent = JSON.parse(e.target ? e.target.result as string : '');
           if (!this.checkIfValidJsonFormat(this.fileContent)) {
             return;
           }
