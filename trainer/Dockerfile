@@ -7,6 +7,7 @@ RUN pip install flask==1.1.2
 RUN pip install flask_cors==3.0.8
 RUN pip install flask-compress==1.5.0
 RUN pip install isodate==0.6.0
+RUN pip install gym==0.15.3
 
 ADD . .
 
