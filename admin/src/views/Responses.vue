@@ -203,11 +203,7 @@ export default Vue.extend({
       validateField(value, 'IMAGE', 'Please input image name', callback);
     };
     const checkImageUrl = (rule: any, value: string, callback: any) => {
-      if (!/\.(gif|png|jpg)$/.test(value)) {
-        return callback(new Error('Please input a valid image (gif, png or jpg)'));
-      }
-
-      return callback();
+      validateField(value, 'IMAGE', 'Please input image (gif, png or jpg)', callback);
     };
     return {
       newResponse: {
