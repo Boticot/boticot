@@ -37,6 +37,9 @@ class AgentsRepository():
 
     def get_fallback(self, agent_name):
         return(self.agents_collection.find_one({"name" : agent_name}, {"_id": 0, "fallback": 1}))
+    
+    def get_agent_intents(self, agent_name):
+        return self.agents_collection.find_one({"name": agent_name}, {"_id": 0, "intents": 1})
 
     def update_agent_intents(self, agent_name, intents):
         """Add/update agent intents"""

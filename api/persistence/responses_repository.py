@@ -7,8 +7,11 @@ class ResponsesRepository():
     def __init__(self):
         self.responses_collection = mongo.db.responses
 
-    def find_agent_responses(self, agent_name):
-        return self.responses_collection.find({"agent_name": agent_name})
+    def find_agent_responses(self, agent_name, intent=None):
+        filter = {"agent_name": agent_name}
+        if intent:
+            filter["intent"] = intent
+        return self.responses_collection.find(filter)
 
     def find_agent_responses_by_intent(self, agent_name, intent):
         return self.responses_collection.find({"agent_name": agent_name, "intent": intent})

@@ -27,10 +27,10 @@ class ResponsesService(object):
          self.agents_repository = AgentsRepository()
          ResponsesService.__instance = self
     
-    def get_agent_responses(self, agent_name):
+    def get_agent_responses(self, agent_name, intent=None):
         tmp_data = []
-        responses = self.responses_repository.find_agent_responses(agent_name)
-        for entry in responses:    
+        responses = self.responses_repository.find_agent_responses(agent_name, intent)
+        for entry in responses: 
             tmp_data.append({
                     "intent": entry.get("intent"),
                     "response_type": entry.get("response_type"), 

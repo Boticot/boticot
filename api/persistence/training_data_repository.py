@@ -14,9 +14,13 @@ class TrainingDataRepository():
         """Find training data by id"""
         return self.training_data_collection.find_one({"_id": ObjectId(id)})
 
-    def find_agent_training_data(self, agent_name):
+    def find_agent_training_data(self, agent_name, intent=None):
+        filter = {"agent_name": agent_name}
+        if intent :
+            filter["data.intent"] = intent
+
         """Find all training data linked to a specific agent"""
-        return self.training_data_collection.find({"agent_name": agent_name})
+        return self.training_data_collection.find(filter)
 
     def count_agent_training_data(self, agent_name, intent, text):
         if intent and text:
