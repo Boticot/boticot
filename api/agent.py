@@ -46,7 +46,10 @@ class Agent(object):
         nlu_data = {}
         nlu_data["intent"] = {}
         nlu_data["text"] = text
-        intent_from_db = AgentsService.get_instance().get_intent_by_text(text, agent_name)
+        if os.environ.get("CHECK_EXACT_TEXT", "0") == "0":
+            intent_from_db = None
+        else:
+            intent_from_db = AgentsService.get_instance().get_intent_by_text(text, agent_name)
         if intent_from_db is not None:
             intent = intent_from_db["data"]["intent"]
             nlu_data["intent"]["name"] = intent
