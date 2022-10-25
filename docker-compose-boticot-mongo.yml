@@ -35,6 +35,7 @@ services:
             - "MODEL_LOADER=mongodb"
             - "ACTIVATE_LOADER_CRON=1"
             - "LOADER_CRON_SCHEDULE=1"
+            - "CHECK_EXACT_TEXT=1"
             - "MAX_PAGE_SIZE=200"
             - "TF_XLA_FLAGS=--tf_xla_cpu_global_jit"
             - "JWT_SECRET_KEY=7165e13fac4bcc29789f43e410c00f4ccd1f74a0"
