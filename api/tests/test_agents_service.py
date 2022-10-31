@@ -87,3 +87,10 @@ class TestAgentsService:
         mocker.patch("agents_service.UsersInputsRepository.get_agent_inputs", return_value=["data1", "data2"])
         mocker.patch("agents_service.UsersInputsRepository.count_user_inputs", return_value=4)
         assert agents_service.AgentsService.get_instance().get_agent_inputs("test1", None, None, 1, 0, 1, 20) == {"count" : 4,"items": ["data1", "data2"]}
+
+    def test_should_call_check_agent_config_when_creating_an_agent(self, mocker):
+        mocker.patch("agents_service.AgentsRepository.check_agent_config")
+        mocker.patch("agents_service.AgentsRepository.insert_agent")
+        mocker.patch("agents_service.UsersRepository.update_user_agent_access")
+        agents_service.AgentsService.get_instance().create_agent(None, "test1", "config", True, None, None, None, None)
+        agents_service.AgentsRepository.check_agent_config.assert_called()

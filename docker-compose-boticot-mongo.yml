@@ -73,3 +73,10 @@ services:
             - "PUBLIC_PATH=/"
         ports:
             - "8012:80"
+            
+    duckling:
+        container_name: duckling
+        image: "rasa/duckling"
+        restart: "always"
+        ports:
+            - "8000:8000"

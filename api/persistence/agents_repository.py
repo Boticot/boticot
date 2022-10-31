@@ -57,3 +57,8 @@ class AgentsRepository():
             {"name": agent_name}, 
             { "$addToSet": { "entities": {"$each":entities} } }
         )
+
+    def check_agent_config(self, agent_name):
+        if self.agents_collection.find_one({"name": agent_name, "config.pipeline.name": "DucklingHTTPExtractor", "config.pipeline.url": {"$exists": False}}):
+            self.agents_collection.update_one({"name": agent_name, "config.pipeline.name": "DucklingHTTPExtractor"},
+                                              {"$set": {"config.pipeline.$.url": os.environ.get("DUCKLING_URL", "http://localhost:8000")}})
