@@ -33,7 +33,24 @@ const getAgentFile = async (agentName: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
   const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/export`;
   const agent = await axios.get(url, {
-    url: `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/export`,
+    responseType: 'arraybuffer',
+    headers: {
+      encoding: null,
+      'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
+    },
+  });
+  return agent.data;
+};
+
+const getAgentIntentFile = async (agentName: string, intent: string, fullTree: boolean): Promise<any> => {
+  const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const urlBase = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}`;
+  const url = `${urlBase}/${agentName}/intents/${intent}/export`;
+  const agent = await axios.get(url, {
+    params: {
+      fullTree,
+    },
     responseType: 'arraybuffer',
     headers: {
       encoding: null,
@@ -133,5 +150,14 @@ const parseText = async (agentName: string, text: string): Promise<any> => {
 };
 
 export {
-  getAgents, addAgent, getInputs, deleteInput, parseText, getAgent, deleteAgent, deleteAgentIntent, getAgentFile,
+  getAgents,
+  addAgent,
+  getInputs,
+  deleteInput,
+  parseText,
+  getAgent,
+  deleteAgent,
+  deleteAgentIntent,
+  getAgentFile,
+  getAgentIntentFile,
 };

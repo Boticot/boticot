@@ -25,6 +25,42 @@
       <h4>Intents</h4>
       <el-table :data="intents" style="width: 100%">
         <el-table-column prop="intent" label="Intent"></el-table-column>
+        <el-table-column fixed="right" width="90">
+          <template slot-scope="scope">
+            <el-tooltip
+            class="box-item"
+            effect="light"
+            content="Export intent"
+            placement="top"
+            >
+              <el-button
+              type="primary"
+              @click="downloadAgentIntentFile(agentName, scope.row.intent, false)"
+              icon="el-icon-download"
+              :style="{ marginLeft: '15px' }"
+              plain
+              ></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+        <el-table-column fixed="right" width="90">
+          <template slot-scope="scope">
+            <el-tooltip
+            class="box-item"
+            effect="light"
+            content="Export full intent tree"
+            placement="top"
+            >
+              <el-button
+                type="primary"
+                @click="downloadAgentIntentFile(agentName, scope.row.intent, true)"
+                icon="el-icon-folder-add"
+                :style="{ marginLeft: '15px' }"
+                plain
+              ></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
         <el-table-column v-if="!isReadUser()" fixed="right" width="90">
           <template slot-scope="scope">
             <el-button
@@ -45,7 +81,7 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import { GlobalEntity } from '@/types';
-import { getAgent, deleteAgentIntent } from '@/client/agent';
+import { getAgent, deleteAgentIntent, getAgentIntentFile } from '@/client/agent';
 import { initEntities } from '@/service/entityService';
 
 export default Vue.extend({
@@ -108,6 +144,16 @@ export default Vue.extend({
           offset: 100,
         });
       }
+    },
+    async downloadAgentIntentFile(agentName: string, intent: string, fullTree: boolean) {
+      const response = await getAgentIntentFile(agentName, intent, fullTree);
+      const buffer = Buffer.from(response);
+      const fileURL = window.URL.createObjectURL(new Blob([buffer]));
+      const fileLink = document.createElement('a');
+      fileLink.href = fileURL;
+      fileLink.setAttribute('download', `${agentName}_${intent}${fullTree ? '_full' : ''}.json`);
+      document.body.appendChild(fileLink);
+      fileLink.click();
     },
   },
   mounted() {
