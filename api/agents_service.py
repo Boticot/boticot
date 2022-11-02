@@ -4,7 +4,7 @@ from datetime import datetime
 import numpy as np
 from itertools import groupby
 from agent import Agent
-from utils import remove_file_or_dir
+from utils import remove_file_or_dir, create_folder
 from responses_service import ResponsesService
 from synonyms_service import SynonymsService
 from users_service import UsersService
@@ -74,9 +74,9 @@ class AgentsService(object):
             except Exception as e:
                 logger.error("Agent {0} could not be loaded at starting with exception: {1}".format(agent_name, e), exc_info=True)
 
-    def get_agent_training_data(self, agent_name):
+    def get_agent_training_data(self, agent_name, intent=None):
         tmp_data = []
-        train_data = self.training_data_repository.find_agent_training_data(agent_name)
+        train_data = self.training_data_repository.find_agent_training_data(agent_name, intent)
         for entry in train_data:    
             del entry["_id"]
             tmp_data.append(entry["data"])
@@ -143,6 +143,13 @@ class AgentsService(object):
         agent = self.agents_repository.find_agent(agent_name)
         try:
             return json.loads(MongoJSONEncoder().encode(agent))
+        except:
+            return None
+
+    def get_agent_intents(self, agent_name):
+        intents = self.agents_repository.get_agent_intents(agent_name)
+        try:
+            return json.loads(MongoJSONEncoder().encode(intents))
         except:
             return None
 
@@ -361,7 +368,24 @@ class AgentsService(object):
         if self.lookups_repository.delete_lookup(agent_name, lookup_name):
             self.agents_repository.agent_modified(agent_name)
 
-    def create_agent_file(self, agent_name):
+    def create_agent_file(self, agent_name, intent=None, full_tree=False):
+        directory_name = os.environ.get("MODELS_PATH") + "export/"
+        file_name = agent_name + ("_intent" if intent else "") + ("_tree" if full_tree else "") + ".json"
+        file_path = directory_name + file_name
+        remove_file_or_dir(file_path)
+        if intent:
+            if full_tree:
+                dic = self.get_agent_intent_data_recursive(agent_name, intent)
+            else:
+                dic = self.get_agent_intent_data(agent_name, intent)
+        else:
+            dic = self.get_agent_data(agent_name)
+        create_folder(directory_name)
+        with open(file_path, "w+") as f:
+            json.dump(dic,f)
+        return directory_name, file_name
+
+    def get_agent_data(self, agent_name):
         agent_data = self.get_agent(agent_name)
         agent = {}
         agent["config"] = agent_data.get("config")
@@ -371,6 +395,42 @@ class AgentsService(object):
         agent["rasa_nlu_data"]["entity_synonyms"] = SynonymsService.get_instance().get_agent_synonyms(agent_name)
         agent["responses"] = ResponsesService.get_instance().get_agent_responses(agent_name)
         return agent
+    
+    def get_agent_intent_data(self, agent_name, intent):
+        agent = {}
+        agent["rasa_nlu_data"] = {}
+        agent["rasa_nlu_data"]["common_examples"] = self.get_agent_training_data(agent_name, intent)
+        agent["responses"] = ResponsesService.get_instance().get_agent_responses(agent_name, intent)
+        return agent
+    
+    def get_agent_intent_data_recursive(self, agent_name, intent, agent=None):
+        if agent is None:
+            agent = {}
+            agent["rasa_nlu_data"] = {}
+        
+        '''Merging current intent data in agent intents data dict'''
+        data = self.get_agent_intent_data(agent_name, intent)
+        if not "common_examples" in agent["rasa_nlu_data"] and data["rasa_nlu_data"]["common_examples"]:
+            agent["rasa_nlu_data"]["common_examples"] = data["rasa_nlu_data"]["common_examples"]
+        elif data["rasa_nlu_data"]["common_examples"]:
+            agent["rasa_nlu_data"]["common_examples"].append(data["rasa_nlu_data"]["common_examples"][0])
+        if not "responses" in agent and "responses" in data and data["responses"]:
+            agent["responses"] = data["responses"]
+        elif "responses" in data and data["responses"]:
+            agent["responses"].append(data["responses"][0])
+        
+        '''Retrieving data from all nested intents (suggested intents)'''
+        nested_intents = self.get_nested_intents(data)
+        for n_intent in nested_intents:
+            agent = self.get_agent_intent_data_recursive(agent_name, n_intent, agent)
+        return agent
+    
+    def get_nested_intents(self, data):
+        intents = []
+        for key, val in enumerate(data["responses"]):
+            if "data" in val and "suggestion_intent" in val["data"]:
+                intents.append(val["data"]["suggestion_intent"])
+        return intents
 
     def store_user_input(self, agent_name, nlu_data, userId):
         try:

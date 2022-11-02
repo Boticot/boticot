@@ -1,5 +1,5 @@
 import os
-from utils import response_template, remove_file_or_dir, create_folder
+from utils import response_template
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import json
@@ -24,14 +24,7 @@ def get_agent(agent_name):
 @current_app.route("/nlu/agents/<agent_name>/export", methods=["GET"])
 @jwt_required
 def get_agent_file(agent_name):
-    directory_name = os.environ.get("MODELS_PATH") + "export/" 
-    file_name = agent_name + ".json"
-    file_path = directory_name + file_name
-    remove_file_or_dir(file_path)
-    dic = AgentsService.get_instance().create_agent_file(agent_name)
-    create_folder(directory_name)
-    with open(file_path, "w+") as f:
-        json.dump(dic,f)
+    directory_name, file_name = AgentsService.get_instance().create_agent_file(agent_name = agent_name)
     return(send_from_directory(directory = directory_name, filename = "./" + file_name, as_attachment = True))
 
 @current_app.route("/nlu/agents", methods=["PUT"])
@@ -129,3 +122,10 @@ def set_specific_model(agent_name):
             return("Can't load model " + request_data.get("modelName") + "for bot " + agent_name)
     else:
         return response_template(400, "A body is mandatory inside the request")
+
+@current_app.route("/nlu/agents/<agent_name>/intents/<intent>/export", methods=["GET"])
+@jwt_required
+def get_intents_file(agent_name, intent):
+    full_tree = request.args.get("fullTree", default = False, type = lambda v: v.lower() == 'true')
+    directory_name, file_name = AgentsService.get_instance().create_agent_file(agent_name = agent_name, intent = intent, full_tree = full_tree)
+    return(send_from_directory(directory = directory_name, filename = "./" + file_name, as_attachment = True))

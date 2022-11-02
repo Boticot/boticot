@@ -1,0 +1,511 @@
+{
+    "agent_name": "test1",
+    "lookup_name": "city",
+    "lookup_json": [
+        {
+            "name": "lookup1",
+            "elements": [
+                "e1",
+                "e2"
+            ]
+        },
+        {
+            "name": "lookup2",
+            "elements": [
+                "e3",
+                "e4"
+            ]
+        }
+    ],
+    "lookup_db": [
+        {
+            "_id": 1,
+            "lookups": {
+                "name": "lookup1",
+                "elements": [
+                    "e1",
+                    "e2"
+                ]
+            }
+        },
+        {
+            "_id": 2,
+            "lookups": {
+                "name": "lookup2",
+                "elements": [
+                    "e3",
+                    "e4"
+                ]
+            }
+        }
+    ],
+    "agent_db": {
+        "name": "Agent1",
+        "last_train": 1666688485,
+        "config": {
+            "language": "en",
+            "pipeline": "supervised_embeddings"
+        },
+        "fallback": 0.4,
+        "current_version": "20221025-090124",
+        "last_version": "20221025-090124",
+        "last_modified": 1666688439,
+        "intents": [
+            "FALLBACK",
+            "greetings_hello",
+            "greetings_bye",
+            "Hello1",
+            "Hello2"
+        ],
+        "entities": [],
+        "trained_intents": [
+            "greetings_hello",
+            "greetings_bye",
+            "Hello2"
+        ],
+        "versions": [
+            "20221025-090124",
+            "20221025-085219",
+            "20221025-085114"
+        ]
+    },
+    "training_data_db": [
+        {
+            "_id": {
+                "$oid": "6357a3566d8cc5cad3edfeb0"
+            },
+            "agent_name": "Agent1",
+            "data": {
+                "intent": "greetings_hello",
+                "text": "hello"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a3566d8cc5cad3edfeb1"
+            },
+            "agent_name": "Agent1",
+            "data": {
+                "intent": "greetings_bye",
+                "text": "bye"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a3856d8cc5cad3edfeb3"
+            },
+            "agent_name": "Agent1",
+            "data": {
+                "intent": "greetings_hello",
+                "entities": [],
+                "text": "Hey"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a5a86d8cc5cad3edfeb4"
+            },
+            "agent_name": "Agent1",
+            "data": {
+                "intent": "Hello2",
+                "entities": [],
+                "text": "hello2"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a5b76d8cc5cad3edfeb5"
+            },
+            "agent_name": "Agent1",
+            "data": {
+                "intent": "Hello2",
+                "entities": [],
+                "text": "Hey2"
+            }
+        }
+    ],
+    "synonyms_db": [
+        {
+            "_id": 1,
+            "agent_name": "Agent1",
+            "synonyms": {
+                "value": "Synonyme1",
+                "synonyms": [
+                    "Hi"
+                ]
+            }
+        }
+    ],
+    "responses_db": [
+        {
+            "_id": {
+                "$oid": "6357a3568e52148e1a322577"
+            },
+            "agent_name": "Agent1",
+            "intent": "greetings_hello",
+            "response_type": "TEXT",
+            "data": {
+                "fulfillment_text": "Hello !"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a3568e52148e1a32257a"
+            },
+            "agent_name": "Agent1",
+            "intent": "greetings_bye",
+            "response_type": "TEXT",
+            "data": {
+                "fulfillment_text": "See you soon, bye !"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a3568e52148e1a32257d"
+            },
+            "agent_name": "Agent1",
+            "intent": "greetings_bye",
+            "response_type": "TEXT",
+            "data": {
+                "fulfillment_text": "Bye !"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a3778e52148e1a3225b6"
+            },
+            "agent_name": "Agent1",
+            "intent": "greetings_hello",
+            "response_type": "TEXT",
+            "data": {
+                "fulfillment_text": "Test de reponse"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a42b8e52148e1a322642"
+            },
+            "agent_name": "Agent1",
+            "intent": "greetings_hello",
+            "response_type": "SUGGESTION",
+            "data": {
+                "suggestion_text": "Suggestion",
+                "linked_to": "INTENT",
+                "suggestion_intent": "Hello1"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a4b88e52148e1a322691"
+            },
+            "agent_name": "Agent1",
+            "intent": "Hello1",
+            "response_type": "SUGGESTION",
+            "data": {
+                "suggestion_text": "Hello2Text",
+                "linked_to": "INTENT",
+                "suggestion_intent": "Hello2"
+            }
+        }
+    ],
+    "training_data_intent_db": [
+        {
+            "_id": {
+                "$oid": "6357a3566d8cc5cad3edfeb0"
+            },
+            "agent_name": "Agent1",
+            "data": {
+                "intent": "greetings_hello",
+                "text": "hello"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a3856d8cc5cad3edfeb3"
+            },
+            "agent_name": "Agent1",
+            "data": {
+                "intent": "greetings_hello",
+                "entities": [],
+                "text": "Hey"
+            }
+        }
+    ],
+    "responses_intent_db": [
+        {
+            "_id": {
+                "$oid": "6357a3568e52148e1a322577"
+            },
+            "agent_name": "Agent1",
+            "intent": "greetings_hello",
+            "response_type": "TEXT",
+            "data": {
+                "fulfillment_text": "Hello !"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a3778e52148e1a3225b6"
+            },
+            "agent_name": "Agent1",
+            "intent": "greetings_hello",
+            "response_type": "TEXT",
+            "data": {
+                "fulfillment_text": "Test de reponse"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a42b8e52148e1a322642"
+            },
+            "agent_name": "Agent1",
+            "intent": "greetings_hello",
+            "response_type": "SUGGESTION",
+            "data": {
+                "suggestion_text": "Suggestion",
+                "linked_to": "INTENT",
+                "suggestion_intent": "Hello1"
+            }
+        }
+    ],
+    "training_data_intent1_db": [],
+    "responses_intent1_db": [
+        {
+            "_id": {
+                "$oid": "6357a4b88e52148e1a322691"
+            },
+            "agent_name": "Agent1",
+            "intent": "Hello1",
+            "response_type": "SUGGESTION",
+            "data": {
+                "suggestion_text": "Hello2Text",
+                "linked_to": "INTENT",
+                "suggestion_intent": "Hello2"
+            }
+        }
+    ],
+    "training_data_intent2_db": [
+        {
+            "_id": {
+                "$oid": "6357a5a86d8cc5cad3edfeb4"
+            },
+            "agent_name": "Agent1",
+            "data": {
+                "intent": "Hello2",
+                "entities": [],
+                "text": "hello2"
+            }
+        },
+        {
+            "_id": {
+                "$oid": "6357a5b76d8cc5cad3edfeb5"
+            },
+            "agent_name": "Agent1",
+            "data": {
+                "intent": "Hello2",
+                "entities": [],
+                "text": "Hey2"
+            }
+        }
+    ],
+    "responses_intent2_db": [],
+    "expected_agent_data": {
+        "config": {
+            "language": "en",
+            "pipeline": "supervised_embeddings"
+        },
+        "rasa_nlu_data": {
+            "common_examples": [
+                {
+                    "intent": "greetings_hello",
+                    "text": "hello"
+                },
+                {
+                    "intent": "greetings_bye",
+                    "text": "bye"
+                },
+                {
+                    "intent": "greetings_hello",
+                    "entities": [],
+                    "text": "Hey"
+                },
+                {
+                    "intent": "Hello2",
+                    "entities": [],
+                    "text": "hello2"
+                },
+                {
+                    "intent": "Hello2",
+                    "entities": [],
+                    "text": "Hey2"
+                }
+            ],
+            "lookup_tables": [
+                {
+                    "name": "lookup1",
+                    "elements": [
+                        "e1",
+                        "e2"
+                    ]
+                },
+                {
+                    "name": "lookup2",
+                    "elements": [
+                        "e3",
+                        "e4"
+                    ]
+                }
+            ],
+            "entity_synonyms": [
+                {
+                    "value": "Synonyme1",
+                    "synonyms": [
+                        "Hi"
+                    ]
+                }
+            ]
+        },
+        "responses": [
+            {
+                "intent": "greetings_hello",
+                "response_type": "TEXT",
+                "data": {
+                    "fulfillment_text": "Hello !"
+                }
+            },
+            {
+                "intent": "greetings_bye",
+                "response_type": "TEXT",
+                "data": {
+                    "fulfillment_text": "See you soon, bye !"
+                }
+            },
+            {
+                "intent": "greetings_bye",
+                "response_type": "TEXT",
+                "data": {
+                    "fulfillment_text": "Bye !"
+                }
+            },
+            {
+                "intent": "greetings_hello",
+                "response_type": "TEXT",
+                "data": {
+                    "fulfillment_text": "Test de reponse"
+                }
+            },
+            {
+                "intent": "greetings_hello",
+                "response_type": "SUGGESTION",
+                "data": {
+                    "suggestion_text": "Suggestion",
+                    "linked_to": "INTENT",
+                    "suggestion_intent": "Hello1"
+                }
+            },
+            {
+                "intent": "Hello1",
+                "response_type": "SUGGESTION",
+                "data": {
+                    "suggestion_text": "Hello2Text",
+                    "linked_to": "INTENT",
+                    "suggestion_intent": "Hello2"
+                }
+            }
+        ]
+    },
+    "expected_agent_intent_data": {
+        "rasa_nlu_data": {
+            "common_examples": [
+                {
+                    "intent": "greetings_hello",
+                    "text": "hello"
+                },
+                {
+                    "intent": "greetings_hello",
+                    "entities": [],
+                    "text": "Hey"
+                }
+            ]
+        },
+        "responses": [
+            {
+                "intent": "greetings_hello",
+                "response_type": "TEXT",
+                "data": {
+                    "fulfillment_text": "Hello !"
+                }
+            },
+            {
+                "intent": "greetings_hello",
+                "response_type": "TEXT",
+                "data": {
+                    "fulfillment_text": "Test de reponse"
+                }
+            },
+            {
+                "intent": "greetings_hello",
+                "response_type": "SUGGESTION",
+                "data": {
+                    "suggestion_text": "Suggestion",
+                    "linked_to": "INTENT",
+                    "suggestion_intent": "Hello1"
+                }
+            }
+        ]
+    },
+    "expected_agent_intent_data_recursive": {
+        "rasa_nlu_data": {
+            "common_examples": [
+                {
+                    "intent": "greetings_hello",
+                    "text": "hello"
+                },
+                {
+                    "intent": "greetings_hello",
+                    "entities": [],
+                    "text": "Hey"
+                },
+                {
+                    "intent": "Hello2",
+                    "entities": [],
+                    "text": "hello2"
+                }
+            ]
+        },
+        "responses": [
+            {
+                "intent": "greetings_hello",
+                "response_type": "TEXT",
+                "data": {
+                    "fulfillment_text": "Hello !"
+                }
+            },
+            {
+                "intent": "greetings_hello",
+                "response_type": "TEXT",
+                "data": {
+                    "fulfillment_text": "Test de reponse"
+                }
+            },
+            {
+                "intent": "greetings_hello",
+                "response_type": "SUGGESTION",
+                "data": {
+                    "suggestion_text": "Suggestion",
+                    "linked_to": "INTENT",
+                    "suggestion_intent": "Hello1"
+                }
+            },
+            {
+                "intent": "Hello1",
+                "response_type": "SUGGESTION",
+                "data": {
+                    "suggestion_text": "Hello2Text",
+                    "linked_to": "INTENT",
+                    "suggestion_intent": "Hello2"
+                }
+            }
+        ]
+    }
+}
