@@ -42,6 +42,7 @@ class ResponsesService(object):
         db_responses = self.responses_repository.find_agent_responses_by_intent(agent_name, intent)
         responses = {}
         text_responses = []
+        richtext_responses = []
         suggestion_responses = []
         link_responses = []
         image_responses = []
@@ -51,6 +52,11 @@ class ResponsesService(object):
                 text = db_text.get("data")
                 text["_id"] = db_text.get("_id")
                 text_responses.append(text)
+            if (entry.get("response_type") == "RICHTEXT"):
+                db_richtext = json.loads(MongoJSONEncoder().encode(entry))
+                richtext = db_richtext.get("data")
+                richtext["_id"] = db_richtext.get("_id")
+                richtext_responses.append(richtext)
             elif (entry.get("response_type") == "SUGGESTION"):
                 db_suggestion = json.loads(MongoJSONEncoder().encode(entry))
                 suggestion = db_suggestion.get("data")
@@ -67,6 +73,7 @@ class ResponsesService(object):
                 image["_id"] = db_image.get("_id")
                 image_responses.append(image)
         responses["texts"] = text_responses
+        responses["rich_texts"] = richtext_responses
         responses["suggestions"] = suggestion_responses
         responses["links"] = link_responses
         responses["images"] = image_responses
@@ -87,6 +94,8 @@ class ResponsesService(object):
         if (len(responses.get("texts")) != 0):
             random_position = randint(0, len(responses.get("texts")) - 1)
             response["fulfillment_text"] = responses.get("texts")[random_position].get("fulfillment_text")
+        if (len(responses.get("rich_texts")) != 0):
+            response["rich_texts"] = responses.get("rich_texts")
         if (len(responses.get("suggestions")) != 0):
             response["suggestions"] = responses.get("suggestions")
         if (len(responses.get("links")) != 0):
