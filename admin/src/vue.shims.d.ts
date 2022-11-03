@@ -5,3 +5,7 @@ declare module '*.vue' {
 }
 
 declare module 'element-ui/*';
+declare module 'vue2-editor';
+declare module 'quill-image-drop-module';
+declare module 'quill-image-resize-vue';
+declare module 'quill-emoji';
