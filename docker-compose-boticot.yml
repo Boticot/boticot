@@ -4,7 +4,7 @@ services:
 
     boticot-api:
         container_name: boticot-api
-        image: "boticot/api:0.9.0-alpha"
+        image: "boticot/api:0.9.0"
         restart: "always"
         environment:
             - "SERVER_HOST=0.0.0.0"
@@ -26,7 +26,7 @@ services:
 
     boticot-trainer:
         container_name: boticot-trainer
-        image: "boticot/trainer:0.9.0-alpha"
+        image: "boticot/trainer:0.9.0"
         restart: "always"
         environment:
             - "SERVER_HOST=0.0.0.0"
@@ -42,13 +42,13 @@ services:
 
     boticot-admin:
         container_name: boticot-admin
-        image: "boticot/admin:0.9.0-alpha"
+        image: "boticot/admin:0.9.0"
         restart: "always"
         environment:
             - "HOST=0.0.0.0"
             - "VUE_APP_NLU_SERVICE_URL=http://localhost:8010"
             - "VUE_APP_NLU_PATH=/nlu/agents"
             - "VUE_APP_NLU_ENTRIES_PAGE_SIZE=10"
-            - "PUBLIC_PATH=/"
+            #- "PUBLIC_PATH=/" # Should be used when deploy admin in environment with specific path
         ports:
             - "8012:80"
