@@ -10,19 +10,22 @@ class TestResponsesService:
                     {"_id": 2, "response_type": "LINK", "data": {"link_name": "link_1", "url": "link_url_1"}},
                     {"_id": 3, "response_type": "LINK", "data": {"link_name": "link_2", "url": "link_url_2"}},
                     {"_id": 4, "response_type": "SUGGESTION", "data": {"suggestion_text": "sugg_1", "linked_to": "INTENT", "suggestion_intent": "intent_2"}},
-                    {"_id": 5, "response_type": "TEXT", "data": {"fulfillment_text": "text_1"}}]
+                    {"_id": 5, "response_type": "RICHTEXT", "data": {"rich_text": "<p>text_1</p>"}},
+                    {"_id": 6, "response_type": "TEXT", "data": {"fulfillment_text": "text_1"}}]
 
-    db_responses_get_agent_responses = {"texts": [{"_id": 5, "fulfillment_text": "text_1"}],
-                              "suggestions": [{"_id": 4, "suggestion_text": "sugg_1", "linked_to": "INTENT", "suggestion_intent": "intent_2"}],
-                              "links": [{"_id": 2, "link_name": "link_1", "url": "link_url_1"},
-                                        {"_id": 3, "link_name": "link_2", "url": "link_url_2"}],
-                              "images": [{"_id": 1, "image_name": "image_1", "image_url": "image_url"}]}
+    db_responses_get_agent_responses = {"texts": [{"_id": 6, "fulfillment_text": "text_1"}],
+                            "rich_texts": [{"_id": 5, "rich_text": "<p>text_1</p>"}],
+                            "suggestions": [{"_id": 4, "suggestion_text": "sugg_1", "linked_to": "INTENT", "suggestion_intent": "intent_2"}],
+                            "links": [{"_id": 2, "link_name": "link_1", "url": "link_url_1"},
+                                    {"_id": 3, "link_name": "link_2", "url": "link_url_2"}],
+                            "images": [{"_id": 1, "image_name": "image_1", "image_url": "image_url"}]}
 
     db_responses_get_response = {"fulfillment_text": "text_1",
-                              "suggestions": [{"_id": 4, "suggestion_text": "sugg_1", "linked_to": "INTENT", "suggestion_intent": "intent_2"}],
-                              "links": [{"_id": 2, "link_name": "link_1", "url": "link_url_1"},
-                                        {"_id": 3, "link_name": "link_2", "url": "link_url_2"}],
-                              "images": [{"_id": 1, "image_name": "image_1", "image_url": "image_url"}]}
+                            "rich_texts": [{"_id": 5, "rich_text": "<p>text_1</p>"}],
+                            "suggestions": [{"_id": 4, "suggestion_text": "sugg_1", "linked_to": "INTENT", "suggestion_intent": "intent_2"}],
+                            "links": [{"_id": 2, "link_name": "link_1", "url": "link_url_1"},
+                                    {"_id": 3, "link_name": "link_2", "url": "link_url_2"}],
+                            "images": [{"_id": 1, "image_name": "image_1", "image_url": "image_url"}]}
 
     @pytest.fixture(scope="function", autouse=True)
     def mock_functions(self, mocker):
