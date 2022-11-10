@@ -1,8 +1,7 @@
 <template>
-  <div class="responses halfSize">
+  <div class="responses tableSize">
     <el-card class="box-card textAlignLeft">
       <h4 class="textAlignCenter">Agent Responses</h4>
-
       <el-form :model="newResponse" :rules="rules" ref="newResponse" label-width="120px">
         <el-form-item label="Intent" prop='selectedIntent'>
           <el-select v-model="newResponse.selectedIntent" filterable placeholder="Select Intent" @change="selectIntent">
@@ -13,6 +12,9 @@
           <el-radio-group v-model="newResponse.type">
             <el-radio label="TEXT">
               Text
+            </el-radio>
+            <el-radio label="RICHTEXT">
+              Rich Text
             </el-radio>
             <el-radio label="SUGGESTION">
               Suggestion
@@ -30,8 +32,52 @@
             <el-input type="textarea" :rows="4" v-model="newResponse.text"></el-input>
           </el-form-item>
         </div>
+        <div v-show="showRichTextForm" key="richtext">
+          <el-form-item label="Rich Text Response" prop='richText'>
+            <vue-editor
+            v-model="newResponse.richText"
+            :editorOptions="editorSettings"
+            ref="quillEditor"
+            class="mb-2"
+            >
+            </vue-editor>
+          </el-form-item>
+        </div>
+        <el-dialog :visible.sync="dialogImageVisible" title="Select image(s)">
+          <div>
+            <span>Paste URL :</span>
+            <el-input v-model="imageURL" autocomplete="off" />
+          </div>
+          <div class="marginTopSmall">
+            <span>Upload images :</span>
+          <el-upload
+            :file-list="imageList"
+            class="textAlignCenter"
+            drag
+            action=""
+            multiple
+            list-type="picture"
+            :auto-upload="false"
+            :on-change="importImageData"
+            :on-remove="removeImageData"
+          >
+            <el-icon class="el-icon-upload"></el-icon>
+            <div class="el-upload__text">
+              Drop file here or <em>click to upload</em>
+            </div>
+          </el-upload>
+          </div>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="dialogImageVisible = false">Cancel</el-button>
+              <el-button type="primary" @click="handleImages">
+                Add image(s)
+              </el-button>
+            </span>
+          </template>
+        </el-dialog>
         <div v-if="showSuggestionForm" key="suggestion">
-          <el-form-item label="Suggesion Text" prop='suggestionText'>
+          <el-form-item label="Suggestion Text" prop='suggestionText'>
             <el-input v-model="newResponse.suggestionText"></el-input>
           </el-form-item>
           <el-form-item label="Linked to">
@@ -81,6 +127,41 @@
       <el-table :data="responses.texts" row-key="_id" max-height="250" style="width: 100%"
       :class="[responses.texts.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
         <el-table-column prop="fulfillment_text" label="Text"></el-table-column>
+        <el-table-column fixed="right" width="90">
+          <template slot-scope="scope">
+            <el-button
+            type="danger"
+            @click="deleteResponseById(scope.row._id)"
+            icon="el-icon-delete"
+            :style="{ marginLeft: '15px' }"
+            plain
+          ></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-table :data="responses.rich_texts" row-key="_id" max-height="250" style="width: 100%"
+      :class="[responses.rich_texts.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
+        <el-table-column prop="rich_text" label="Rich Text">
+          <template slot-scope="scope">
+            <el-button
+            type="primary"
+            @click="showRichTextPreview(scope.row._id)"
+            icon="el-icon-view"
+            plain
+            >
+            View content
+            </el-button>
+            <el-dialog
+            v-if="scope.row._id === selectedRichTextId"
+            :visible.sync="richTextPreviewVisible"
+            title="Rich Text content"
+            :modal="false"
+            :lock-scroll="true"
+            >
+              <div v-html="scope.row.rich_text" style="height:60vh; overflow:auto;"></div>
+            </el-dialog>
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" width="90">
           <template slot-scope="scope">
             <el-button
@@ -149,14 +230,33 @@
 
 <script lang='ts'>
 import Vue from 'vue';
+import { VueEditor, Quill } from 'vue2-editor';
+import { ImageDrop } from 'quill-image-drop-module';
+import ImageResize from 'quill-image-resize-vue';
+import Emoji from 'quill-emoji';
+import 'quill-emoji/dist/quill-emoji.css';
 import {
   getResponses,
   addResponse,
   deleteResponse,
 } from '../client/responses';
 
+const QuillImage = Quill.import('formats/image');
+QuillImage.sanitize = (url: any) => url;
+Quill.register('modules/imageDrop', ImageDrop);
+Quill.register('modules/imageResize', ImageResize);
+Quill.register({
+  'formats/emoji': Emoji.EmojiBlot,
+  'modules/short_name_emoji': Emoji.ShortNameEmoji,
+  'modules/toolbar_emoji': Emoji.ToolbarEmoji,
+  'modules/textarea_emoji': Emoji.TextAreaEmoji,
+}, true);
+
 export default Vue.extend({
   name: 'responses',
+  components: {
+    VueEditor,
+  },
   data() {
     const validateField = (value: string, type: string, errorMsg: string, callback: any) => {
       const { newResponse }: any = this;
@@ -167,6 +267,9 @@ export default Vue.extend({
     };
     const checkText = (rule: any, value: string, callback: any) => {
       validateField(value, 'TEXT', 'Please input response text', callback);
+    };
+    const checkRichText = (rule: any, value: string, callback: any) => {
+      validateField(value, 'RICHTEXT', 'Please input response text', callback);
     };
     const checkSuggestionText = (rule: any, value: string, callback: any) => {
       validateField(value, 'SUGGESTION', 'Please input suggestion text', callback);
@@ -210,6 +313,7 @@ export default Vue.extend({
         selectedIntent: '',
         type: 'TEXT',
         text: '',
+        richText: '',
         suggestionText: '',
         suggestionLinkedTo: 'NONE',
         suggestionCode: '',
@@ -226,6 +330,9 @@ export default Vue.extend({
         ],
         text: [
           { required: true, validator: checkText, trigger: 'blur' },
+        ],
+        richText: [
+          { required: true, validator: checkRichText, trigger: 'blur' },
         ],
         suggestionText: [
           { required: true, validator: checkSuggestionText, trigger: 'blur' },
@@ -269,10 +376,40 @@ export default Vue.extend({
       ],
       responses: {
         texts: Array<any>(),
+        rich_texts: Array<any>(),
         suggestions: Array<any>(),
         links: Array<any>(),
         images: Array<any>(),
       },
+      editorSettings: {
+        modules: {
+          imageDrop: true,
+          imageResize: {},
+          'emoji-toolbar': true,
+          'emoji-textarea': false,
+          'emoji-shortname': true,
+          toolbar: {
+            container: [
+              [{ size: [] }],
+              ['bold', 'italic', 'underline'],
+              [{ list: 'ordered' }, { list: 'bullet' }],
+              ['image', 'link'],
+              [{ align: '' }, { align: 'center' }, { align: 'right' }, { align: 'justify' }],
+              ['emoji'],
+            ],
+          },
+        },
+      },
+      quill: null,
+      htmlPaste: '',
+      advanced: false,
+      dialogImageVisible: false,
+      imageURL: null,
+      savedRichTextIndex: 0,
+      imageList: [],
+      imagesBlobURL: Array<any>(),
+      richTextPreviewVisible: false,
+      selectedRichTextId: '',
     };
   },
   computed: {
@@ -281,6 +418,9 @@ export default Vue.extend({
     },
     showTextForm(): boolean {
       return this.newResponse.type === 'TEXT';
+    },
+    showRichTextForm(): boolean {
+      return this.newResponse.type === 'RICHTEXT';
     },
     showSuggestionForm(): boolean {
       return this.newResponse.type === 'SUGGESTION';
@@ -307,12 +447,18 @@ export default Vue.extend({
   created() {
     this.clearForm();
   },
+  mounted() {
+    const { quillEditor }: any = this.$refs;
+    const toolbar = quillEditor.quill.getModule('toolbar');
+    toolbar.addHandler('image', this.showImageDialog);
+  },
   methods: {
     clearForm() {
       this.newResponse = {
         selectedIntent: this.newResponse ? this.newResponse.selectedIntent : '',
         type: 'TEXT',
         text: '',
+        richText: '',
         suggestionText: '',
         suggestionLinkedTo: 'NONE',
         suggestionCode: '',
@@ -341,6 +487,19 @@ export default Vue.extend({
                     response_type: this.newResponse.type,
                     data: {
                       fulfillment_text: this.newResponse.text,
+                    },
+                  },
+                ],
+              };
+              await addResponse(this.agentName, responsesBody);
+            } else if (this.newResponse.type === 'RICHTEXT') {
+              const responsesBody = {
+                responses: [
+                  {
+                    intent: this.newResponse.selectedIntent,
+                    response_type: this.newResponse.type,
+                    data: {
+                      rich_text: this.newResponse.richText,
                     },
                   },
                 ],
@@ -429,6 +588,53 @@ export default Vue.extend({
       if (this.newResponse.suggestionLinkedTo === 'INTENT') {
         this.newResponse.suggestionIntent = '';
       }
+    },
+    parseHtml() {
+      const { quillEditor }: any = this.$refs;
+      quillEditor.quill.clipboard.dangerouslyPasteHTML(0, this.htmlPaste);
+      this.htmlPaste = '';
+    },
+    async handleImages() {
+      const { quillEditor }: any = this.$refs;
+      const promises = [];
+      for (let i = 0; i < this.imagesBlobURL.length; i += 1) {
+        promises.push(fetch(this.imagesBlobURL[i]).then((r) => r.blob()));
+      }
+      const blobs = await Promise.all(promises);
+      for (let i = 0; i < blobs.length; i += 1) {
+        const reader = new FileReader();
+        reader.readAsDataURL(blobs[i]);
+        reader.onloadend = () => {
+          const base64data = reader.result;
+          quillEditor.quill.insertEmbed(this.savedRichTextIndex, 'image', base64data, Quill.sources.USER);
+        };
+      }
+      if (this.imageURL) {
+        quillEditor.quill.insertEmbed(this.savedRichTextIndex, 'image', this.imageURL, Quill.sources.USER);
+      }
+      this.imageURL = null;
+      this.imageList = [];
+      this.imagesBlobURL = Array<any>();
+      this.dialogImageVisible = false;
+    },
+    importImageData(file: any) {
+      this.imagesBlobURL.push(file.url);
+    },
+    removeImageData(file: any) {
+      const index = this.imagesBlobURL.indexOf(file.url);
+      if (index !== -1) {
+        this.imagesBlobURL.splice(index, 1);
+      }
+    },
+    showImageDialog() {
+      const { quillEditor }: any = this.$refs;
+      const range = quillEditor.quill.getSelection();
+      this.savedRichTextIndex = range.index;
+      this.dialogImageVisible = true;
+    },
+    showRichTextPreview(id: string) {
+      this.selectedRichTextId = id;
+      this.richTextPreviewVisible = true;
     },
   },
 });
