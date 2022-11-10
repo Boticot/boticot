@@ -97,8 +97,10 @@
 }
 
 .header-row {
-    background: #e9eaed !important;
-    color: rgb(0, 0, 0);
+    font-family: Tahoma, Geneva, sans-serif;
+    background-color: #edf6ff !important;
+	color: #000000;
+	font-size: 14px;
 }
 
 .w-100 {
