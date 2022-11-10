@@ -106,3 +106,15 @@ class ResponsesService(object):
     
     def delete_response(self, id):
         self.responses_repository.delete_response_by_id(id)
+
+    def get_agent_suggestions_tree(self, agent_name, intent, suggestions_responses):
+        db_suggestions = self.responses_repository.find_agent_suggestions_by_intent(agent_name, intent)
+        for entry in db_suggestions:
+            db_suggestion = json.loads(MongoJSONEncoder().encode(entry))
+            suggestion = db_suggestion.get("data")
+            suggestion["_id"] = db_suggestion.get("_id")
+            suggestion["intent"] = db_suggestion.get("intent")
+            suggestions_responses.append(suggestion)
+            if suggestion["linked_to"] == "INTENT":
+                self.get_agent_suggestions_tree(agent_name, suggestion["suggestion_intent"], suggestions_responses)
+        return suggestions_responses

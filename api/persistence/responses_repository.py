@@ -15,6 +15,9 @@ class ResponsesRepository():
 
     def find_agent_responses_by_intent(self, agent_name, intent):
         return self.responses_collection.find({"agent_name": agent_name, "intent": intent})
+    
+    def find_agent_suggestions_by_intent(self, agent_name, intent):
+        return self.responses_collection.find({"agent_name": agent_name, "intent": intent, "response_type": "SUGGESTION"})
 
     def insert_response(self, agent_name, response):
         response_data = {
