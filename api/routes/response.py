@@ -34,3 +34,9 @@ def delete_response(id):
     """Remove a response by id"""
     ResponsesService.get_instance().delete_response(id)
     return response_template(200, "Response with id {0} successfully deleted".format(id))
+
+@current_app.route("/responses/agents/<agent_name>/intents/<intent>/suggestions", methods=["GET"])
+@jwt_required
+def get_suggestions_tree(agent_name, intent):
+    intent_data = ResponsesService.get_instance().get_agent_suggestions_tree(agent_name = agent_name, intent = intent, suggestions_responses=[])
+    return jsonify(intent_data)
