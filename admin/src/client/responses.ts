@@ -15,6 +15,20 @@ const getResponses = async (agentName: string, intent: string): Promise<any> => 
   return response.data;
 };
 
+const getSuggestions = async (agentName: string, intent: string): Promise<any> => {
+  const { VUE_APP_NLU_SERVICE_URL } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}/responses/agents/${agentName}/intents/${intent}/suggestions`;
+  const opt = {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
+    },
+  };
+  const response = await axios.get(url, opt);
+  return response.data;
+};
+
 const deleteResponse = async (idResponse: string): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL } = process.env;
   const url = `${VUE_APP_NLU_SERVICE_URL}/responses/${idResponse}`;
@@ -44,5 +58,5 @@ const addResponse = async (agentName: string, responses: any): Promise<any> => {
 };
 
 export {
-  getResponses, addResponse, deleteResponse,
+  getResponses, addResponse, deleteResponse, getSuggestions,
 };

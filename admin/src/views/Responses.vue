@@ -124,106 +124,117 @@
     </el-card>
     <el-card v-if="hasResponses" class="box-card">
       <h4>Intent "{{newResponse.selectedIntent}}" Responses</h4>
-      <el-table :data="responses.texts" row-key="_id" max-height="250" style="width: 100%"
-      :class="[responses.texts.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
-        <el-table-column prop="fulfillment_text" label="Text"></el-table-column>
-        <el-table-column fixed="right" width="90">
-          <template slot-scope="scope">
-            <el-button
-            type="danger"
-            @click="deleteResponseById(scope.row._id)"
-            icon="el-icon-delete"
-            :style="{ marginLeft: '15px' }"
-            plain
-          ></el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-table :data="responses.rich_texts" row-key="_id" max-height="250" style="width: 100%"
-      :class="[responses.rich_texts.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
-        <el-table-column prop="rich_text" label="Rich Text">
-          <template slot-scope="scope">
-            <el-button
-            type="primary"
-            @click="showRichTextPreview(scope.row._id)"
-            icon="el-icon-view"
-            plain
+      <el-tabs v-model="activeName">
+        <el-tab-pane v-for="tab in tableTabs" :label="tab.label" :name="tab.name" :key="tab.label">
+          <el-table
+          :data="getResponsesByKey(tab.name)"
+          row-key="_id"
+          style="width: 100%"
+          v-if="getResponsesByKey(tab.name).length !== 0 && tab.name !== 'suggestions'"
+          header-cell-class-name='header-row'
+          :show-header="!['texts', 'rich_texts'].includes(tab.name)"
+          >
+            <el-table-column
+            v-for="col in getTableTreePropsByKey(tab.name)"
+            :label="col.label"
+            :prop="col.prop"
+            :key="col.prop"
             >
-            View content
+              <template slot-scope="scope">
+                <div v-if="tab.name === 'rich_texts'">
+                  <div style="width:35vw; height:14vh; overflow: auto;">
+                    <div v-html="scope.row.rich_text"></div>
+                  </div>
+                </div>
+                <div v-else-if="tab.name === 'texts'">
+                  <span style="white-space: pre;">{{scope.row.fulfillment_text}}</span>
+                </div>
+                <div v-else-if="tab.name === 'images'">
+                  <span v-if="col.prop !== 'image_preview'">{{scope.row[col.prop]}}</span>
+                  <img v-else :src="scope.row.image_url" style="max-width: 20vw; max-height: 26vh;">
+                </div>
+                <div v-else-if="tab.name === 'links'">
+                  <span v-if="col.prop !== 'url'">{{scope.row[col.prop]}}</span>
+                  <a v-else target="_blank" rel="noopener noreferrer" :href="scope.row.url">{{scope.row.url}}</a>
+                </div>
+                <div v-else>
+                  <span>{{scope.row[col.prop]}}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" width="200" v-if="tab.name === 'rich_texts'">
+              <template slot-scope="scope">
+                <el-button
+                type="primary"
+                @click="showRichTextPreview(scope.row._id)"
+                icon="el-icon-view"
+                :style="{ marginLeft: '40px' }"
+                plain
+                >
+                View content
+                </el-button>
+                <el-dialog
+                v-if="scope.row._id === selectedRichTextId"
+                :visible.sync="richTextPreviewVisible"
+                title="Rich Text content"
+                :modal="false"
+                :lock-scroll="true"
+                >
+                  <div v-html="scope.row.rich_text" style="height:60vh; overflow:auto;"></div>
+                </el-dialog>
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" width="90">
+              <template slot-scope="scope">
+                <el-button
+                type="danger"
+                @click="deleteResponseById(scope.row._id)"
+                icon="el-icon-delete"
+                :style="{ marginLeft: '15px' }"
+                plain
+                ></el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div
+          v-if="tab.name === 'suggestions'"
+          :style="{'white-space': 'nowrap', 'width': '100%', 'overflow-x': 'auto',
+          'padding-bottom': '20px'}">
+            <SuggestionsTree
+            :suggestions="responses['suggestions']"
+            :agent-name="agentName"
+            :style="{'width': 'max-content', 'display': 'flex', 'justify-content': 'center'}"
+            :baseIntent="{'suggestion_intent': newResponse.selectedIntent, '_id': ''}"
+            :isRoot="true"
+            :selectedIntent="selectedIntentInTree"
+            :key="intentTreeKey"
+            v-on:select-intent="selectIntentInTree">
+            </SuggestionsTree>
+          </div>
+          <div v-if="tab.name === 'suggestions'" style="display: flex; justify-content: end; margin-top: 20px;">
+            <el-button
+              type="primary"
+              icon="el-icon-view"
+              :disabled="selectedIntentInTree._id === '0' ||
+              selectedIntentInTree.suggestion_intent === newResponse.selectedIntent"
+              @click="selectIntent(selectedIntentInTree.suggestion_intent)"
+              :style="{ marginLeft: '15px' }"
+              plain
+              >View suggestion
             </el-button>
-            <el-dialog
-            v-if="scope.row._id === selectedRichTextId"
-            :visible.sync="richTextPreviewVisible"
-            title="Rich Text content"
-            :modal="false"
-            :lock-scroll="true"
-            >
-              <div v-html="scope.row.rich_text" style="height:60vh; overflow:auto;"></div>
-            </el-dialog>
-          </template>
-        </el-table-column>
-        <el-table-column fixed="right" width="90">
-          <template slot-scope="scope">
             <el-button
-            type="danger"
-            @click="deleteResponseById(scope.row._id)"
-            icon="el-icon-delete"
-            :style="{ marginLeft: '15px' }"
-            plain
-          ></el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-table :data="responses.suggestions" row-key="_id" max-height="250" class="marginTopLarge" style="width: 100%"
-      :class="[responses.suggestions.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
-        <el-table-column prop="suggestion_text" label="Suggestion"></el-table-column>
-        <el-table-column prop="linked_to" label="Linked To" width="150"></el-table-column>
-        <el-table-column prop="suggestion_code" label="Code" width="200"></el-table-column>
-        <el-table-column prop="suggestion_intent" label="Intent" width="200"></el-table-column>
-        <el-table-column fixed="right" width="90">
-          <template slot-scope="scope">
-            <el-button
-            type="danger"
-            @click="deleteResponseById(scope.row._id)"
-            icon="el-icon-delete"
-            :style="{ marginLeft: '15px' }"
-            plain
-          ></el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-table :data="responses.links" row-key="_id" max-height="250" class="marginTopLarge" style="width: 100%"
-      :class="[responses.links.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
-        <el-table-column prop="link_name" label="Link name" width="200"></el-table-column>
-        <el-table-column prop="url" label="URL"></el-table-column>
-        <el-table-column fixed="right" width="90">
-          <template slot-scope="scope">
-            <el-button
-            type="danger"
-            @click="deleteResponseById(scope.row._id)"
-            icon="el-icon-delete"
-            :style="{ marginLeft: '15px' }"
-            plain
-          ></el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-table :data="responses.images" row-key="_id" max-height="250" class="marginTopLarge" style="width: 100%"
-      :class="[responses.images.length == 0 ? 'displayNone' : '']" header-cell-class-name="header-row">
-        <el-table-column prop="image_name" label="Image name" width="200"></el-table-column>
-        <el-table-column prop="image_url" label="URL (gif, jpg, png)"></el-table-column>
-        <el-table-column fixed="right" width="90">
-          <template slot-scope="scope">
-            <el-button
-            type="danger"
-            @click="deleteResponseById(scope.row._id)"
-            icon="el-icon-delete"
-            :style="{ marginLeft: '15px' }"
-            plain
-          ></el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+              type="danger"
+              icon="el-icon-delete"
+              :disabled="selectedIntentInTree._id === '0' ||
+              selectedIntentInTree.suggestion_intent === newResponse.selectedIntent"
+              @click="deleteResponseById(selectedIntentInTree._id)"
+              :style="{ marginLeft: '15px' }"
+              plain
+              >Delete suggestion
+            </el-button>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
     </el-card>
   </div>
 </template>
@@ -234,6 +245,7 @@ import { VueEditor, Quill } from 'vue2-editor';
 import { ImageDrop } from 'quill-image-drop-module';
 import ImageResize from 'quill-image-resize-vue';
 import Emoji from 'quill-emoji';
+import SuggestionsTree from '@/components/SuggestionsTree.vue';
 import 'quill-emoji/dist/quill-emoji.css';
 import {
   getResponses,
@@ -256,6 +268,7 @@ export default Vue.extend({
   name: 'responses',
   components: {
     VueEditor,
+    SuggestionsTree,
   },
   data() {
     const validateField = (value: string, type: string, errorMsg: string, callback: any) => {
@@ -410,6 +423,35 @@ export default Vue.extend({
       imagesBlobURL: Array<any>(),
       richTextPreviewVisible: false,
       selectedRichTextId: '',
+      activeName: 'texts',
+      tableTabs: [
+        { name: 'texts', label: 'Texts' },
+        { name: 'rich_texts', label: 'Rich Texts' },
+        { name: 'suggestions', label: 'Suggestions' },
+        { name: 'images', label: 'Images' },
+        { name: 'links', label: 'Links' },
+      ],
+      tableTree: {
+        texts: [{ prop: 'fulfillment_text', label: 'Text' }],
+        rich_texts: [{ prop: 'rich_text', label: 'Rich Text' }],
+        suggestions: [
+          { prop: 'suggestion_text', label: 'Suggestion' },
+          { prop: 'linked_to', label: 'Linked To' },
+          { prop: 'suggestion_code', label: 'Code' },
+          { prop: 'suggestion_intent', label: 'Intent' },
+        ],
+        links: [
+          { prop: 'link_name', label: 'Link name' },
+          { prop: 'url', label: 'URL' },
+        ],
+        images: [
+          { prop: 'image_name', label: 'Image name' },
+          { prop: 'image_url', label: 'Image URL (gif, jpg, png)' },
+          { prop: 'image_preview', label: 'Preview' },
+        ],
+      },
+      selectedIntentInTree: { _id: '0', suggestion_intent: '' },
+      intentTreeKey: 0,
     };
   },
   computed: {
@@ -469,10 +511,12 @@ export default Vue.extend({
         imageName: '',
         imageUrl: '',
       };
+      this.intentTreeKey += 1;
     },
     async selectIntent(value: string) {
       this.newResponse.selectedIntent = value;
       this.responses = await getResponses(this.agentName, value);
+      this.intentTreeKey += 1;
     },
     async addResponse(e: any) {
       const { newResponse }: any = this.$refs;
@@ -583,6 +627,8 @@ export default Vue.extend({
     async deleteResponseById(id: string) {
       await deleteResponse(id);
       this.responses = await getResponses(this.agentName, this.newResponse.selectedIntent);
+      this.selectedIntentInTree = { _id: '0', suggestion_intent: '' };
+      this.intentTreeKey += 1;
     },
     selectSuggestionLinkedTo() {
       if (this.newResponse.suggestionLinkedTo === 'INTENT') {
@@ -635,6 +681,15 @@ export default Vue.extend({
     showRichTextPreview(id: string) {
       this.selectedRichTextId = id;
       this.richTextPreviewVisible = true;
+    },
+    getResponsesByKey(key: string) {
+      return this.responses[key as keyof object];
+    },
+    getTableTreePropsByKey(key: string) {
+      return this.tableTree[key as keyof object];
+    },
+    selectIntentInTree(intent: any) {
+      this.selectedIntentInTree = intent;
     },
   },
 });
