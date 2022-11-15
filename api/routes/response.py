@@ -38,5 +38,5 @@ def delete_response(id):
 @current_app.route("/responses/agents/<agent_name>/intents/<intent>/suggestions", methods=["GET"])
 @jwt_required
 def get_suggestions_tree(agent_name, intent):
-    intent_data = ResponsesService.get_instance().get_agent_suggestions_tree(agent_name = agent_name, intent = intent, suggestions_responses=[])
+    intent_data = ResponsesService.get_instance().get_agent_suggestions_tree(agent_name = agent_name, intent = intent, suggestions_responses=[], visited=[])
     return jsonify(intent_data)
