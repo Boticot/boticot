@@ -7,7 +7,7 @@
         @click="selectIntent(baseIntent)"
         :class="{
           'root': isRoot,
-          'selected': selectedIntent.suggestion_intent === baseIntent.suggestion_intent,
+          'selected': isSelected(),
           'single-select': selectedIntent._id === baseIntent._id}">
           <div v-if="'suggestion_text' in baseIntent">
             Suggestion: {{ baseIntent.suggestion_text }}
@@ -27,6 +27,7 @@
             :agentName="agentName"
             :allSuggestions="suggestions"
             :selectedIntent="selectedIntent"
+            :visitedNodes="visitedNodes"
             v-on:select-intent="selectIntent"/>
           </li>
         </ul>
@@ -74,25 +75,48 @@ export default Vue.extend({
         return {};
       },
     },
+    visitedNodes: {
+      type: Array,
+      default() {
+        return [];
+      },
+    },
   },
   data() {
     return {
       suggestions: Array<any>(),
       popoverVisible: false,
       intentSelected: false,
+      visitedNodesCopy: Array<any>(),
     };
   },
   async mounted() {
     if (this.allSuggestions.length === 0) {
       this.suggestions = await getSuggestions(this.agentName, this.baseIntent.suggestion_intent);
     } else this.suggestions = this.allSuggestions;
+    this.visitedNodes.push(this.baseIntent._id);
+    this.visitedNodesCopy = JSON.parse(JSON.stringify(this.visitedNodes));
   },
   methods: {
     getIntentSuggestions() {
-      return this.suggestions.filter((s) => s['intent' as keyof object] === this.baseIntent.suggestion_intent);
+      const sugg_list = [];
+      for (let i = 0; i < this.suggestions.length; i += 1) {
+        if (this.suggestions[i]['intent' as keyof object] === this.baseIntent.suggestion_intent
+        && !this.visitedNodesCopy.includes(this.suggestions[i]['_id' as keyof object])) {
+          sugg_list.push(this.suggestions[i]);
+        }
+      }
+      return sugg_list;
     },
     selectIntent(intent: any) {
       this.$emit('select-intent', intent);
+    },
+    isSelected() {
+      return (this.selectedIntent.linked_to === 'INTENT'
+      && this.selectedIntent.suggestion_intent === this.baseIntent.suggestion_intent)
+      || (this.selectedIntent.linked_to === 'CODE'
+      && this.selectedIntent.suggestion_code === this.baseIntent.suggestion_code)
+      || this.selectedIntent._id === this.baseIntent._id;
     },
   },
 });

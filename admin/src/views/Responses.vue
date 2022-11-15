@@ -468,7 +468,7 @@ export default Vue.extend({
       return this.newResponse.type === 'SUGGESTION';
     },
     showSuggestionIntentForm(): boolean {
-      return this.newResponse.suggestionLinkedTo !== 'CODE';
+      return this.newResponse.suggestionLinkedTo === 'INTENT';
     },
     showSuggestionCodeForm(): boolean {
       return this.newResponse.suggestionLinkedTo === 'CODE';
