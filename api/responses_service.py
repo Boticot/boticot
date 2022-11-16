@@ -88,6 +88,10 @@ class ResponsesService(object):
                 self.agents_repository.update_agent_intents(agent_name, [response.get("intent")])
             self.responses_repository.insert_response(agent_name, response)
 
+    def update_agent_responses(self, agent_name, responses, id):
+        for response in responses: 
+            self.responses_repository.update_response_by_id(agent_name, response, id)
+
     def get_response(self, agent_name, intent):
         response = {}
         responses = self.get_agent_responses_by_intent(agent_name, intent)

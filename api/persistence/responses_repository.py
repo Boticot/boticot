@@ -27,6 +27,15 @@ class ResponsesRepository():
             "data": response["data"]
             }
         return self.responses_collection.update(response_data, response_data, upsert = True)
+    
+    def update_response_by_id(self, agent_name, response, id):
+        response_data = {
+            "agent_name": agent_name, 
+            "intent": response["intent"], 
+            "response_type": response["response_type"], 
+            "data": response["data"]
+            }
+        return self.responses_collection.update({"_id": ObjectId(id)}, response_data)
 
     def delete_all_agent_responses(self, agent_name):
         self.responses_collection.delete_many({"agent_name": agent_name})
