@@ -2,14 +2,14 @@
   <div class="responses tableSize">
     <el-card class="box-card textAlignLeft">
       <h4 class="textAlignCenter">Agent Responses</h4>
-      <el-form :model="newResponse" :rules="rules" ref="newResponse" label-width="120px">
+      <el-form :model="newResponse" :rules="rules" ref="newResponse" label-width="150px" label-position="left">
         <el-form-item label="Intent" prop='selectedIntent'>
           <el-select v-model="newResponse.selectedIntent" filterable placeholder="Select Intent" @change="selectIntent">
             <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="Response type">
-          <el-radio-group v-model="newResponse.type">
+          <el-radio-group v-model="newResponse.type" @change="selectResponseType">
             <el-radio label="TEXT">
               Text
             </el-radio>
@@ -27,99 +27,11 @@
             </el-radio>
           </el-radio-group>
         </el-form-item>
-        <div v-if="showTextForm" key="text">
-          <el-form-item label="Text Response" prop='text'>
-            <el-input type="textarea" :rows="4" v-model="newResponse.text"></el-input>
-          </el-form-item>
-        </div>
-        <div v-show="showRichTextForm" key="richtext">
-          <el-form-item label="Rich Text Response" prop='richText'>
-            <vue-editor
-            v-model="newResponse.richText"
-            :editorOptions="editorSettings"
-            ref="quillEditor"
-            class="mb-2"
-            >
-            </vue-editor>
-          </el-form-item>
-        </div>
-        <el-dialog :visible.sync="dialogImageVisible" title="Select image(s)">
-          <div>
-            <span>Paste URL :</span>
-            <el-input v-model="imageURL" autocomplete="off" />
-          </div>
-          <div class="marginTopSmall">
-            <span>Upload images :</span>
-          <el-upload
-            :file-list="imageList"
-            class="textAlignCenter"
-            drag
-            action=""
-            multiple
-            list-type="picture"
-            :auto-upload="false"
-            :on-change="importImageData"
-            :on-remove="removeImageData"
-          >
-            <el-icon class="el-icon-upload"></el-icon>
-            <div class="el-upload__text">
-              Drop file here or <em>click to upload</em>
-            </div>
-          </el-upload>
-          </div>
-          <template #footer>
-            <span class="dialog-footer">
-              <el-button @click="dialogImageVisible = false">Cancel</el-button>
-              <el-button type="primary" @click="handleImages">
-                Add image(s)
-              </el-button>
-            </span>
-          </template>
-        </el-dialog>
-        <div v-if="showSuggestionForm" key="suggestion">
-          <el-form-item label="Suggestion Text" prop='suggestionText'>
-            <el-input v-model="newResponse.suggestionText"></el-input>
-          </el-form-item>
-          <el-form-item label="Linked to">
-            <el-select v-model="newResponse.suggestionLinkedTo" @change="selectSuggestionLinkedTo">
-              <el-option v-for="choice in suggestionsLinkedToList" :key="choice.value" :label="choice.label"
-               :value="choice.value">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item  v-if="showSuggestionCodeForm" label="Code" prop='suggestionCode'>
-            <el-input v-model="newResponse.suggestionCode"></el-input>
-          </el-form-item>
-          <el-form-item v-if="showSuggestionIntentForm" label="Intent" prop='suggestionIntent'>
-            <el-select v-model="newResponse.suggestionIntent" filterable placeholder="Select an intent">
-              <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
-              <el-option label="Create New Intent" value="NEW_INTENT"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item v-if="showSuggestionNewIntentForm" label="New intent"
-          prop='suggestionNewIntent'>
-            <el-input v-model="newResponse.suggestionNewIntent"></el-input>
-          </el-form-item>
-        </div>
-        <div v-if="showLinkForm" key="link">
-          <el-form-item label="Link name" prop='linkName'>
-            <el-input v-model="newResponse.linkName"></el-input>
-          </el-form-item>
-          <el-form-item label="URL" prop='url'>
-            <el-input v-model="newResponse.url"></el-input>
-          </el-form-item>
-        </div>
-        <div v-if="showImageForm" key="image">
-          <el-form-item label="Image name" prop='imageName'>
-            <el-input v-model="newResponse.imageName"></el-input>
-          </el-form-item>
-          <el-form-item label="URL" prop='imageUrl'>
-            <el-input v-model="newResponse.imageUrl"></el-input>
-          </el-form-item>
-        </div>
-        <el-form-item>
-          <el-button type="primary" @click="addResponse">Add Response</el-button>
-        </el-form-item>
+        <ResponseEditor
+        :response="newResponse"
+        :key="responseEditorKey"
+        v-on:add-response="addResponse">
+        </ResponseEditor>
       </el-form>
     </el-card>
     <el-card v-if="hasResponses" class="box-card">
@@ -180,8 +92,19 @@
                 :modal="false"
                 :lock-scroll="true"
                 >
-                  <div v-html="scope.row.rich_text" style="height:60vh; overflow:auto;"></div>
+                <div v-html="scope.row.rich_text" style="height:60vh; overflow:auto;"></div>
                 </el-dialog>
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" width="90">
+              <template slot-scope="scope">
+                <el-button
+                type="primary"
+                @click="editResponse(tab, scope.row)"
+                icon="el-icon-edit"
+                :style="{ marginLeft: '15px' }"
+                plain
+                ></el-button>
               </template>
             </el-table-column>
             <el-table-column fixed="right" width="90">
@@ -214,19 +137,29 @@
           <div v-if="tab.name === 'suggestions'" style="display: flex; justify-content: end; margin-top: 20px;">
             <el-button
               type="primary"
+              icon="el-icon-edit"
+              :disabled="selectedIntentInTree._id === '0' ||
+              selectedIntentInTree._id === newResponse._id"
+              @click="editResponse({name: 'suggestions', type: 'SUGGESTION'}, selectedIntentInTree)"
+              :style="{ marginLeft: '15px' }"
+              plain
+              >Edit suggestion
+            </el-button>
+            <el-button
+              type="primary"
               icon="el-icon-view"
               :disabled="selectedIntentInTree._id === '0' ||
-              selectedIntentInTree.suggestion_intent === newResponse.selectedIntent"
+              selectedIntentInTree._id === newResponse._id"
               @click="selectIntent(selectedIntentInTree.suggestion_intent)"
               :style="{ marginLeft: '15px' }"
               plain
-              >View suggestion
+              >View intent
             </el-button>
             <el-button
               type="danger"
               icon="el-icon-delete"
               :disabled="selectedIntentInTree._id === '0' ||
-              selectedIntentInTree.suggestion_intent === newResponse.selectedIntent"
+              selectedIntentInTree._id === newResponse._id"
               @click="deleteResponseById(selectedIntentInTree._id)"
               :style="{ marginLeft: '15px' }"
               plain
@@ -236,38 +169,42 @@
         </el-tab-pane>
       </el-tabs>
     </el-card>
+    <el-dialog
+    :visible.sync="editDialogVisible"
+    title="Edit response"
+    :lock-scroll="true"
+    close-on-click-modal
+    close-on-press-escape
+    width="65%"
+    >
+      <el-form :model="newResponse" :rules="rules" ref="newResponse" label-width="150px" label-position="left">
+        <ResponseEditor
+        v-if="editDialogVisible"
+        :response="newResponse"
+        v-on:add-response="addResponse"
+        :editOptions="editOptions">
+        </ResponseEditor>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
 <script lang='ts'>
 import Vue from 'vue';
-import { VueEditor, Quill } from 'vue2-editor';
-import { ImageDrop } from 'quill-image-drop-module';
-import ImageResize from 'quill-image-resize-vue';
-import Emoji from 'quill-emoji';
 import SuggestionsTree from '@/components/SuggestionsTree.vue';
+import ResponseEditor from '@/components/ResponseEditor.vue';
 import 'quill-emoji/dist/quill-emoji.css';
 import {
   getResponses,
   addResponse,
+  editResponse,
   deleteResponse,
 } from '../client/responses';
-
-const QuillImage = Quill.import('formats/image');
-QuillImage.sanitize = (url: any) => url;
-Quill.register('modules/imageDrop', ImageDrop);
-Quill.register('modules/imageResize', ImageResize);
-Quill.register({
-  'formats/emoji': Emoji.EmojiBlot,
-  'modules/short_name_emoji': Emoji.ShortNameEmoji,
-  'modules/toolbar_emoji': Emoji.ToolbarEmoji,
-  'modules/textarea_emoji': Emoji.TextAreaEmoji,
-}, true);
 
 export default Vue.extend({
   name: 'responses',
   components: {
-    VueEditor,
+    ResponseEditor,
     SuggestionsTree,
   },
   data() {
@@ -336,6 +273,7 @@ export default Vue.extend({
         url: '',
         imageName: '',
         imageUrl: '',
+        _id: '',
       },
       rules: {
         selectedIntent: [
@@ -373,20 +311,6 @@ export default Vue.extend({
         ],
       },
       agentName: this.$route.params.agentName,
-      suggestionsLinkedToList: [
-        {
-          value: 'NONE',
-          label: 'None',
-        },
-        {
-          value: 'CODE',
-          label: 'Code',
-        },
-        {
-          value: 'INTENT',
-          label: 'Intent',
-        },
-      ],
       responses: {
         texts: Array<any>(),
         rich_texts: Array<any>(),
@@ -394,64 +318,44 @@ export default Vue.extend({
         links: Array<any>(),
         images: Array<any>(),
       },
-      editorSettings: {
-        modules: {
-          imageDrop: true,
-          imageResize: {},
-          'emoji-toolbar': true,
-          'emoji-textarea': false,
-          'emoji-shortname': true,
-          toolbar: {
-            container: [
-              [{ size: [] }],
-              ['bold', 'italic', 'underline'],
-              [{ list: 'ordered' }, { list: 'bullet' }],
-              ['image', 'link'],
-              [{ align: '' }, { align: 'center' }, { align: 'right' }, { align: 'justify' }],
-              ['emoji'],
-            ],
-          },
-        },
-      },
-      quill: null,
-      htmlPaste: '',
-      advanced: false,
-      dialogImageVisible: false,
-      imageURL: null,
-      savedRichTextIndex: 0,
-      imageList: [],
-      imagesBlobURL: Array<any>(),
-      richTextPreviewVisible: false,
-      selectedRichTextId: '',
-      activeName: 'texts',
-      tableTabs: [
-        { name: 'texts', label: 'Texts' },
-        { name: 'rich_texts', label: 'Rich Texts' },
-        { name: 'suggestions', label: 'Suggestions' },
-        { name: 'images', label: 'Images' },
-        { name: 'links', label: 'Links' },
-      ],
-      tableTree: {
-        texts: [{ prop: 'fulfillment_text', label: 'Text' }],
-        rich_texts: [{ prop: 'rich_text', label: 'Rich Text' }],
-        suggestions: [
-          { prop: 'suggestion_text', label: 'Suggestion' },
-          { prop: 'linked_to', label: 'Linked To' },
-          { prop: 'suggestion_code', label: 'Code' },
-          { prop: 'suggestion_intent', label: 'Intent' },
-        ],
-        links: [
-          { prop: 'link_name', label: 'Link name' },
-          { prop: 'url', label: 'URL' },
-        ],
-        images: [
-          { prop: 'image_name', label: 'Image name' },
-          { prop: 'image_url', label: 'Image URL (gif, jpg, png)' },
-          { prop: 'image_preview', label: 'Preview' },
-        ],
-      },
       selectedIntentInTree: { _id: '0', suggestion_intent: '' },
       intentTreeKey: 0,
+      responseEditorKey: 0,
+      activeName: 'texts',
+      tableTabs: [
+        { name: 'texts', label: 'Texts', type: 'TEXT' },
+        { name: 'rich_texts', label: 'Rich Texts', type: 'RICHTEXT' },
+        { name: 'suggestions', label: 'Suggestions', type: 'SUGGESTION' },
+        { name: 'images', label: 'Images', type: 'IMAGE' },
+        { name: 'links', label: 'Links', type: 'LINK' },
+      ],
+      tableTree: {
+        texts: [{ prop: 'fulfillment_text', label: 'Text', dict_key: 'text' }],
+        rich_texts: [{ prop: 'rich_text', label: 'Rich Text', dict_key: 'richText' }],
+        suggestions: [
+          { prop: 'suggestion_text', label: 'Suggestion', dict_key: 'suggestionText' },
+          { prop: 'linked_to', label: 'Linked To', dict_key: 'suggestionLinkedTo' },
+          { prop: 'suggestion_code', label: 'Code', dict_key: 'suggestionCode' },
+          { prop: 'suggestion_intent', label: 'Intent', dict_key: 'suggestionIntent' },
+        ],
+        links: [
+          { prop: 'link_name', label: 'Link name', dict_key: 'linkName' },
+          { prop: 'url', label: 'URL', dict_key: 'url' },
+        ],
+        images: [
+          { prop: 'image_name', label: 'Image name', dict_key: 'imageName' },
+          { prop: 'image_url', label: 'Image URL (gif, jpg, png)', dict_key: 'imageUrl' },
+          { prop: 'image_preview', label: 'Preview', dict_key: 'imagePreview' },
+        ],
+      },
+      richTextPreviewVisible: false,
+      selectedRichTextId: '',
+      editDialogVisible: false,
+      editOptions: {
+        obj: {},
+        name: '',
+        type: '',
+      },
     };
   },
   computed: {
@@ -489,15 +393,10 @@ export default Vue.extend({
   created() {
     this.clearForm();
   },
-  mounted() {
-    const { quillEditor }: any = this.$refs;
-    const toolbar = quillEditor.quill.getModule('toolbar');
-    toolbar.addHandler('image', this.showImageDialog);
-  },
   methods: {
     clearForm() {
       this.newResponse = {
-        selectedIntent: this.newResponse ? this.newResponse.selectedIntent : '',
+        selectedIntent: '',
         type: 'TEXT',
         text: '',
         richText: '',
@@ -510,21 +409,32 @@ export default Vue.extend({
         url: '',
         imageName: '',
         imageUrl: '',
+        _id: '',
       };
       this.intentTreeKey += 1;
+      this.responseEditorKey += 1;
     },
     async selectIntent(value: string) {
       this.newResponse.selectedIntent = value;
       this.responses = await getResponses(this.agentName, value);
       this.intentTreeKey += 1;
+      this.responseEditorKey += 1;
     },
-    async addResponse(e: any) {
+    async selectResponseType() {
+      this.responseEditorKey += 1;
+    },
+    async addResponse(copy: any, edit = false) {
+      const objResp = this.newResponse;
+      Object.keys(copy).forEach((key) => {
+        this.newResponse[key as keyof typeof objResp] = copy[key];
+      });
       const { newResponse }: any = this.$refs;
       newResponse.validate(
         async (valid: any) => {
           if (valid) {
+            let responseBody = {};
             if (this.newResponse.type === 'TEXT') {
-              const responsesBody = {
+              responseBody = {
                 responses: [
                   {
                     intent: this.newResponse.selectedIntent,
@@ -535,9 +445,8 @@ export default Vue.extend({
                   },
                 ],
               };
-              await addResponse(this.agentName, responsesBody);
             } else if (this.newResponse.type === 'RICHTEXT') {
-              const responsesBody = {
+              responseBody = {
                 responses: [
                   {
                     intent: this.newResponse.selectedIntent,
@@ -548,7 +457,6 @@ export default Vue.extend({
                   },
                 ],
               };
-              await addResponse(this.agentName, responsesBody);
             } else if (this.newResponse.type === 'SUGGESTION') {
               let data = {};
               if (this.newResponse.suggestionLinkedTo === 'NONE') {
@@ -575,7 +483,7 @@ export default Vue.extend({
                   suggestion_intent: suggestionIntentValue,
                 };
               }
-              const responsesBody = {
+              responseBody = {
                 responses: [
                   {
                     intent: this.newResponse.selectedIntent,
@@ -584,9 +492,8 @@ export default Vue.extend({
                   },
                 ],
               };
-              await addResponse(this.agentName, responsesBody);
             } else if (this.newResponse.type === 'LINK') {
-              const responsesBody = {
+              responseBody = {
                 responses: [
                   {
                     intent: this.newResponse.selectedIntent,
@@ -598,9 +505,8 @@ export default Vue.extend({
                   },
                 ],
               };
-              await addResponse(this.agentName, responsesBody);
             } else if (this.newResponse.type === 'IMAGE') {
-              const responsesBody = {
+              responseBody = {
                 responses: [
                   {
                     intent: this.newResponse.selectedIntent,
@@ -612,13 +518,15 @@ export default Vue.extend({
                   },
                 ],
               };
-              await addResponse(this.agentName, responsesBody);
             }
-
+            if (edit) {
+              await editResponse(this.agentName, responseBody, this.newResponse._id);
+            } else await addResponse(this.agentName, responseBody);
+            const currIntent = this.newResponse.selectedIntent;
             this.clearForm();
-
+            this.newResponse.selectedIntent = currIntent;
             this.responses = await getResponses(this.agentName, this.newResponse.selectedIntent);
-            e.preventDefault();
+            this.editDialogVisible = false;
           }
           return false;
         },
@@ -629,54 +537,6 @@ export default Vue.extend({
       this.responses = await getResponses(this.agentName, this.newResponse.selectedIntent);
       this.selectedIntentInTree = { _id: '0', suggestion_intent: '' };
       this.intentTreeKey += 1;
-    },
-    selectSuggestionLinkedTo() {
-      if (this.newResponse.suggestionLinkedTo === 'INTENT') {
-        this.newResponse.suggestionIntent = '';
-      }
-    },
-    parseHtml() {
-      const { quillEditor }: any = this.$refs;
-      quillEditor.quill.clipboard.dangerouslyPasteHTML(0, this.htmlPaste);
-      this.htmlPaste = '';
-    },
-    async handleImages() {
-      const { quillEditor }: any = this.$refs;
-      const promises = [];
-      for (let i = 0; i < this.imagesBlobURL.length; i += 1) {
-        promises.push(fetch(this.imagesBlobURL[i]).then((r) => r.blob()));
-      }
-      const blobs = await Promise.all(promises);
-      for (let i = 0; i < blobs.length; i += 1) {
-        const reader = new FileReader();
-        reader.readAsDataURL(blobs[i]);
-        reader.onloadend = () => {
-          const base64data = reader.result;
-          quillEditor.quill.insertEmbed(this.savedRichTextIndex, 'image', base64data, Quill.sources.USER);
-        };
-      }
-      if (this.imageURL) {
-        quillEditor.quill.insertEmbed(this.savedRichTextIndex, 'image', this.imageURL, Quill.sources.USER);
-      }
-      this.imageURL = null;
-      this.imageList = [];
-      this.imagesBlobURL = Array<any>();
-      this.dialogImageVisible = false;
-    },
-    importImageData(file: any) {
-      this.imagesBlobURL.push(file.url);
-    },
-    removeImageData(file: any) {
-      const index = this.imagesBlobURL.indexOf(file.url);
-      if (index !== -1) {
-        this.imagesBlobURL.splice(index, 1);
-      }
-    },
-    showImageDialog() {
-      const { quillEditor }: any = this.$refs;
-      const range = quillEditor.quill.getSelection();
-      this.savedRichTextIndex = range.index;
-      this.dialogImageVisible = true;
     },
     showRichTextPreview(id: string) {
       this.selectedRichTextId = id;
@@ -690,6 +550,21 @@ export default Vue.extend({
     },
     selectIntentInTree(intent: any) {
       this.selectedIntentInTree = intent;
+    },
+    editResponse(tab: any, responseObj: any) {
+      const formattedObj: any = {};
+      Object.keys(responseObj).forEach((key) => {
+        const tabProps: Array<any> = this.tableTree[tab.name as keyof object];
+        const filtered = tabProps.filter((table: any) => table.prop === key);
+        if (filtered.length > 0) {
+          const { dict_key } = filtered[0];
+          formattedObj[dict_key] = responseObj[key];
+        } else formattedObj[key] = responseObj[key];
+      });
+      this.editOptions.obj = formattedObj;
+      this.editOptions.name = tab.name;
+      this.editOptions.type = tab.type;
+      this.editDialogVisible = true;
     },
   },
 });

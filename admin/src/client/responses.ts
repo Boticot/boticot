@@ -53,10 +53,27 @@ const addResponse = async (agentName: string, responses: any): Promise<any> => {
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
   };
-  const response = await axios.put(url, responses, opt);
+  const response = await axios.post(url, responses, opt);
+  return response.data;
+};
+
+const editResponse = async (agentName: string, responses: any, idResponse: string): Promise<any> => {
+  const { VUE_APP_NLU_SERVICE_URL } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}/responses/${idResponse}/agents/${agentName}`;
+  const opt = {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
+    },
+  };
+  const reqBody = {
+    ...responses,
+  };
+  const response = await axios.put(url, reqBody, opt);
   return response.data;
 };
 
 export {
-  getResponses, addResponse, deleteResponse, getSuggestions,
+  getResponses, addResponse, deleteResponse, editResponse, getSuggestions,
 };
