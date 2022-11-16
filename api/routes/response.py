@@ -14,7 +14,7 @@ def get_responses(agent_name, intent):
     data = ResponsesService.get_instance().get_agent_responses_by_intent(agent_name, intent)
     return jsonify(data)
 
-@current_app.route("/responses/agents/<agent_name>", methods=["PUT"])
+@current_app.route("/responses/agents/<agent_name>", methods=["POST"])
 @jwt_required
 def add_response(agent_name):
     """Add a response associated to an agent name and intent"""
@@ -23,6 +23,20 @@ def add_response(agent_name):
         if (request_data.get("responses") and isinstance(request_data.get("responses"), list)):
             ResponsesService.get_instance().add_agent_responses(agent_name, request_data["responses"])
             return response_template(200, "Responses was successfully added for agent {0}".format(agent_name))
+        else:
+            return response_template(400, "Should Contains valid responses array object")
+    else:
+        return response_template(400, "A body is mandatory inside the request")
+
+@current_app.route("/responses/<id>/agents/<agent_name>", methods=["PUT"])
+@jwt_required
+def update_response(id, agent_name):
+    """Update a response associated to an agent name by id"""
+    if request.get_data():
+        request_data = json.loads((request.get_data()).decode())
+        if (request_data.get("responses") and isinstance(request_data.get("responses"), list)):
+            ResponsesService.get_instance().update_agent_responses(agent_name, request_data["responses"], id)
+            return response_template(200, "Response was successfully updated for agent {0}".format(agent_name))
         else:
             return response_template(400, "Should Contains valid responses array object")
     else:
