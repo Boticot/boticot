@@ -4,19 +4,20 @@
       <li>
         <div
         class="node"
+        style="max-width: 17rem; overflow-wrap: anywhere; white-space: normal;"
         @click="selectIntent(baseIntent)"
         :class="{
           'root': isRoot,
           'selected': isSelected(),
           'single-select': selectedIntent._id === baseIntent._id}">
           <div v-if="'suggestion_text' in baseIntent">
-            Suggestion: {{ baseIntent.suggestion_text }}
+            Suggestion: <span style="font-weight: bold;">{{ baseIntent.suggestion_text }}</span>
           </div>
           <div v-if="'suggestion_code' in baseIntent">
-            Code: {{ baseIntent.suggestion_code }}
+            Code: <span style="font-style: italic;">{{ baseIntent.suggestion_code }}</span>
           </div>
           <div v-if="'suggestion_intent' in baseIntent">
-            Intent: {{ baseIntent.suggestion_intent }}
+            Intent: <span style="font-style: italic;">{{ baseIntent.suggestion_intent }}</span>
           </div>
         </div>
         <ul v-if="getIntentSuggestions().length > 0">
