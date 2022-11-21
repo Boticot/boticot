@@ -470,6 +470,11 @@
                     "intent": "Hello2",
                     "entities": [],
                     "text": "hello2"
+                },
+                {
+                    "intent": "Hello2",
+                    "entities": [],
+                    "text": "Hey2"
                 }
             ]
         },

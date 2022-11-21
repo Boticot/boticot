@@ -139,7 +139,7 @@ class TestAgentsService:
         responses_values = [deepcopy(self.mock_data["responses_intent_db"]), deepcopy(self.mock_data["responses_intent1_db"]), deepcopy(self.mock_data["responses_intent2_db"])]
         mocker.patch("agents_service.TrainingDataRepository.find_agent_training_data", side_effect=training_data_values)
         mocker.patch("agents_service.ResponsesRepository.find_agent_responses", side_effect=responses_values)
-        agent_data = agents_service.AgentsService.get_instance().get_agent_intent_data_recursive(agent_name = "Agent1", intent="greetings_hello")
+        agent_data = agents_service.AgentsService.get_instance().get_agent_intent_data_recursive(agent_name = "Agent1", intent="greetings_hello", visited=[])
         assert all(key in agent_data for key in ["rasa_nlu_data", "responses"])
         assert "common_examples" in agent_data["rasa_nlu_data"]
         assert agent_data["rasa_nlu_data"]["common_examples"] == self.mock_data["expected_agent_intent_data_recursive"]["rasa_nlu_data"]["common_examples"]
