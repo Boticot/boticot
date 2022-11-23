@@ -7,6 +7,7 @@ import sys
 sys.path.append("..")
 from agents_service import AgentsService
 from flask import current_app, send_from_directory
+from security_decorator import api_auth_required
 
 @current_app.route("/nlu/agents", methods=["GET"])
 @jwt_required
@@ -71,6 +72,7 @@ def delete_agent_intent(agent_name, intent_name):
     return response_template(200, "Intent {1} of agent {0} successfully deleted".format(agent_name, intent_name))
 
 @current_app.route("/nlu/agents/<agent_name>/parse", methods=["POST"])
+@api_auth_required
 def parse(agent_name):
     """Parse a text to get nlu response with intent/entities assosciated"""
     if request.get_data():
