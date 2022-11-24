@@ -375,7 +375,7 @@ class AgentsService(object):
         remove_file_or_dir(file_path)
         if intent:
             if full_tree:
-                dic = self.get_agent_intent_data_recursive(agent_name, intent)
+                dic = self.get_agent_intent_data_recursive(agent_name, intent, visited=[])
             else:
                 dic = self.get_agent_intent_data(agent_name, intent)
         else:
@@ -403,7 +403,7 @@ class AgentsService(object):
         agent["responses"] = ResponsesService.get_instance().get_agent_responses(agent_name, intent)
         return agent
     
-    def get_agent_intent_data_recursive(self, agent_name, intent, agent=None):
+    def get_agent_intent_data_recursive(self, agent_name, intent, visited, agent=None):
         if agent is None:
             agent = {}
             agent["rasa_nlu_data"] = {}
@@ -413,16 +413,21 @@ class AgentsService(object):
         if not "common_examples" in agent["rasa_nlu_data"] and data["rasa_nlu_data"]["common_examples"]:
             agent["rasa_nlu_data"]["common_examples"] = data["rasa_nlu_data"]["common_examples"]
         elif data["rasa_nlu_data"]["common_examples"]:
-            agent["rasa_nlu_data"]["common_examples"].append(data["rasa_nlu_data"]["common_examples"][0])
+            for example in data["rasa_nlu_data"]["common_examples"]:
+                agent["rasa_nlu_data"]["common_examples"].append(example)
         if not "responses" in agent and "responses" in data and data["responses"]:
             agent["responses"] = data["responses"]
         elif "responses" in data and data["responses"]:
-            agent["responses"].append(data["responses"][0])
+            for resp in data["responses"]:
+                agent["responses"].append(resp)
         
         '''Retrieving data from all nested intents (suggested intents)'''
         nested_intents = self.get_nested_intents(data)
         for n_intent in nested_intents:
-            agent = self.get_agent_intent_data_recursive(agent_name, n_intent, agent)
+            if n_intent in visited:
+                continue
+            visited.append(n_intent)
+            agent = self.get_agent_intent_data_recursive(agent_name, n_intent, visited, agent)
         return agent
     
     def get_nested_intents(self, data):
