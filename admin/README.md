@@ -1,23 +1,25 @@
 ## Boticot Admin QuickStart
 
-You should be in admin folder and follow the next steps:
+Recommended NodeJS version: **16.18**
 
-### Project setup
+You should be in /admin folder and follow the next steps:
+
+#### Install dependencies
 ```
 yarn install
 ```
 
-#### Compiles and hot-reloads for development
+#### Run with hot-reload for development
 ```
 yarn serve
 ```
 
-#### Compiles and minifies for production
+#### Compile and minify for production
 ```
 yarn build
 ```
 
-#### Lints and fixes files
+#### Lint and fix files
 ```
 yarn lint
 ```
