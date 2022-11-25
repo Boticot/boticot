@@ -321,7 +321,6 @@ export default Vue.extend({
     };
   },
   mounted() {
-    this.response = JSON.parse(JSON.stringify(this.response));
     this.response.selectedIntent = this.intent;
     this.response.type = this.type;
     if (Object.keys(this.editOptions.obj).length > 0) {
@@ -354,6 +353,8 @@ export default Vue.extend({
         imageUrl: '',
         _id: '',
       };
+      this.response.selectedIntent = this.intent;
+      this.response.type = this.type;
     },
     parseHtml() {
       const { quillEditor }: any = this.$refs;
