@@ -67,28 +67,28 @@
           v-else
           :suggestions="responses['suggestions']" :agent-name="agentName"
           :style="{ 'width': 'max-content', 'display': 'flex', 'justify-content': 'center' }"
-          :baseIntent="{ 'suggestion_intent': intent, '_id': '' }" :isRoot="true"
+          :baseIntent="{ 'suggestion_intent': intent, '_id': '', isRoot: true }" :isRoot="true"
           :selectedIntent="selectedIntentInTree" :key="intentTreeKey" v-on:select-intent="selectIntentInTree">
           </SuggestionsTree>
         </div>
         <div v-if="tab.name === 'suggestions'" style="display: flex; justify-content: end; margin-top: 20px;">
           <el-button type="primary" icon="el-icon-edit"
           :disabled="selectedIntentInTree._id === '0' ||
-          selectedIntentInTree.suggestion_intent === intent"
+          selectedIntentInTree.isRoot"
             @click="editResponse({ name: 'suggestions', type: 'SUGGESTION' }, selectedIntentInTree)"
             :style="{ marginLeft: '15px' }" plain>
             Edit suggestion
           </el-button>
           <el-button type="primary" icon="el-icon-view"
           :disabled="selectedIntentInTree._id === '0' ||
-          selectedIntentInTree.suggestion_intent === intent ||
+          selectedIntentInTree.isRoot ||
           !selectedIntentInTree.suggestion_intent"
             @click="selectIntent(selectedIntentInTree.suggestion_intent)" :style="{ marginLeft: '15px' }" plain>
             View intent
           </el-button>
           <el-button type="danger" icon="el-icon-delete"
           :disabled="selectedIntentInTree._id === '0' ||
-          selectedIntentInTree.suggestion_intent === intent"
+          selectedIntentInTree.isRoot"
             @click="deleteResponseById(selectedIntentInTree._id)" :style="{ marginLeft: '15px' }" plain>
             Delete suggestion
           </el-button>
@@ -154,7 +154,7 @@ export default Vue.extend({
         images: Array<any>(),
         links: Array<any>(),
       },
-      selectedIntentInTree: { _id: '0', suggestion_intent: '' },
+      selectedIntentInTree: { _id: '0', suggestion_intent: '', isRoot: false },
       intentTreeKey: 0,
       responseEditorKey: 0,
       activeTab: 'texts',
@@ -234,7 +234,7 @@ export default Vue.extend({
     async deleteResponseById(id: string) {
       await deleteResponse(id);
       this.responses = await getResponses(this.agentName, this.intent);
-      this.selectedIntentInTree = { _id: '0', suggestion_intent: '' };
+      this.selectedIntentInTree = { _id: '0', suggestion_intent: '', isRoot: false };
       this.intentTreeKey += 1;
     },
     showRichTextPreview(id: string) {

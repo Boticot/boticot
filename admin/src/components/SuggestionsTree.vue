@@ -126,9 +126,9 @@ export default Vue.extend({
 <style>
 .tree .root {
   border: 1px solid #eaeaea !important;
-  -webkit-box-shadow:inset 0px 0px 0px 2px lightblue;
-  -moz-box-shadow:inset 0px 0px 0px 2px lightblue;
-  box-shadow:inset 0px 0px 0px 2px lightblue;
+  -webkit-box-shadow:inset 0px 0px 0px 2px rgb(187, 187, 187);
+  -moz-box-shadow:inset 0px 0px 0px 2px rgb(187, 187, 187);
+  box-shadow:inset 0px 0px 0px 2px rgb(187, 187, 187);
 }
 
 .tree .single-select {
