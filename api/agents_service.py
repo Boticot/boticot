@@ -256,6 +256,14 @@ class AgentsService(object):
         self.agents_repository.delete_agent_intent(agent_name, intent_name)
         self.training_data_repository.delete_agent_training_data_by_intent(agent_name, intent_name)
         self.responses_repository.delete_agent_responses_by_intent(agent_name, intent_name)
+        self.agents_repository.agent_modified(agent_name)
+
+    def update_agent_intent(self, agent_name, intent_name, new_intent_name):
+        self.agents_repository.update_agent_intent(agent_name, intent_name, new_intent_name)
+        self.training_data_repository.update_agent_training_data_intent(agent_name, intent_name, new_intent_name)
+        self.responses_repository.update_agent_responses_intent(agent_name, intent_name, new_intent_name)
+        self.responses_repository.update_agent_suggestion_responses_intent(agent_name, intent_name, new_intent_name)
+        self.agents_repository.agent_modified(agent_name)
 
     def cleanup_agent(self, agent_name):
         self.agents_repository.delete_agent(agent_name)
@@ -396,6 +404,39 @@ class AgentsService(object):
         agent["responses"] = ResponsesService.get_instance().get_agent_responses(agent_name)
         return agent
     
+    def import_agent_intent_data(self, agent_name, training_data, responses):
+        try: 
+            intents = set()
+            for t_data in training_data:
+                intents.add(t_data["intent"])
+            mapped_responses = []
+            for response in responses:
+                mapped_responses.append({
+                    "agent_name": agent_name,
+                    "intent": response["intent"],
+                    "response_type": response["response_type"],
+                    "data": response["data"]
+                })
+                intents.add(response["intent"])
+            
+            self.agents_repository.update_agent_intents(agent_name, list(intents))
+            self.add_agent_training_data(agent_name, training_data)
+            self.responses_repository.insert_responses(mapped_responses)
+        except Exception as e:
+            logger.error("Error adding intents to agent {0}. {1}".format(agent_name, e), exc_info=True)
+
+    def add_agent_intent(self, agent_name, intent, training_data):
+        try:
+            self.agents_repository.update_agent_intents(agent_name, [intent])
+            if training_data and isinstance(training_data, list) and len(training_data) > 0:
+                td_list = []
+                for td in training_data:
+                    td_list.append({"agent_name": agent_name, "data": {"intent": intent, "text": td}})
+                self.training_data_repository.insert_training_data(td_list)
+                self.agents_repository.agent_modified(agent_name)
+        except Exception as e:
+                logger.error("Error adding intents to agent {0}. {1}".format(agent_name, e), exc_info=True)
+
     def get_agent_intent_data(self, agent_name, intent):
         agent = {}
         agent["rasa_nlu_data"] = {}
