@@ -4,9 +4,17 @@
       <h4 class="textAlignCenter">Agent Responses</h4>
       <el-form :model="selection" ref="selection" label-width="150px" label-position="left">
         <el-form-item label="Intent" prop='selectedIntent'>
-          <el-select v-model="selection.selectedIntent" filterable placeholder="Select Intent" @change="selectIntent">
-            <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
-          </el-select>
+          <el-tooltip
+            class="box-item"
+            :content="selection.selectedIntent || 'No intent selected'"
+            placement="top-start"
+            effect="light"
+          >
+            <el-select v-model="selection.selectedIntent" filterable style="width: 40%;"
+            placeholder="Select Intent" @change="selectIntent">
+              <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
+            </el-select>
+          </el-tooltip>
         </el-form-item>
         <el-form-item label="Response type">
           <el-radio-group v-model="selection.type" @change="selectResponseType">

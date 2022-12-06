@@ -61,6 +61,21 @@ const getAgentIntentFile = async (agentName: string, intent: string, fullTree: b
   return agent.data;
 };
 
+const addAgentIntents = async (agentName: string, body: any): Promise<any> => {
+  const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const urlBase = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}`;
+  const url = `${urlBase}/${agentName}/intents`;
+  const opt = {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
+    },
+  };
+  const response = await axios.post(url, body, opt);
+  return response.data;
+};
+
 const addAgent = async (body: any): Promise<any> => {
   const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
   const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}`;
@@ -100,6 +115,37 @@ const deleteAgentIntent = async (agentName: string, intent: string): Promise<any
     },
   };
   const response = await axios.delete(url, opt);
+  return response.data;
+};
+
+const addAgentIntent = async (body: any, agentName: string): Promise<any> => {
+  const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/intent`;
+  const opt = {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
+    },
+  };
+  const response = await axios.post(url, body, opt);
+  return response.data;
+};
+
+const updateAgentIntent = async (agentName: string, intent: string, newIntent: string): Promise<any> => {
+  const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${agentName}/intents/${intent}`;
+  const opt = {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
+    },
+  };
+  const body = {
+    new_intent_name: newIntent,
+  };
+  const response = await axios.put(url, body, opt);
   return response.data;
 };
 
@@ -158,6 +204,9 @@ export {
   getAgent,
   deleteAgent,
   deleteAgentIntent,
+  addAgentIntent,
+  updateAgentIntent,
   getAgentFile,
   getAgentIntentFile,
+  addAgentIntents,
 };

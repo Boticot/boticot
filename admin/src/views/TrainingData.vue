@@ -2,9 +2,16 @@
   <div class="training-data halfSize" v-loading="loading">
     <el-row :gutter="10">
         <el-col :span="10">
-          <el-select class="w-100" v-model="intentName" clearable="true" placeholder="Search by intent">
-            <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
-          </el-select>
+          <el-tooltip
+              class="box-item"
+              :content="intentName || 'No intent selected'"
+              placement="top-start"
+              effect="light"
+            >
+            <el-select class="w-100" v-model="intentName" clearable="true" placeholder="Search by intent">
+              <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
+            </el-select>
+          </el-tooltip>
         </el-col>
         <el-col :span="10">
           <el-input placeholder="Search by text" v-model="text"></el-input>
