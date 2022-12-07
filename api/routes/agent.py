@@ -70,6 +70,19 @@ def delete_agent_intent(agent_name, intent_name):
     AgentsService.get_instance().delete_agent_intent(agent_name, intent_name)
     return response_template(200, "Intent {1} of agent {0} successfully deleted".format(agent_name, intent_name))
 
+@current_app.route("/nlu/agents/<agent_name>/intents/<intent_name>", methods=["PUT"])
+@jwt_required
+def update_agent_intent(agent_name, intent_name):
+    if request.get_data():
+        request_data = json.loads((request.get_data()).decode())
+        new_intent_name = request_data.get("new_intent_name")
+        if new_intent_name is None or new_intent_name == "":
+            return response_template(400, "New intent name field is mandatory")
+        AgentsService.get_instance().update_agent_intent(agent_name, intent_name, new_intent_name)
+    else:
+        return response_template(400, "Shoulds Contains a valid body") 
+    return response_template(200, "Intent {1} of agent {0} successfully deleted".format(agent_name, intent_name))
+
 @current_app.route("/nlu/agents/<agent_name>/parse", methods=["POST"])
 def parse(agent_name):
     """Parse a text to get nlu response with intent/entities assosciated"""
@@ -129,3 +142,37 @@ def get_intents_file(agent_name, intent):
     full_tree = request.args.get("fullTree", default = False, type = lambda v: v.lower() == 'true')
     directory_name, file_name = AgentsService.get_instance().create_agent_file(agent_name = agent_name, intent = intent, full_tree = full_tree)
     return(send_from_directory(directory = directory_name, filename = "./" + file_name, as_attachment = True))
+
+# Create multiple intents, responses and training data
+@current_app.route("/nlu/agents/<agent_name>/intents", methods=["POST"])
+@jwt_required
+def import_intents(agent_name):
+    if agent_name is None or agent_name == "":
+        return response_template(400, "Agent name field is mandatory")
+    if request.get_data():
+        request_data = json.loads((request.get_data()).decode())
+        training_data = request_data.get("training_data")
+        responses = request_data.get("responses")
+        if training_data is None or responses is None:
+            return response_template(400, "Invalid request body")
+        AgentsService.get_instance().import_agent_intent_data(agent_name, training_data, responses)
+        return response_template(200, "Intents were successfully imported for agent {0}".format(agent_name))
+    else:
+        return response_template(400, "A body is mandatory inside the request")
+
+# Create a single intent and training data only
+@current_app.route("/nlu/agents/<agent_name>/intent", methods=["POST"])
+@jwt_required
+def create_intent(agent_name):
+    if agent_name is None or agent_name == "":
+        return response_template(400, "Agent name field is mandatory")
+    if request.get_data():
+        request_data = json.loads((request.get_data()).decode())
+        training_data = request_data.get("training_data")
+        intent = request_data.get("intent")
+        if training_data is None or intent is None:
+            return response_template(400, "Invalid request body")
+        AgentsService.get_instance().add_agent_intent(agent_name, intent, training_data)
+        return response_template(200, "Intent {0} successfully imported for agent {1}".format(intent, agent_name))
+    else:
+        return response_template(400, "A body is mandatory inside the request")

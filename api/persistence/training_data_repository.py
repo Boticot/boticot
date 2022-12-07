@@ -44,8 +44,11 @@ class TrainingDataRepository():
             self.training_data_collection.update_one({"agent_name": agent_name, "_id": ObjectId(id)}, {"$set": {"data": data}}, upsert = True)
             return True
         except:
-            return False   
-
+            return False
+    
+    def update_agent_training_data_intent(self, agent_name, intent_name, new_intent_name):
+            return self.training_data_collection.update_many({"agent_name": agent_name, "data.intent": intent_name}, {"$set": {"data.intent": new_intent_name}}) 
+    
     def insert_training_data(self, data):
         """Add sequentially multiple training data based on bulk size"""
         bulk_insert_size = int(os.environ.get("BULK_INSERT_SIZE", 500))

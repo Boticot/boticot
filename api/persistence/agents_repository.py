@@ -54,6 +54,16 @@ class AgentsRepository():
             { "$pull": { "intents": intent } }
         )
     
+    def update_agent_intent(self, agent_name, intent_name, new_intent_name):
+        self.agents_collection.update_one(
+            {"name": agent_name},
+            { "$pull": { "intents": intent_name } }
+        )
+        return self.agents_collection.update_one(
+            {"name": agent_name}, 
+            { "$addToSet": { "intents": new_intent_name } }
+        )
+    
     def update_agent_entities(self, agent_name, entities):
         """Add/update agent entities"""
         return self.agents_collection.update_one(
