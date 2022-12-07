@@ -23,6 +23,9 @@ class AgentsRepository():
     def insert_agent(self, data):
         return self.agents_collection.insert_one(data)
 
+    def update_agent(self, agent_name, data):
+        self.agents_collection.update_one({"name": agent_name}, {"$set": data })
+
     def agent_modified(self, agent_name):
         """update last modified field by the current timestamp"""
         last_modified = int(datetime.timestamp(datetime.now()))
