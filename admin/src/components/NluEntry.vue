@@ -45,10 +45,17 @@
       >
         <el-row>
           <el-col v-if="!isAddNewIntent">
-            <el-select v-model="newIntentValue" filterable placeholder="Select Intent" @change="selectNewIntent">
-              <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
-              <el-option v-if="!isReadUser()" label="Create New Intent" value="NEW_INTENT"></el-option>
-            </el-select>
+            <el-tooltip
+              class="box-item"
+              :content="newIntentValue || 'No intent selected'"
+              placement="top-start"
+              effect="light"
+            >
+              <el-select v-model="newIntentValue" filterable placeholder="Select Intent" @change="selectNewIntent">
+                <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
+                <el-option v-if="!isReadUser()" label="Create New Intent" value="NEW_INTENT"></el-option>
+              </el-select>
+            </el-tooltip>
           </el-col>
           <el-col v-else>
             <el-input
@@ -56,6 +63,9 @@
               v-model="newIntentValue"
               style="width: 50%; margin: auto;"
             ></el-input>
+            <div v-if="textMsg !== ''" :class="classMsg" class="marginBottomMedium">
+            {{ textMsg }}
+            </div>
           </el-col>
         </el-row>
         <el-row class="marginTopSmall">
@@ -136,6 +146,8 @@ const NluEntryComponent = Vue.extend({
       newIntentValue: this.data.intent.name,
       isAddNewIntent: false,
       isHideElement: false,
+      textMsg: '',
+      classMsg: '',
     };
   },
   watch: {
@@ -261,6 +273,12 @@ const NluEntryComponent = Vue.extend({
       this.isAddEntity = false;
     },
     validate(): void {
+      const format = /[`!@#$%^&*=[\]{};':"\\|,.<>/?~]/;
+      if (format.test(this.newIntentValue)) {
+        this.textMsg = 'Text includes forbidden special characters';
+        this.classMsg = 'errorMsg';
+        return;
+      }
       if (
         this.newIntentValue
         && this.newIntentValue !== this.data.intent.name
@@ -282,6 +300,8 @@ const NluEntryComponent = Vue.extend({
         message: `Data added: '${this.data.text}'`,
         offset: 100,
       });
+      this.textMsg = '';
+      this.classMsg = '';
     },
     remove(): void {
       deleteElement(this.data.type, this.agentName, this.data.id);

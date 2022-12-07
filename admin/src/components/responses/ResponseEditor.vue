@@ -54,11 +54,18 @@
         </div>
       </el-form-item>
       <el-form-item v-if="showSuggestionIntentForm" label="Intent" prop='suggestionIntent'>
-        <div style="display: flex; flex-direction: column; justify-content: start; width:14rem;">
-          <el-select v-model="response.suggestionIntent" filterable placeholder="Select an intent">
-            <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
-            <el-option label="Create New Intent" value="NEW_INTENT"></el-option>
-          </el-select>
+        <div style="display: flex; flex-direction: column; justify-content: start; width:40%;">
+          <el-tooltip
+            class="box-item"
+            :content="response.suggestionIntent || 'No intent selected'"
+            placement="top-start"
+            effect="light"
+          >
+            <el-select v-model="response.suggestionIntent" filterable placeholder="Select an intent">
+              <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
+              <el-option label="Create New Intent" value="NEW_INTENT"></el-option>
+            </el-select>
+          </el-tooltip>
         </div>
       </el-form-item>
       <el-form-item v-if="showSuggestionNewIntentForm" label="New intent" prop='suggestionNewIntent'>
@@ -210,6 +217,10 @@ export default Vue.extend({
       if (value === '' && response.type === 'SUGGESTION' && response.suggestionLinkedTo === 'INTENT'
       && response.suggestionIntent === 'NEW_INTENT') {
         callback(new Error('Please input new Intent'));
+      }
+      const format = /[`!@#$%^&*=[\]{};':"\\|,.<>/?~]/;
+      if (format.test(value)) {
+        callback(new Error('Text includes forbidden special characters'));
       }
       callback();
     };

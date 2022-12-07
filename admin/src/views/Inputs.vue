@@ -2,9 +2,16 @@
   <div class="inputs halfSize" v-loading="loading">
     <el-row :gutter="10">
         <el-col :span="10">
-          <el-select class="w-100" v-model="intentName" clearable="true" placeholder="Search by intent">
-            <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
-          </el-select>
+          <el-tooltip
+              class="box-item"
+              :content="intentName || 'No intent selected'"
+              placement="top-start"
+              effect="light"
+            >
+            <el-select class="w-100" v-model="intentName" clearable="true" placeholder="Search by intent">
+              <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
+            </el-select>
+          </el-tooltip>
         </el-col>
         <el-col :span="10">
           <el-input placeholder="Search by text" v-model="text"></el-input>
@@ -16,11 +23,11 @@
     <h3 class="marginBottomMedium">
       <span>Users Inputs count: {{count}}</span>
       <el-button
-            type="primary"
-            @click="pageChange(1)"
-            icon="el-icon-refresh-right"
-            :style="{ marginLeft: '15px' }"
-            plain>
+        type="primary"
+        @click="pageChange(1)"
+        icon="el-icon-refresh-right"
+        :style="{ marginLeft: '15px' }"
+        plain>
       </el-button>
     </h3>
     <el-pagination v-if="count != 0" background layout="prev, pager, next" @current-change="pageChange"
