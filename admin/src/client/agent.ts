@@ -86,6 +86,20 @@ const addAgent = async (body: any): Promise<any> => {
       Authorization: `Bearer ${store.getters.authToken()}`,
     },
   };
+  const response = await axios.post(url, body, opt);
+  return response.data;
+};
+
+const updateAgent = async (body: any): Promise<any> => {
+  const { VUE_APP_NLU_SERVICE_URL, VUE_APP_NLU_PATH } = process.env;
+  const url = `${VUE_APP_NLU_SERVICE_URL}${VUE_APP_NLU_PATH}/${body.name}`;
+  const opt = {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+      Authorization: `Bearer ${store.getters.authToken()}`,
+    },
+  };
   const response = await axios.put(url, body, opt);
   return response.data;
 };
@@ -198,6 +212,7 @@ const parseText = async (agentName: string, text: string): Promise<any> => {
 export {
   getAgents,
   addAgent,
+  updateAgent,
   getInputs,
   deleteInput,
   parseText,

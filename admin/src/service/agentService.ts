@@ -1,4 +1,9 @@
-import { getAgents, addAgent, deleteInput } from '@/client/agent';
+import {
+  getAgents,
+  addAgent,
+  updateAgent,
+  deleteInput,
+} from '@/client/agent';
 import { deleteTrainingData, updateTrainingData, addTrainingData } from '@/client/trainingData';
 import { EntryType, NluData } from '@/types';
 
@@ -39,8 +44,8 @@ const updateElement = async (agentName: string, nluData: NluData): Promise<void>
   }
 };
 
-const createNewAgent = async (agentName: string, configType: string, language: string,
-  configuration: any, fallback: number, trainingData: any, defaultResponses: any): Promise<void> => {
+const createAgent = async (agentName: string, configType: string, language: string,
+  configuration: any, fallback: number, trainingData: any, defaultResponses: any, update: boolean): Promise<void> => {
   let nluPipeline = {};
   if (configType === 'supervised_embeddings') {
     nluPipeline = { language, pipeline: configType };
@@ -51,13 +56,15 @@ const createNewAgent = async (agentName: string, configType: string, language: s
     name: agentName,
     config: nluPipeline,
     fallback: fallback / 100,
-    rasa_nlu_data: trainingData,
-    responses: defaultResponses,
+    ...(!update && { rasa_nlu_data: trainingData }),
+    ...(!update && { responses: defaultResponses }),
   };
-  const response = await addAgent(data);
+  let response: any;
+  if (update) response = await updateAgent(data);
+  else response = await addAgent(data);
   return response;
 };
 
 export {
-  getAgentsNames, deleteElement, updateElement, createNewAgent,
+  getAgentsNames, deleteElement, updateElement, createAgent,
 };
