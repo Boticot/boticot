@@ -238,6 +238,22 @@ class AgentsService(object):
             self.bots[agent_name] = Agent()
         except Exception as e:
             logger.error("Exception when creating agent {0}. {1}".format(agent_name, e), exc_info=True)
+    
+    def update_agent(self, agent_name, config, fallback):
+        try:
+            """Update agent"""
+            mappedData = {
+                "name": agent_name,
+                "config": config,
+                "fallback": fallback,
+            }
+            old_agent = self.agents_repository.find_agent(agent_name)
+            self.agents_repository.update_agent(agent_name, mappedData)
+            if old_agent["config"] != config:
+                self.agents_repository.agent_modified(agent_name)
+            
+        except Exception as e:
+            logger.error("Exception when updating agent {0}. {1}".format(agent_name, e), exc_info=True)
 
     def delete_agent(self, agent_name):
         """ Remove entries in database """
@@ -397,6 +413,7 @@ class AgentsService(object):
         agent_data = self.get_agent(agent_name)
         agent = {}
         agent["config"] = agent_data.get("config")
+        agent["fallback"] = agent_data.get("fallback")
         agent["rasa_nlu_data"] = {}
         agent["rasa_nlu_data"]["common_examples"] = self.get_agent_training_data(agent_name)
         agent["rasa_nlu_data"]["lookup_tables"] = self.get_agent_lookups(agent_name)

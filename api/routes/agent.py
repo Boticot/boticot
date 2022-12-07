@@ -27,7 +27,7 @@ def get_agent_file(agent_name):
     directory_name, file_name = AgentsService.get_instance().create_agent_file(agent_name = agent_name)
     return(send_from_directory(directory = directory_name, filename = "./" + file_name, as_attachment = True))
 
-@current_app.route("/nlu/agents", methods=["PUT"])
+@current_app.route("/nlu/agents", methods=["POST"])
 @jwt_required
 def create_agent():
     agent_name = ""
@@ -57,6 +57,25 @@ def create_agent():
     else:
         return response_template(400, "Shoulds Contains a valid body or file of new Agent") 
     return response_template(201, "Agent {0} successfully created".format(agent_name))
+
+@current_app.route("/nlu/agents/<agent_name>", methods=["PUT"])
+@jwt_required
+def update_agent(agent_name):
+    agent_name = ""
+    if request.get_data():
+        """Create agent with data passed directly inside query"""
+        request_data = json.loads((request.get_data()).decode())
+        agent_name = request_data.get("name")
+        if agent_name is None or agent_name == "":
+            return response_template(400, "Agent name field is mandatory")
+        elif not AgentsService.get_instance().agent_exist(agent_name):
+            return response_template(400, "Agent {0} does not exist".format(agent_name))
+        elif request_data.get("config") is None:
+            return response_template(400, "Should Contains config field inside body request")
+        AgentsService.get_instance().update_agent(agent_name, request_data.get("config"), request_data.get("fallback"))
+    else:
+        return response_template(400, "Shoulds Contains a valid body or file of new Agent") 
+    return response_template(201, "Agent {0} successfully updated".format(agent_name))
 
 @current_app.route("/nlu/agents/<agent_name>", methods=["DELETE"])
 @jwt_required
