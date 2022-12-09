@@ -452,6 +452,7 @@ export default Vue.extend({
                   message: 'Synonyms created successfully',
                 });
                 this.addIntentDialogVisible = false;
+                this.$store.commit('addIntent', this.addIntentForm.value);
                 this.updateModelDetails();
                 this.addIntentForm = {
                   training_data: Array<any>(),

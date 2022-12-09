@@ -8,7 +8,7 @@
               placement="top-start"
               effect="light"
             >
-            <el-select class="w-100" v-model="intentName" clearable="true" placeholder="Search by intent">
+            <el-select class="w-100" v-model="intentName" filterable clearable="true" placeholder="Search by intent">
               <el-option v-for="choice in allIntents" :key="choice" :label="choice" :value="choice"></el-option>
             </el-select>
           </el-tooltip>
