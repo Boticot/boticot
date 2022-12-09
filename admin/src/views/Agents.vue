@@ -41,7 +41,7 @@
           <template slot-scope="scope">
             <el-button
             type="danger"
-            @click="deleteAgent(scope.row.name)"
+            @click="openDeleteDialog(scope.row.name)"
             icon="el-icon-delete"
             :style="{ marginLeft: '15px' }"
             plain
@@ -66,6 +66,19 @@
       v-on:updated="agentUpdated">
       </AgentEditor>
     </el-dialog>
+    <el-dialog :visible.sync="deleteAgentDialogVisible">
+      <div style="font-size: 18px;">
+        Are you sure you want to delete agent "{{agentToDelete}}"?
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="deleteAgentDialogVisible = false">Cancel</el-button>
+          <el-button type="danger" @click="deleteAgent(agentToDelete)">
+            Delete agent
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -87,6 +100,8 @@ export default Vue.extend({
       hideExistingAgents: false,
       loading: false,
       editDialogVisible: false,
+      deleteAgentDialogVisible: false,
+      agentToDelete: '',
       editData: {
         name: '',
         language: 'en',
@@ -106,7 +121,12 @@ export default Vue.extend({
     ]),
   },
   methods: {
+    openDeleteDialog(agent: string) {
+      this.agentToDelete = agent;
+      this.deleteAgentDialogVisible = true;
+    },
     deleteAgent(name: string) {
+      this.deleteAgentDialogVisible = false;
       deleteAgent(name);
       this.$store.commit('deleteAgent', name);
       this.agents = this.agents.filter((e: any) => (e.name !== name));

@@ -51,7 +51,7 @@
           </el-table-column>
           <el-table-column fixed="right" width="90">
             <template slot-scope="scope">
-              <el-button type="danger" @click="deleteResponseById(scope.row._id)" icon="el-icon-delete"
+              <el-button type="danger" @click="openDeleteDialog(scope.row._id)" icon="el-icon-delete"
                 :style="{ marginLeft: '15px' }" plain></el-button>
             </template>
           </el-table-column>
@@ -89,7 +89,7 @@
           <el-button type="danger" icon="el-icon-delete"
           :disabled="selectedIntentInTree._id === '0' ||
           selectedIntentInTree.isRoot"
-            @click="deleteResponseById(selectedIntentInTree._id)" :style="{ marginLeft: '15px' }" plain>
+            @click="openDeleteDialog(selectedIntentInTree._id)" :style="{ marginLeft: '15px' }" plain>
             Delete suggestion
           </el-button>
         </div>
@@ -110,6 +110,19 @@
       v-on:added-response="updateResponses"
       :editOptions="editOptions">
       </ResponseEditor>
+    </el-dialog>
+    <el-dialog :visible.sync="deleteResponseDialogVisible">
+      <div style="font-size: 18px;">
+        Are you sure you want to delete response ?
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="deleteResponseDialogVisible = false">Cancel</el-button>
+          <el-button type="danger" @click="deleteResponseById(responseIdToDelete)">
+            Delete response
+          </el-button>
+        </span>
+      </template>
     </el-dialog>
   </el-card>
   <div v-else style="margin-top: 40px;" v-loading="loadingResponses"></div>
@@ -201,6 +214,8 @@ export default Vue.extend({
       },
       editDialogVisible: false,
       loadingResponses: false,
+      deleteResponseDialogVisible: false,
+      responseIdToDelete: '',
     };
   },
   computed: {
@@ -231,7 +246,12 @@ export default Vue.extend({
     async selectResponseType() {
       this.responseEditorKey += 1;
     },
+    openDeleteDialog(id: string) {
+      this.responseIdToDelete = id;
+      this.deleteResponseDialogVisible = true;
+    },
     async deleteResponseById(id: string) {
+      this.deleteResponseDialogVisible = false;
       await deleteResponse(id);
       this.responses = await getResponses(this.agentName, this.intent);
       this.selectedIntentInTree = { _id: '0', suggestion_intent: '', isRoot: false };

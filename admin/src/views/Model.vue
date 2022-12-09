@@ -125,7 +125,7 @@
           <template slot-scope="scope">
             <el-button
             type="danger"
-            @click="deleteSelectedIntent(scope.row.intent)"
+            @click="openDeleteDialog(scope.row.intent)"
             icon="el-icon-delete"
             :style="{ marginLeft: '15px' }"
             plain
@@ -147,6 +147,19 @@
           <el-button @click="dialogIntentVisible = false">Cancel</el-button>
           <el-button type="primary" @click="updateIntent">
             Edit intent
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+    <el-dialog :visible.sync="deleteIntentDialogVisible">
+      <div style="font-size: 18px;">
+        Are you sure you want to delete intent "{{intentToDelete}}"?
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="deleteIntentDialogVisible = false">Cancel</el-button>
+          <el-button type="danger" @click="deleteSelectedIntent(intentToDelete)">
+            Delete intent
           </el-button>
         </span>
       </template>
@@ -189,6 +202,8 @@ export default Vue.extend({
       file: null,
       fileContent: null,
       dialogIntentVisible: false,
+      deleteIntentDialogVisible: false,
+      intentToDelete: '',
       intentNameEdit: '',
       previousIntentName: '',
       addIntentDialogVisible: false,
@@ -227,8 +242,13 @@ export default Vue.extend({
       }
       this.config = JSON.stringify(agentResponse.config, null, 2);
     },
+    openDeleteDialog(intent: string) {
+      this.intentToDelete = intent;
+      this.deleteIntentDialogVisible = true;
+    },
     async deleteSelectedIntent(intent: string) {
       try {
+        this.deleteIntentDialogVisible = false;
         await deleteAgentIntent(this.agentName, intent);
         this.$store.commit('deleteIntent', intent);
         this.intents = this.intents.filter((i: any) => (i.intent !== intent));
