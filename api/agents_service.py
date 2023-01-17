@@ -554,15 +554,3 @@ class AgentsService(object):
 
     def get_models(self, agent_name):
         return self.agents_repository.get_versions(agent_name).get("versions")
-
-    def get_analytics(self, agent_name, days_number):
-        analytics_response = {
-            "agent_name": agent_name,
-            "analytics": []
-        }
-        analytics = self.analytics_repository.find_agent_analytics(agent_name, days_number)
-        for analytic in analytics:    
-            del analytic["_id"]
-            del analytic["agent_name"]
-            analytics_response.get("analytics").append(analytic)
-        return analytics_response
